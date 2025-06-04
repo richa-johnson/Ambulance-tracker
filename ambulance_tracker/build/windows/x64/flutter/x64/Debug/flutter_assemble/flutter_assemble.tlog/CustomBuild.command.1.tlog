@@ -1,0 +1,28 @@
+^C:\USERS\DIYAB\ONEDRIVE\DESKTOP\RESQROUTE\AMBULANCE-TRACKER\AMBULANCE_TRACKER\BUILD\WINDOWS\X64\CMAKEFILES\FB4496612A48167A84FED610BE85AB6A\FLUTTER_WINDOWS.DLL.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E env FLUTTER_ROOT=C:\Users\diyab\flutter PROJECT_DIR=C:\Users\diyab\OneDrive\Desktop\ResQRoute\Ambulance-tracker\ambulance_tracker FLUTTER_ROOT=C:\Users\diyab\flutter FLUTTER_EPHEMERAL_DIR=C:\Users\diyab\OneDrive\Desktop\ResQRoute\Ambulance-tracker\ambulance_tracker\windows\flutter\ephemeral PROJECT_DIR=C:\Users\diyab\OneDrive\Desktop\ResQRoute\Ambulance-tracker\ambulance_tracker FLUTTER_TARGET=C:\Users\diyab\OneDrive\Desktop\ResQRoute\Ambulance-tracker\ambulance_tracker\lib\main.dart DART_DEFINES=RkxVVFRFUl9WRVJTSU9OPTMuMzIuMQ==,RkxVVFRFUl9DSEFOTkVMPXN0YWJsZQ==,RkxVVFRFUl9HSVRfVVJMPWh0dHBzOi8vZ2l0aHViLmNvbS9mbHV0dGVyL2ZsdXR0ZXIuZ2l0,RkxVVFRFUl9GUkFNRVdPUktfUkVWSVNJT049YjI1MzA1YTg4Mw==,RkxVVFRFUl9FTkdJTkVfUkVWSVNJT049MTQyNWU1ZTllYw==,RkxVVFRFUl9EQVJUX1ZFUlNJT049My44LjE= DART_OBFUSCATION=false TRACK_WIDGET_CREATION=true TREE_SHAKE_ICONS=false PACKAGE_CONFIG=C:\Users\diyab\OneDrive\Desktop\ResQRoute\Ambulance-tracker\ambulance_tracker\.dart_tool\package_config.json C:/Users/diyab/flutter/packages/flutter_tools/bin/tool_backend.bat windows-x64 Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DIYAB\ONEDRIVE\DESKTOP\RESQROUTE\AMBULANCE-TRACKER\AMBULANCE_TRACKER\BUILD\WINDOWS\X64\CMAKEFILES\315A9DDC027970BD6221FBA97E6F0DBE\FLUTTER_ASSEMBLE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DIYAB\ONEDRIVE\DESKTOP\RESQROUTE\AMBULANCE-TRACKER\AMBULANCE_TRACKER\WINDOWS\FLUTTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/diyab/OneDrive/Desktop/ResQRoute/Ambulance-tracker/ambulance_tracker/windows -BC:/Users/diyab/OneDrive/Desktop/ResQRoute/Ambulance-tracker/ambulance_tracker/build/windows/x64 --check-stamp-file C:/Users/diyab/OneDrive/Desktop/ResQRoute/Ambulance-tracker/ambulance_tracker/build/windows/x64/flutter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
