@@ -1,4 +1,4 @@
-import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/registration/driver.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: homepage(),
+      home: DriverRegistration(),
     );
   }
 }
