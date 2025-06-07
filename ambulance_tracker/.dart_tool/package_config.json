@@ -170,6 +170,7 @@
       "languageVersion": "3.7"
     }
   ],
+  
   "generator": "pub",
   "generatorVersion": "3.8.1",
   "flutterRoot": "file:///C:/Users/diyab/flutter",
