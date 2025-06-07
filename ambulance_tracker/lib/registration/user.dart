@@ -1,4 +1,3 @@
-import 'dart:ffi' as ffi;
 
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:flutter/material.dart';
