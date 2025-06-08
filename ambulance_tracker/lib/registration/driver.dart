@@ -28,11 +28,6 @@ class DriverRegistrationState extends State<DriverRegistration> {
     'Kannur',
     'Kasaragod',
   ];
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> df1ca9569d6cdce6accd316f849ea7b2f06e25b3
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,11 +188,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-<<<<<<< HEAD
-                            "import license",
-=======
                             "IMPORT LICENSE",
->>>>>>> df1ca9569d6cdce6accd316f849ea7b2f06e25b3
                             style: TextStyle(
                               color: Colors.black.withAlpha(107),
                               fontSize: 16,
