@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class DriverRegistration extends StatefulWidget {
@@ -29,18 +28,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
     'Kannur',
     'Kasaragod',
   ];
-  File? pickedimage;
-  Future pickimage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    try {
-      if (picked == null) return;
-      final image = File(picked.path);
-      setState(() => pickedimage = image);
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,9 +189,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            pickedimage != null
-                                ? "Image selected"
-                                : "IMPORT LICENSE",
+                            "IMPORT LICENSE",
                             style: TextStyle(
                               color: Colors.black.withAlpha(107),
                               fontSize: 16,
@@ -216,7 +202,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                             color: Colors.black.withAlpha(107),
                             size: 20,
                           ),
-                          onPressed: pickimage,
+                          onPressed: DriverRegistration.new,
                         ),
                       ],
                     ),
