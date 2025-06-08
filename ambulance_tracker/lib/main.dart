@@ -1,5 +1,6 @@
 import 'package:ambulance_tracker/registration/driver.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
+import 'package:ambulance_tracker/registration/password.dart';
 import 'package:flutter/material.dart';
 
 void main() {
