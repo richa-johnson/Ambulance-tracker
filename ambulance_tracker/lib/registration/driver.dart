@@ -28,7 +28,6 @@ class DriverRegistrationState extends State<DriverRegistration> {
     'Kannur',
     'Kasaragod',
   ];
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -202,7 +201,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                             color: Colors.black.withAlpha(107),
                             size: 20,
                           ),
-                          onPressed: DriverRegistration.new,
+                          onPressed: homepage.new,
                         ),
                       ],
                     ),

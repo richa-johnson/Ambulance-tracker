@@ -12,5 +12,13 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
-/build/
+
 .dart_tool/
+.idea/
+build/
+*.iml
+.metadata
+ios/
+android/
+*.lock
+pubspec.lock
