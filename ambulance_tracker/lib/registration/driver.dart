@@ -112,7 +112,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         hint: Text(
                           'SELECT DISTRICT',
                           style: TextStyle(
-                            color: Colors.black.withAlpha(107),
+                            color: Color.fromRGBO(0, 0, 0, 42),
                             fontSize: 16,
                           ),
                         ),
@@ -162,7 +162,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         border: InputBorder.none,
                         hintText: 'FACILITIES',
                         hintStyle: TextStyle(
-                          color: Colors.black.withAlpha(107), // opacity ~ 42%
+                          color: Color.fromRGBO(0, 0, 0, 42), // opacity ~ 42%
                           fontSize: 16,
                         ),
                         contentPadding: EdgeInsets.symmetric(
@@ -196,7 +196,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                           child: Text(
                             "IMPORT LICENSE",
                             style: TextStyle(
-                              color: Colors.black.withAlpha(107),
+                              color: Color.fromRGBO(0, 0, 0, 42),
                               fontSize: 16,
                             ),
                           ),
@@ -270,7 +270,7 @@ class CustomTextField extends StatelessWidget {
             border: InputBorder.none,
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.black.withAlpha(107),
+              color: Color.fromRGBO(0, 0, 0, 42),
               fontSize: 16,
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
