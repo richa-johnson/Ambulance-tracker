@@ -1,4 +1,5 @@
 import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/registration/password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -129,7 +130,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                 ElevatedButton(onPressed: otpvalues.every((val) => val.isNotEmpty)
                 ?(){
                   Navigator.push(context, 
-                  MaterialPageRoute(builder: (context)=>homepage()),
+                  MaterialPageRoute(builder: (context)=>Password()),
                   );
                   }:null,
                   style: ElevatedButton.styleFrom(

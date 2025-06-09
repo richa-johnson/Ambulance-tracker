@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:ambulance_tracker/registration/user.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,7 @@ class _loginPageState extends State<loginPage> {
                   ElevatedButton(onPressed: (){
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context)=>homepage()),
+                      MaterialPageRoute(builder: (context)=>userdashboard()),
                     );
                   }, 
                   style: ElevatedButton.styleFrom(

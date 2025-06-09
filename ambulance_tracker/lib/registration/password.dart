@@ -1,4 +1,5 @@
 import "package:ambulance_tracker/registration/basic.dart";
+import "package:ambulance_tracker/registration/login.dart";
 import "package:flutter/material.dart";
 
 class Password extends StatefulWidget {
@@ -201,7 +202,7 @@ class _PasswordState extends State<Password> {
                           set.text.isNotEmpty) {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => homepage()),
+                          MaterialPageRoute(builder: (context) => loginPage()),
                         );
                         print("Password set successfully");
                       } else {

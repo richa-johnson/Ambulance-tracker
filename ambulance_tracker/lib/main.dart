@@ -1,7 +1,9 @@
+import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:ambulance_tracker/registration/driver.dart';
 import 'package:ambulance_tracker/registration/login.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:ambulance_tracker/registration/password.dart';
+import 'package:ambulance_tracker/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
        primarySwatch:Colors.blue
       ),
       debugShowCheckedModeBanner: false,
-      home: loginPage(),
+      home: SplashScreen(),
     );
   }
 }

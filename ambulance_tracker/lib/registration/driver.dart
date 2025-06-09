@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/registration/facilities_screen.dart';
+import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -166,10 +169,13 @@ class DriverRegistrationState extends State<DriverRegistration> {
                           horizontal: 12,
                           vertical: 16,
                         ),
-                        suffixIcon: Icon(
-                          Icons.add,
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.add),
                           color: Colors.black.withAlpha(107),
-                        ),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> FacilitiesScreen()));
+                          },
+                        )
                       ),
                     ),
                   ),
@@ -221,7 +227,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => homepage()),
+                        MaterialPageRoute(builder: (context) => OtpVerification()),
                       );
                       print('Account Registered');
                     },
