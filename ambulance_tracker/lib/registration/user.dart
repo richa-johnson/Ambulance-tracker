@@ -105,7 +105,7 @@ class _userRegistrationState extends State<userRegistration> {
                     child: DropdownButton<String>(
                         value: selectedDistrict,           
                         hint: Padding(padding: const EdgeInsets.only(left:19),
-                          child: Text("DISTRICT"),
+                          child: Text("DISTRICT", style: TextStyle(color: Color.fromRGBO(0, 0, 0, 42))),
                         ),
                         items: district.map((String item) {
                           return DropdownMenuItem<String>(
