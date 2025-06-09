@@ -1,4 +1,5 @@
 import 'package:ambulance_tracker/registration/driver.dart';
+import 'package:ambulance_tracker/registration/login.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:ambulance_tracker/registration/password.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
        primarySwatch:Colors.blue
       ),
       debugShowCheckedModeBanner: false,
-      home: OtpVerification(),
+      home: loginPage(),
     );
   }
 }
