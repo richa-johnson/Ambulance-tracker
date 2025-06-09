@@ -61,7 +61,7 @@ class _userdashboardState extends State<userdashboard> {
                 ),
                 alignment:Alignment.centerRight,
                 child: Padding(
-                  padding:EdgeInsetsGeometry.symmetric(horizontal: 10),
+                  padding:EdgeInsets.symmetric(horizontal: 10),
                   child:IconButton(onPressed: (){}, icon:Icon(Icons.person),iconSize: 30,)),
                   ),
                   Column(

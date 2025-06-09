@@ -74,7 +74,7 @@ class _loginPageState extends State<loginPage> {
                   const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Padding(padding: EdgeInsetsGeometry.only(right: 50),
+                    child: Padding(padding: EdgeInsets.only(right: 50),
                       child: Text(
                         "forgot password?",
                         textAlign: TextAlign.end,

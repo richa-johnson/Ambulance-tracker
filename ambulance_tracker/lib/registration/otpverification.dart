@@ -70,7 +70,7 @@ class _OtpVerificationState extends State<OtpVerification> {
             color: Colors.white,
           ),
           child: Padding(
-            padding: EdgeInsetsGeometry.only(top: 72),
+            padding: EdgeInsets.only(top: 72),
             child:SingleChildScrollView(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
