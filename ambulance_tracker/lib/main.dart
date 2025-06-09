@@ -1,4 +1,5 @@
 import 'package:ambulance_tracker/registration/driver.dart';
+import 'package:ambulance_tracker/registration/forgotpassword.dart';
 import 'package:ambulance_tracker/registration/password.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: Password(),
+      home: Forgotpassword(),
     );
   }
 }
