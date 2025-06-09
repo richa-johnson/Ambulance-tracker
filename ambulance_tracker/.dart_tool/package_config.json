@@ -59,7 +59,7 @@
       "name": "flutter_lints",
       "rootUri": "file:///C:/Users/diyab/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-6.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.5"
     },
     {
       "name": "flutter_shaders",
@@ -95,7 +95,7 @@
       "name": "lints",
       "rootUri": "file:///C:/Users/diyab/AppData/Local/Pub/Cache/hosted/pub.dev/lints-6.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.6"
     },
     {
       "name": "matcher",
@@ -182,6 +182,7 @@
       "languageVersion": "3.7"
     }
   ],
+  "generated": "2025-06-09T06:30:16.737239Z",
   "generator": "pub",
   "generatorVersion": "3.8.1",
   "flutterRoot": "file:///C:/Users/diyab/flutter",

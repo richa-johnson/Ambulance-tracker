@@ -233,7 +233,7 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
                   
                     Icon(Icons.add_circle_outline),
                     Padding(
-                      padding: EdgeInsetsGeometry.symmetric(horizontal: 5),
+                      padding: EdgeInsets.symmetric(horizontal: 5),
                       child:Text('ADD',style: TextStyle(
                       fontWeight:FontWeight.w500,
                       
