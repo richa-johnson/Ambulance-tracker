@@ -10,6 +10,12 @@ class userdashboard extends StatefulWidget {
 }
 
 class _userdashboardState extends State<userdashboard> {
+  bool hasooked = true;
+
+  String drname = "driver name";
+  String phno = "Phone no";
+  String vhno = "Vehicle no";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,155 +195,485 @@ class _userdashboardState extends State<userdashboard> {
 
                     SizedBox(height: 20),
 
-                    Container(
-                      width: 344,
-                      height: 364,
-
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(159, 13, 55, 1),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Color.fromRGBO(137, 131, 131, .5),
-                          width: 5,
-                        ),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                    hasooked
+                        ? Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              'Emergency?',
-                              style: TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(3, 3), // x and y offset
-                                    blurRadius: 2.0,
-                                    color: Colors.black.withOpacity(1.0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              'Don\'t panic',
-                              style: TextStyle(
-                                fontSize: 27,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(3, 3), // x and y offset
-                                    blurRadius: 2.0,
-                                    color: Colors.black.withOpacity(1.0),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            Text(
-                              'Book your ambulance',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(3, 3), // x and y offset
-                                    blurRadius: 2.0,
-                                    color: Colors.black.withOpacity(1.0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              'instantly!',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(3, 3), // x and y offset
-                                    blurRadius: 2.0,
-                                    color: Colors.black.withOpacity(1.0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10),
-
                             Container(
+                              width: 351,
+                              height: 469,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(35),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(1),
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                    offset: Offset(
-                                      0,
-                                      6,
-                                    ), // changes the position of the shadow
+                                color: Color.fromRGBO(137, 131, 131, 0.5),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.all(8),
+
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(159, 13, 55, 1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Emergency?',
+                                            style: TextStyle(
+                                              fontSize: 40,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                  offset: Offset(
+                                                    3,
+                                                    3,
+                                                  ), // x and y offset
+                                                  blurRadius: 2.0,
+                                                  color: Colors.black
+                                                      .withOpacity(1.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Text(
+                                            'Don\'t panic',
+                                            style: TextStyle(
+                                              fontSize: 27,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                  offset: Offset(
+                                                    3,
+                                                    3,
+                                                  ), // x and y offset
+                                                  blurRadius: 2.0,
+                                                  color: Colors.black
+                                                      .withOpacity(1.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          Text(
+                                            'Book your ambulance',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                  offset: Offset(
+                                                    3,
+                                                    3,
+                                                  ), // x and y offset
+                                                  blurRadius: 2.0,
+                                                  color: Colors.black
+                                                      .withOpacity(1.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Text(
+                                            'instantly!',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.white,
+                                              shadows: [
+                                                Shadow(
+                                                  offset: Offset(
+                                                    3,
+                                                    3,
+                                                  ), // x and y offset
+                                                  blurRadius: 2.0,
+                                                  color: Colors.black
+                                                      .withOpacity(1.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(35),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(1),
+                                                  spreadRadius: 1,
+                                                  blurRadius: 2,
+                                                  offset: Offset(
+                                                    0,
+                                                    6,
+                                                  ), // changes the position of the shadow
+                                                ),
+                                              ],
+                                            ),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                minimumSize: Size(161, 47),
+                                                backgroundColor: Colors.white,
+                                                elevation:
+                                                    0, // No built-in shadow to avoid mixing
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(35),
+                                                ),
+                                              ),
+                                              onPressed: () {},
+
+                                              child: Text(
+                                                'BOOK NOW',
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Color.fromRGBO(
+                                                    159,
+                                                    13,
+                                                    55,
+                                                    1.0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    child: Container(
+                                      width: 340,
+                                      height: 190,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(10),
+                                          bottom: Radius.circular(10),
+                                        ),
+                                        color: Color.fromRGBO(217, 217, 217, 1),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 8.0,
+                                            ),
+                                            child: Container(
+                                              color: Colors.grey,
+                                              width: 100,
+                                              height: 3,
+                                            ),
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              'Your Ambulance is on the way',
+                                              style: TextStyle(
+                                                color: const Color.fromARGB(
+                                                  255,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                ),
+                                                fontSize: 19,
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsetsGeometry.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 4,
+                                                      ),
+                                                  child: Text(
+                                                    drname,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsetsGeometry.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
+                                                  child: Text(
+                                                    phno,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsetsGeometry.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
+                                                  child: Text(
+                                                    vhno,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    child: Container(
+                                      width: 341,
+                                      height: 53,
+                                      decoration: BoxDecoration(
+                                        color: Color.fromRGBO(143, 130, 130, 1),
+                                        borderRadius: BorderRadius.vertical(
+                                          bottom: Radius.circular(10),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                            ),
+                                            child: Text(
+                                              'Track Ambulance',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 19,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(Icons.arrow_forward),
+                                            color: Colors.white,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(161, 47),
-                                  backgroundColor: Colors.white,
-                                  elevation:
-                                      0, // No built-in shadow to avoid mixing
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(35),
-                                  ),
+                            ),
+                          ],
+                        )
+                        : Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              width: 351,
+                              height: 348,
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(137, 131, 131, 0.5),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.all(8),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(159, 13, 55, 1),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                onPressed: () {},
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Emergency?',
+                                        style: TextStyle(
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(
+                                                3,
+                                                3,
+                                              ), // x and y offset
+                                              blurRadius: 2.0,
+                                              color: Colors.black.withOpacity(
+                                                1.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        'Don\'t panic',
+                                        style: TextStyle(
+                                          fontSize: 27,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(
+                                                3,
+                                                3,
+                                              ), // x and y offset
+                                              blurRadius: 2.0,
+                                              color: Colors.black.withOpacity(
+                                                1.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
 
-                                child: Text(
-                                  'BOOK NOW',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color.fromRGBO(159, 13, 55, 1.0),
+                                      Text(
+                                        'Book your ambulance',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(
+                                                3,
+                                                3,
+                                              ), // x and y offset
+                                              blurRadius: 2.0,
+                                              color: Colors.black.withOpacity(
+                                                1.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        'instantly!',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              offset: Offset(
+                                                3,
+                                                3,
+                                              ), // x and y offset
+                                              blurRadius: 2.0,
+                                              color: Colors.black.withOpacity(
+                                                1.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            35,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                1,
+                                              ),
+                                              spreadRadius: 1,
+                                              blurRadius: 2,
+                                              offset: Offset(
+                                                0,
+                                                6,
+                                              ), // changes the position of the shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            minimumSize: Size(161, 47),
+                                            backgroundColor: Colors.white,
+                                            elevation:
+                                                0, // No built-in shadow to avoid mixing
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(35),
+                                            ),
+                                          ),
+                                          onPressed: () {},
+
+                                          child: Text(
+                                            'BOOK NOW',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color.fromRGBO(
+                                                159,
+                                                13,
+                                                55,
+                                                1.0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                              ),
+                            ),
+
+                            SizedBox(height: 28),
+                            Container(
+                              width: 361,
+                              height: 55,
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(143, 130, 130, 1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    child: Text(
+                                      'See Booking History',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 19,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.arrow_forward),
+                                    color: Colors.white,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-
-                    SizedBox(height: 28),
-                    Container(
-                      width: 361,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(143, 130, 130, 1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          
-                          Container(
-                            padding:EdgeInsets.symmetric(horizontal: 10),
-                            child: Text('See Booking History',
-                            style: TextStyle(
-                              
-                              color: Colors.white,
-                              fontSize: 19,
-                            
-                            ),),
-                          ),
-                          IconButton(onPressed: (){}, icon: Icon(Icons.arrow_forward),
-                          color: Colors.white,
-                          )
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
