@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class RegisterUserScreen extends StatefulWidget {
+  const RegisterUserScreen({super.key});
+
   @override 
   _RegisterUserScreenState createState() => _RegisterUserScreenState();
 }
@@ -19,7 +21,7 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 110.0),
               child: Center(
-                child: Container(
+                child: SizedBox(
                     width: 200,
                     height: 100,
                     /*decoration: BoxDecoration(

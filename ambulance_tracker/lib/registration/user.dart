@@ -151,7 +151,7 @@ class _userRegistrationState extends State<userRegistration> {
 
 class CustomInputField extends StatelessWidget{
   final String hintText;
-  const CustomInputField({Key?key, required this.hintText}):super(key: key);
+  const CustomInputField({super.key, required this.hintText});
 
   @override
   Widget build(BuildContext context){

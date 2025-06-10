@@ -24,8 +24,12 @@ class _OtpVerificationState extends State<OtpVerification> {
 
   @override
   void dispose() {
-    for (var node in focusNodes) node.dispose();
-    for (var controller in controllers) controller.dispose();
+    for (var node in focusNodes) {
+      node.dispose();
+    }
+    for (var controller in controllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
   @override
