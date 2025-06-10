@@ -2,6 +2,8 @@ import 'package:ambulance_tracker/registration/driver.dart';
 import 'package:flutter/material.dart';
 
 class FacilitiesScreen extends StatefulWidget {
+  const FacilitiesScreen({super.key});
+
   @override
   State<FacilitiesScreen> createState() => _FacilitiesScreenState();
 }
