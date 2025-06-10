@@ -1,4 +1,6 @@
-import 'package:ambulance_tracker/registration/RegisterUserSCreen.dart';
+import 'package:ambulance_tracker/registration/driver.dart';
+import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/registration/user.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -69,7 +71,7 @@ class RegisterScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RegisterUserScreen(),
+                            builder: (context) => userRegistration(),
                           ),
                         );
                       },
@@ -104,7 +106,7 @@ class RegisterScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RegisterUserScreen(),
+                            builder: (context) => DriverRegistration(),
                           ),
                         );
                       },
@@ -135,7 +137,7 @@ class RegisterScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RegisterUserScreen(),
+                            builder: (context) => loginPage(),
                           ),
                         );
                       },

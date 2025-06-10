@@ -1,4 +1,6 @@
+import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/registration/forgotpassword.dart';
 import 'package:ambulance_tracker/registration/user.dart';
 import 'package:flutter/material.dart';
 
@@ -75,14 +77,19 @@ class _loginPageState extends State<loginPage> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Padding(padding: EdgeInsets.only(right: 50),
-                      child: Text(
-                        "forgot password?",
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                          color: Color.fromRGBO(0, 0, 255, 1.0),
-                          fontSize: 15,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Color.fromRGBO(0, 0, 0, 1.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Forgotpassword()));
+                        },
+                        child: Text(
+                          "forgot password?",
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            color: Color.fromRGBO(0, 0, 255, 1.0),
+                            fontSize: 15,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Color.fromRGBO(0, 0, 0, 1.0),
+                          ),
                         ),
                       ),
                     ),
@@ -91,7 +98,7 @@ class _loginPageState extends State<loginPage> {
                   ElevatedButton(onPressed: (){
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context)=>homepage()),
+                      MaterialPageRoute(builder: (context)=>userdashboard()),
                     );
                   }, 
                   style: ElevatedButton.styleFrom(

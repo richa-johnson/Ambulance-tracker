@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/registration/facilities_screen.dart';
+import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +14,7 @@ class DriverRegistration extends StatefulWidget {
 }
 
 class DriverRegistrationState extends State<DriverRegistration> {
-  String? selectedValue;
+  String? selectedValue,selectedSector;
   List<String> districts = [
     'Thiruvananthapuram',
     'Kollam',
@@ -27,6 +30,19 @@ class DriverRegistrationState extends State<DriverRegistration> {
     'Wayanad',
     'Kannur',
     'Kasaragod',
+  ];
+  List<String> sector=[
+     "Emergency Medical Services (EMS)",
+    "Non-Emergency Transport",
+    "Private Ambulance Services",
+    "Military Ambulance Services",
+    "Disaster Response and Relief",
+    "Air Ambulance Services",
+    "Water Ambulance Services",
+    "Fire Department Ambulance",
+    "Hospital-Based Ambulance",
+    "Event Medical Coverage",
+    "Industrial/Occupational Health Ambulance"
   ];
   @override
   Widget build(BuildContext context) {
@@ -109,7 +125,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         hint: Text(
                           'SELECT DISTRICT',
                           style: TextStyle(
-                            color: Colors.black.withAlpha(107),
+                            color: Color.fromRGBO(0, 0, 0, 42),
                             fontSize: 16,
                           ),
                         ),
@@ -144,7 +160,51 @@ class DriverRegistrationState extends State<DriverRegistration> {
                 SizedBox(height: 10),
                 CustomTextField(hint: 'CAPACITY'),
                 SizedBox(height: 10),
-                CustomTextField(hint: 'SECTOR'),
+                SizedBox(
+                  width: 325,
+                  height: 55,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(227, 185, 197, 1.0),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedSector,
+                        hint: Text(
+                          'SECTOR',
+                          style: TextStyle(
+                            color: Color.fromRGBO(0, 0, 0, 42),
+                            fontSize: 16,
+                          ),
+                        ),
+                        isExpanded: true,
+                        dropdownColor: Color.fromRGBO(227, 185, 197, 1.0),
+                        borderRadius: BorderRadius.circular(10),
+                        items:
+                            sector.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedValue = newValue!;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.black.withAlpha(107),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(height: 10),
                 SizedBox(
                   width: 325,
@@ -159,17 +219,20 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         border: InputBorder.none,
                         hintText: 'FACILITIES',
                         hintStyle: TextStyle(
-                          color: Colors.black.withAlpha(107), // opacity ~ 42%
+                          color: Color.fromRGBO(0, 0, 0, 42), // opacity ~ 42%
                           fontSize: 16,
                         ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 16,
                         ),
-                        suffixIcon: Icon(
-                          Icons.add,
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.add),
                           color: Colors.black.withAlpha(107),
-                        ),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> FacilitiesScreen()));
+                          },
+                        )
                       ),
                     ),
                   ),
@@ -190,7 +253,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                           child: Text(
                             "IMPORT LICENSE",
                             style: TextStyle(
-                              color: Colors.black.withAlpha(107),
+                              color: Color.fromRGBO(0, 0, 0, 42),
                               fontSize: 16,
                             ),
                           ),
@@ -221,7 +284,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => homepage()),
+                        MaterialPageRoute(builder: (context) => OtpVerification()),
                       );
                       print('Account Registered');
                     },
@@ -264,7 +327,7 @@ class CustomTextField extends StatelessWidget {
             border: InputBorder.none,
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.black.withAlpha(107),
+              color: Color.fromRGBO(0, 0, 0, 42),
               fontSize: 16,
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),

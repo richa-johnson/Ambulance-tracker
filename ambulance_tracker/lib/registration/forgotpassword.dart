@@ -109,7 +109,7 @@ class Forgotpasswordstate extends State<Forgotpassword> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 70),
                 SizedBox(
                   width: 161,
                   height: 47,

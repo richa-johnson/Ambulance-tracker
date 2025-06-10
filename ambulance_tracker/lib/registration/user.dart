@@ -1,5 +1,7 @@
 
 import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:flutter/material.dart';
 
 class userRegistration extends StatefulWidget {
@@ -103,7 +105,7 @@ class _userRegistrationState extends State<userRegistration> {
                     child: DropdownButton<String>(
                         value: selectedDistrict,           
                         hint: Padding(padding: const EdgeInsets.only(left:19),
-                          child: Text("DISTRICT"),
+                          child: Text("DISTRICT", style: TextStyle(color: Color.fromRGBO(0, 0, 0, 42))),
                         ),
                         items: district.map((String item) {
                           return DropdownMenuItem<String>(
@@ -126,7 +128,7 @@ class _userRegistrationState extends State<userRegistration> {
                 ElevatedButton(onPressed: (){
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context)=>homepage()),
+                    MaterialPageRoute(builder: (context)=>OtpVerification()),
                   );
                 }, 
                 style: ElevatedButton.styleFrom(

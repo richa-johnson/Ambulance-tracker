@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/registration/driver.dart';
 import 'package:flutter/material.dart';
 
 class FacilitiesScreen extends StatefulWidget {
@@ -254,7 +255,9 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
                     minimumSize: Size(161, 47),
                     backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> DriverRegistration()));
+                  },
                   child: Text(
                     'APPLY',
                     style: TextStyle(fontSize: 24, color: Colors.white),
