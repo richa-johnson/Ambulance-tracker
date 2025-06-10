@@ -14,7 +14,7 @@ class DriverRegistration extends StatefulWidget {
 }
 
 class DriverRegistrationState extends State<DriverRegistration> {
-  String? selectedValue;
+  String? selectedValue,selectedSector;
   List<String> districts = [
     'Thiruvananthapuram',
     'Kollam',
@@ -30,6 +30,19 @@ class DriverRegistrationState extends State<DriverRegistration> {
     'Wayanad',
     'Kannur',
     'Kasaragod',
+  ];
+  List<String> sector=[
+     "Emergency Medical Services (EMS)",
+    "Non-Emergency Transport",
+    "Private Ambulance Services",
+    "Military Ambulance Services",
+    "Disaster Response and Relief",
+    "Air Ambulance Services",
+    "Water Ambulance Services",
+    "Fire Department Ambulance",
+    "Hospital-Based Ambulance",
+    "Event Medical Coverage",
+    "Industrial/Occupational Health Ambulance"
   ];
   @override
   Widget build(BuildContext context) {
@@ -147,7 +160,51 @@ class DriverRegistrationState extends State<DriverRegistration> {
                 SizedBox(height: 10),
                 CustomTextField(hint: 'CAPACITY'),
                 SizedBox(height: 10),
-                CustomTextField(hint: 'SECTOR'),
+                SizedBox(
+                  width: 325,
+                  height: 55,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(227, 185, 197, 1.0),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedSector,
+                        hint: Text(
+                          'SECTOR',
+                          style: TextStyle(
+                            color: Color.fromRGBO(0, 0, 0, 42),
+                            fontSize: 16,
+                          ),
+                        ),
+                        isExpanded: true,
+                        dropdownColor: Color.fromRGBO(227, 185, 197, 1.0),
+                        borderRadius: BorderRadius.circular(10),
+                        items:
+                            sector.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedValue = newValue!;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.black.withAlpha(107),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(height: 10),
                 SizedBox(
                   width: 325,

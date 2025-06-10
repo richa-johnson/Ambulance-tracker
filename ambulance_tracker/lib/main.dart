@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:ambulance_tracker/dashbord/userEdit.dart';
 import 'package:ambulance_tracker/registration/driver.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
        primarySwatch:Colors.blue
       ),
       debugShowCheckedModeBanner: false,
-      home: userEdit(),
+      home: driverEdit(),
     );
   }
 }
