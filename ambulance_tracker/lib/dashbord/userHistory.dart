@@ -1,3 +1,5 @@
+
+import 'package:ambulance_tracker/dashbord/driverHistory.dart';
 import 'package:flutter/material.dart';
 
 class UserHistory extends StatefulWidget {
@@ -8,7 +10,7 @@ class UserHistory extends StatefulWidget {
 }
 
 class _UserHistoryState extends State<UserHistory> {
-  String dname="ravi",phoneno="7736798040",pcount="7",pname="harsha",age="7",bloodGroup="B+",location="snadkugfheanjzxd",date="77-36-7980",time="77:36:79";
+  String dname="ravi",phoneno="7736798040",vehicleNo="2345",pname="harsha",age="7",bloodGroup="B+",location="snadkugfheanjzxd",date="77-36-7980",time="77:36:79";
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +66,7 @@ class _UserHistoryState extends State<UserHistory> {
               children: [
                 Center(
                   child: Text(
-                    "YOUR ACTIVITY HISTORY",
+                    "YOUR BOOKING HISTORY",
                     style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontSize: 18,
@@ -96,8 +98,8 @@ class _UserHistoryState extends State<UserHistory> {
                                   children: [
                                     ActivityHistoryTable(label: "Driver Name", value: dname).build(),
                                     ActivityHistoryTable(label: "Phone No", value: phoneno).build(),
-                                    ActivityHistoryTable(label: "No of Patients    ", value: pcount).build(),
-                                    ActivityHistoryTable(label: "Patient Name", value: pname).build(),
+                                    ActivityHistoryTable(label: "Vehicle No", value: vehicleNo).build(),
+                                    ActivityHistoryTable(label: "Patient Name     ", value: pname).build(),
                                     ActivityHistoryTable(label: "Age", value: age).build(),
                                     ActivityHistoryTable(label: "Blood Group", value: bloodGroup).build(),
                                     ActivityHistoryTable(label: "Location", value: location).build(),
@@ -118,44 +120,6 @@ class _UserHistoryState extends State<UserHistory> {
           ),
         ),
       ),
-    );
-  }
-}
-class ActivityHistoryTable{
-  final String label;
-  final String seperator;
-  final String value;
- 
-  ActivityHistoryTable({required this.label,this.seperator=":",required this.value});
-
-  TableRow build(){
-    return TableRow(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Color.fromRGBO(0, 0, 0, 1),
-            fontWeight: FontWeight.w900,
-            fontSize: 17
-          ),
-        ),
-        Text(
-          seperator,
-          style: TextStyle(
-            color: Color.fromRGBO(0, 0, 0, 1),
-            fontWeight: FontWeight.w900,
-            fontSize: 17
-          ),
-        ),
-        Text(
-          value, 
-          style: TextStyle(
-            color: Color.fromRGBO(0, 0, 0, 1),
-            fontWeight: FontWeight.w900,
-            fontSize: 17
-          ),
-        ),
-      ],
     );
   }
 }
