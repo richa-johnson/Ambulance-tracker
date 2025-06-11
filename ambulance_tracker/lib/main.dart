@@ -2,6 +2,7 @@ import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
+import 'package:ambulance_tracker/dashbord/userDetails.dart';
 import 'package:ambulance_tracker/dashbord/userEdit.dart';
 import 'package:ambulance_tracker/dashbord/userHistory.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
        primarySwatch:Colors.blue
       ),
       debugShowCheckedModeBanner: false,
-      home: AdminDashboard(),
+      home: UserDetails(),
     );
   }
 }
