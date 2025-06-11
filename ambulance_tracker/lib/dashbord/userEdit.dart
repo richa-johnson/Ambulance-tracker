@@ -182,7 +182,7 @@ class _userEditState extends State<userEdit> {
 
 class CustomInputField extends StatelessWidget{
   final String hintText;
-  const CustomInputField({Key?key, required this.hintText}):super(key: key);
+  const CustomInputField({super.key, required this.hintText});
 
   @override
   Widget build(BuildContext context){

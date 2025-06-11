@@ -338,7 +338,7 @@ class driverEditState extends State<driverEdit> {
 class CustomTextField extends StatelessWidget {
   final String hint;
 
-  const CustomTextField({required this.hint, Key? key}) : super(key: key);
+  const CustomTextField({required this.hint, super.key});
 
   @override
   Widget build(BuildContext context) {

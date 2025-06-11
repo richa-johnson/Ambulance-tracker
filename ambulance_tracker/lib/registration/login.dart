@@ -1,5 +1,4 @@
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
-import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:ambulance_tracker/registration/forgotpassword.dart';
 import 'package:ambulance_tracker/registration/user.dart';
 import 'package:flutter/material.dart';

@@ -207,7 +207,7 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
 
 class CustomInputFieldNumber extends StatelessWidget{
   final String hintText;
-  const CustomInputFieldNumber({Key?key, required this.hintText}):super(key: key);
+  const CustomInputFieldNumber({super.key, required this.hintText});
 
   @override
   Widget build(BuildContext context){
