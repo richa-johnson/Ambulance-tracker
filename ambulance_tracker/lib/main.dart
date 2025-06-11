@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/dashbord/activityHistory.dart';
 import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       title: 'resQroute',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: DriverDetails(),
+      home: ActivityHistory(),
     );
   }
 }
