@@ -1,9 +1,6 @@
-import 'dart:io';
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:ambulance_tracker/registration/facilities_screen.dart';
-import 'package:ambulance_tracker/registration/login.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 class DriverRegistration extends StatefulWidget {

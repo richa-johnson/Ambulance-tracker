@@ -1,12 +1,4 @@
-import 'package:ambulance_tracker/dashbord/driverEdit.dart';
-import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
-import 'package:ambulance_tracker/dashbord/userEdit.dart';
-import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
-import 'package:ambulance_tracker/registration/driver.dart';
-import 'package:ambulance_tracker/registration/login.dart';
-import 'package:ambulance_tracker/registration/otpverification.dart';
-import 'package:ambulance_tracker/registration/password.dart';
-import 'package:ambulance_tracker/splash_screen.dart';
+import 'package:ambulance_tracker/alerts/requestalert.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -21,11 +13,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'resQroute',
-      theme: ThemeData(
-       primarySwatch:Colors.blue
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: userdashboard(),
+      home: RequestAlert(),
     );
   }
 }
