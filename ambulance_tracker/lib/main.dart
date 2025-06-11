@@ -12,6 +12,7 @@ import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:ambulance_tracker/registration/password.dart';
 import 'package:ambulance_tracker/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:ambulance_tracker/dashbord/driverDetails.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       title: 'resQroute',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: UserDetails(),
+      home: DriverDetails(),
     );
   }
 }
