@@ -71,15 +71,8 @@ class _DriverDetailsState extends State<DriverDetails> {
                             ),
                             children: [
                               DriverDetailsTable(slno: "Sl No  ", name: "Name  ", phoneno: "Phone No  ", emailid: "Email Id  ", district: "District  ", vehicleno: "Vehicle No", capacity: "Capacity", sector: "Sector", facilities: "Facilities", license: "License").build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
-                              DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
+                              for (int i=0;i<10;i++)
+                                DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
                             ],
                           ),
                         ),

@@ -378,40 +378,40 @@ class _driverDashboardState extends State<driverDashboard> {
                                                         2: FlexColumnWidth(),
                                                       },
                                                       children: [
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Booked by",
                                                           value: bookedby,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Phone no",
                                                           value: phoneno,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label:
                                                               "Number of Patients",
                                                           value: noPatients,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Patient Name",
                                                           value: pname,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Age",
                                                           value: age,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Blood Group",
                                                           value: bloodGroup,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Location",
                                                           value: location,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Date",
                                                           value: date,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Time",
                                                           value: time,
                                                         ).build(),
@@ -509,40 +509,40 @@ class _driverDashboardState extends State<driverDashboard> {
                                                         2: FlexColumnWidth(),
                                                       },
                                                       children: [
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Booked by",
                                                           value: bookedby,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Phone no",
                                                           value: phoneno,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label:
                                                               "Number of Patients",
                                                           value: noPatients,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Patient Name",
                                                           value: pname,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Age",
                                                           value: age,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Blood Group",
                                                           value: bloodGroup,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Location",
                                                           value: location,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Date",
                                                           value: date,
                                                         ).build(),
-                                                        ActivityHistoryTable(
+                                                        HistoryTable(
                                                           label: "Time",
                                                           value: time,
                                                         ).build(),
