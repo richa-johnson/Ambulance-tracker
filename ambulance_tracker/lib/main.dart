@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'resQroute',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: AdminDashboard(),
+      home: userdashboard(),
     );
   }
 }
