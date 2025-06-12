@@ -1,4 +1,6 @@
-import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/dashbord/activityHistory.dart';
+import 'package:ambulance_tracker/dashbord/driverDetails.dart';
+import 'package:ambulance_tracker/dashbord/userDetails.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -74,11 +76,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     Padding(
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.person),
-                        iconSize: 30,
-                      ),
                     ),
                   ],
                 ),
@@ -199,31 +196,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     SizedBox(height: 40),
                     ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>homepage()),);}, 
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>UserDetails()),);}, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                         minimumSize: Size(265,55),
                       ),
                       child: Text(
-                        "USER HISTORY",
+                        "USER DETAILS",
                         style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
                       ),
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>homepage()),);}, 
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DriverDetails()),);}, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                         minimumSize: Size(265,55),
                       ),
                       child: Text(
-                        "DRIVER HISTORY",
+                        "DRIVER DETAILS",
                         style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
                       ),
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>homepage()),);}, 
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>ActivityHistory()),);}, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                         minimumSize: Size(265,55),
@@ -235,7 +232,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>homepage()),);}, 
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>ActivityHistory()),);}, 
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                         minimumSize: Size(265,55),

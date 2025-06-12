@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
-import 'package:ambulance_tracker/dashbord/userHistory.dart';
 import 'package:flutter/material.dart';
 
 class driverDashboard extends StatefulWidget {
@@ -95,7 +95,9 @@ class _driverDashboardState extends State<driverDashboard> {
                     Padding(
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>driverEdit()));
+                        },
                         icon: Icon(Icons.person),
                         iconSize: 30,
                       ),
@@ -594,7 +596,9 @@ class _driverDashboardState extends State<driverDashboard> {
                                                 ),
                                               ),
                                               IconButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>DriverHistory()));
+                                                },
                                                 icon: Icon(Icons.arrow_forward),
                                                 color: Colors.white,
                                               ),

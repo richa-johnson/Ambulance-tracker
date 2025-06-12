@@ -238,10 +238,7 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 5),
                       child:Text('ADD',style: TextStyle(
                       fontWeight:FontWeight.w500,
-                      
-                      
                     ),),),
-                
                   ],
                 )
               ),

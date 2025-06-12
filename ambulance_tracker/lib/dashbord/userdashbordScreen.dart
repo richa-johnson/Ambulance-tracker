@@ -1,5 +1,6 @@
-// ignore_for_file: deprecated_member_use
-
+import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
+import 'package:ambulance_tracker/dashbord/userEdit.dart';
+import 'package:ambulance_tracker/dashbord/userHistory.dart';
 import 'package:flutter/material.dart';
 
 class userdashboard extends StatefulWidget {
@@ -82,7 +83,9 @@ class _userdashboardState extends State<userdashboard> {
                     Padding(
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>userEdit()));
+                        },
                         icon: Icon(Icons.person),
                         iconSize: 30,
                       ),
@@ -258,7 +261,6 @@ class _userdashboardState extends State<userdashboard> {
                                               ],
                                             ),
                                           ),
-
                                           Text(
                                             'Book your ambulance',
                                             style: TextStyle(
@@ -298,7 +300,6 @@ class _userdashboardState extends State<userdashboard> {
                                             ),
                                           ),
                                           SizedBox(height: 10),
-
                                           Container(
                                             decoration: BoxDecoration(
                                               borderRadius:
@@ -327,8 +328,9 @@ class _userdashboardState extends State<userdashboard> {
                                                       BorderRadius.circular(35),
                                                 ),
                                               ),
-                                              onPressed: () {},
-
+                                              onPressed: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>patientDetailsForm()));
+                                              },
                                               child: Text(
                                                 'BOOK NOW',
                                                 style: TextStyle(
@@ -617,8 +619,9 @@ class _userdashboardState extends State<userdashboard> {
                                                   BorderRadius.circular(35),
                                             ),
                                           ),
-                                          onPressed: () {},
-
+                                          onPressed: () {
+                                            Navigator.push(context, MaterialPageRoute(builder: (context)=>patientDetailsForm()));
+                                          },
                                           child: Text(
                                             'BOOK NOW',
                                             style: TextStyle(
@@ -665,7 +668,9 @@ class _userdashboardState extends State<userdashboard> {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>UserHistory()));
+                                    },
                                     icon: Icon(Icons.arrow_forward),
                                     color: Colors.white,
                                   ),
