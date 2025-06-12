@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:flutter/material.dart';
 
 class AvailableAmbulance extends StatefulWidget {
@@ -72,13 +73,10 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>patientDetailsForm()));
+                          },
                           icon: Icon(Icons.arrow_back),
-                          iconSize: 30,
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.person),
                           iconSize: 30,
                         ),
                       ],

@@ -1,3 +1,6 @@
+import 'package:ambulance_tracker/dashbord/activityHistory.dart';
+import 'package:ambulance_tracker/dashbord/driverDetails.dart';
+import 'package:ambulance_tracker/dashbord/userDetails.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -73,11 +76,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     Padding(
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.person),
-                        iconSize: 30,
-                      ),
                     ),
                   ],
                 ),
@@ -185,20 +183,68 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ],
                 ),
               ),
+              SizedBox(height: 40),
               Container(
-                color: Color.fromRGBO(0, 0, 0, 1),
-                padding: EdgeInsets.all(8),
-                child: Container(
-                  color: Color.fromRGBO(255, 255, 255, 1),
-                  child: Text(
-                    "VIEW",
-                    style: TextStyle(
-                      color: Color.fromRGBO(87, 24, 44,1.0),
-                      
-                    ),
-                  ),
+                width: 330,
+                height: 393,
+                padding: EdgeInsets.all(1),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color.fromRGBO(217, 217, 217, 1),
                 ),
-              )
+                child: Column(
+                  children: [
+                    SizedBox(height: 40),
+                    ElevatedButton(onPressed: (){
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>UserDetails()),);}, 
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                        minimumSize: Size(265,55),
+                      ),
+                      child: Text(
+                        "USER DETAILS",
+                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(onPressed: (){
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DriverDetails()),);}, 
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                        minimumSize: Size(265,55),
+                      ),
+                      child: Text(
+                        "DRIVER DETAILS",
+                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(onPressed: (){
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>ActivityHistory()),);}, 
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                        minimumSize: Size(265,55),
+                      ),
+                      child: Text(
+                        "ACTIVITY HISTORY",
+                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(onPressed: (){
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>ActivityHistory()),);}, 
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                        minimumSize: Size(265,55),
+                      ),
+                      child: Text(
+                        "TRACK AMBULANCE",
+                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

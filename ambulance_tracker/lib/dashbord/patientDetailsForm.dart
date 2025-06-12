@@ -1,4 +1,5 @@
 
+import 'package:ambulance_tracker/dashbord/availableAmbulance.dart';
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:flutter/material.dart';
 import 'package:ambulance_tracker/registration/user.dart';
@@ -183,7 +184,7 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                 ElevatedButton(onPressed: (){
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context)=> homepage()),
+                    MaterialPageRoute(builder: (context)=> AvailableAmbulance()),
                   );
                 }, 
                 style: ElevatedButton.styleFrom(

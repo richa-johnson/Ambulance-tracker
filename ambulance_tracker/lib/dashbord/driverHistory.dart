@@ -94,15 +94,15 @@ class _DriverHistoryState extends State<DriverHistory> {
                                     2:FlexColumnWidth()
                                   },
                                   children: [
-                                    ActivityHistoryTable(label: "Booked by", value: uname).build(),
-                                    ActivityHistoryTable(label: "Phone No", value: phoneno).build(),
-                                    ActivityHistoryTable(label: "No of Patients    ", value: pcount).build(),
-                                    ActivityHistoryTable(label: "Patient Name", value: pname).build(),
-                                    ActivityHistoryTable(label: "Age", value: age).build(),
-                                    ActivityHistoryTable(label: "Blood Group", value: bloodGroup).build(),
-                                    ActivityHistoryTable(label: "Location", value: location).build(),
-                                    ActivityHistoryTable(label: "Date", value: date).build(),
-                                    ActivityHistoryTable(label: "Time", value: time).build(),
+                                    HistoryTable(label: "Booked by", value: uname).build(),
+                                    HistoryTable(label: "Phone No", value: phoneno).build(),
+                                    HistoryTable(label: "No of Patients    ", value: pcount).build(),
+                                    HistoryTable(label: "Patient Name", value: pname).build(),
+                                    HistoryTable(label: "Age", value: age).build(),
+                                    HistoryTable(label: "Blood Group", value: bloodGroup).build(),
+                                    HistoryTable(label: "Location", value: location).build(),
+                                    HistoryTable(label: "Date", value: date).build(),
+                                    HistoryTable(label: "Time", value: time).build(),
                                   ],
                                 ),
                               ),
@@ -121,12 +121,12 @@ class _DriverHistoryState extends State<DriverHistory> {
     );
   }
 }
-class ActivityHistoryTable{
+class HistoryTable{
   final String label;
   final String seperator;
   final String value;
  
-  ActivityHistoryTable({required this.label,this.seperator=":",required this.value});
+  HistoryTable({required this.label,this.seperator=":",required this.value});
 
   TableRow build(){
     return TableRow(
