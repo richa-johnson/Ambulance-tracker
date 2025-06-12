@@ -105,11 +105,36 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AvailableAmbulance(),
+                            showModalBottomSheet(
+                              context: context,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
                               ),
+                              builder: (context) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.near_me),
+                                      title: Text("Sort by Nearest"),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        // Handle sorting logic here
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.timer),
+                                      title: Text("Sort by Availability"),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        // Handle sorting logic here
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                           child: Padding(
@@ -143,11 +168,68 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AvailableAmbulance(),
+                            showModalBottomSheet(
+                              context: context,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
                               ),
+                              builder: (context) {
+                                List<String> facilities = [
+                                  "Oxygen",
+                                  "ICU",
+                                  "Ventilator",
+                                ];
+                                List<String> selected = [];
+
+                                return StatefulBuilder(
+                                  builder: (context, setState) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            "Select Facilities",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          ...facilities.map((facility) {
+                                            return CheckboxListTile(
+                                              title: Text(facility),
+                                              value: selected.contains(
+                                                facility,
+                                              ),
+                                              onChanged: (bool? val) {
+                                                setState(() {
+                                                  if (val == true) {
+                                                    selected.add(facility);
+                                                  } else {
+                                                    selected.remove(facility);
+                                                  }
+                                                });
+                                              },
+                                            );
+                                          }).toList(),
+                                          ElevatedButton(
+                                            child: Text("Apply Filter"),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              // Handle filtering with selected list
+                                              print(
+                                                "Selected filters: $selected",
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                             );
                           },
                           child: Padding(
@@ -180,6 +262,7 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                     ],
                   ),
                 ),
+
                 CustomCard(),
                 CustomCard(),
                 CustomCard(),
