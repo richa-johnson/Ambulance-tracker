@@ -1,7 +1,6 @@
 
-import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
 import 'package:ambulance_tracker/registration/facilities_screen.dart';
-import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:flutter/material.dart';
 
 class driverEdit extends StatefulWidget {
@@ -313,7 +312,7 @@ class driverEditState extends State<driverEdit> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => OtpVerification()),
+                        MaterialPageRoute(builder: (context) => driverDashboard()),
                       );
                     },
                     child: Text(
