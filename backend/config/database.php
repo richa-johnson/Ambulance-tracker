@@ -44,12 +44,14 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'url' => env('DB_URL','mysql://utfvxop4mm9xzeg4:5ZQ7Hakcwj1GJxVaSs2I@bvwbfuviyekfaco6yhzn-mysql.services.clever-cloud.com:3306/bvwbfuviyekfaco6yhzn'),
+            'host' => env('DB_HOST', '
+bvwbfuviyekfaco6yhzn-mysql.services.clever-cloud.com'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => env('DB_DATABASE', 'bvwbfuviyekfaco6yhzn'),
+            'username' => env('DB_USERNAME', 'utfvxop4mm9xzeg4
+'),
+            'password' => env('DB_PASSWORD', '5ZQ7Hakcwj1GJxVaSs2I'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
