@@ -211,7 +211,7 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                                                 });
                                               },
                                             );
-                                          }).toList(),
+                                          }),
                                           ElevatedButton(
                                             child: Text("Apply Filter"),
                                             onPressed: () {
