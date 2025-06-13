@@ -1,4 +1,5 @@
 import 'package:ambulance_tracker/registration/otpverification.dart';
+import 'package:email_otp_auth/email_otp_auth.dart';
 import 'package:flutter/material.dart';
 
 class userRegistration extends StatefulWidget {
@@ -26,6 +27,12 @@ List<String> district = [
 String? selectedDistrict;
 
 class _userRegistrationState extends State<userRegistration> {
+
+  final TextEditingController emailcontroller = TextEditingController();
+  bool isValidEmail(String email){
+    return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +96,27 @@ class _userRegistrationState extends State<userRegistration> {
                 const SizedBox(height: 20),
                 CustomInputField(hintText: 'PHONE NUMBER'),
                 const SizedBox(height: 20),
-                CustomInputField(hintText: 'EMAIL ID'),
+                Container(
+                  width: 325,
+                  height: 66,
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(227, 185, 197,1.0),
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: TextField(
+                    controller: emailcontroller,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "EMAIL ID",
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                        color: Color.fromRGBO(0, 0, 0, 42),
+                      ),
+                      contentPadding: EdgeInsets.only(left:19,top:20),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Container(
                   width: 325,
@@ -123,15 +150,18 @@ class _userRegistrationState extends State<userRegistration> {
                 ),
                 SizedBox(height: 72),
                 ElevatedButton(onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context)=>OtpVerification()),
-                  );
+                  String email = emailcontroller.text.trim();
+                  if(isValidEmail(email)){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerification(email: email)));
+                  }else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Enter a valid email address")),
+                    );
+                  }
                 }, 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                   minimumSize: Size(265,55),
-                  
                 ),
                 child: Text(
                   "SUBMIT",

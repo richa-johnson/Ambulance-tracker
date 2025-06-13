@@ -1,6 +1,7 @@
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:ambulance_tracker/registration/facilities_screen.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
+import 'package:email_otp_auth/email_otp_auth.dart';
 import 'package:flutter/material.dart';
 
 class DriverRegistration extends StatefulWidget {
@@ -41,6 +42,12 @@ class DriverRegistrationState extends State<DriverRegistration> {
     "Event Medical Coverage",
     "Industrial/Occupational Health Ambulance"
   ];
+
+  final TextEditingController emailcontroller=TextEditingController();
+  bool isValidEmail(String email){
+    return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,7 +112,29 @@ class DriverRegistrationState extends State<DriverRegistration> {
                 SizedBox(height: 10),
                 CustomTextField(hint: 'PHONE NO'),
                 SizedBox(height: 10),
-                CustomTextField(hint: 'EMAIL ID'),
+                SizedBox(
+                  width: 325,
+                  height: 55,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(227, 185, 197, 1.0),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: TextField(
+                      controller: emailcontroller,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "EMAIL ID",
+                        hintStyle: TextStyle(
+                          color: Color.fromRGBO(0, 0, 0, 42),
+                          fontSize: 16,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(height: 10),
                 SizedBox(
                   width: 325,
@@ -279,10 +308,14 @@ class DriverRegistrationState extends State<DriverRegistration> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => OtpVerification()),
+                      String email = emailcontroller.text.trim();
+                     if(isValidEmail(email)){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerification(email: email)));
+                     }else{
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Invalid Email Id"))
                       );
+                     }
                       print('Account Registered');
                     },
                     child: Text(
