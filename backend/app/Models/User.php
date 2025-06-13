@@ -62,4 +62,10 @@ class User extends Authenticatable
     {
         return 'user_mail';
     }
+
+    public function getAuthPassword()   // tells Auth where hashed pwd lives
+{
+    return $this->user_password;
+}
+
 }

@@ -24,14 +24,24 @@ return new class extends Migration {
             $table->id('driver_id')->primary()->autoIncrement();
             $table->string('driver_name')->nullable(false);
             $table->string('driver_mail', 100)->nullable(false);
+              $table->string('user_password')->nullable(false);
             $table->string('driver_phone', 10)->nullable(false);
             $table->string('driver_vehno')->nullable(false);
-            $table->string('driver_location')->nullable(false);
+             $table->string('driver_district')->nullable(false);
+            $table->string('driver_location')->nullable(true);
             $table->string('driver_status')->nullable(false);
             $table->string('driver_capacity')->nullable(false);
             $table->string('driver_license')->nullable(false);
             $table->timestamps();
 
+        });
+        Schema::create('admin', function (Blueprint $table) {
+            $table->id('admin_id')->primary()->autoIncrement();
+  
+            $table->string('admin_password')->nullable(false);
+            $table->string('admin_mail', 100)->nullable(false);
+            
+            $table->timestamps();
         });
 
         Schema::create('facility', function (Blueprint $table) {

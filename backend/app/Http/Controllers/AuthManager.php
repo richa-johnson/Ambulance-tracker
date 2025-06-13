@@ -52,7 +52,7 @@ class AuthManager extends Controller
     public function login(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'user_email'    => 'required|email|exists:user,user_email',
+            'user_mail'    => 'required|email|exists:user,user_mail',
             'user_password' => 'required|string',
         ]);
 
@@ -63,7 +63,10 @@ class AuthManager extends Controller
             ], 422);
         }
 
-        $credentials = $validate->validated();
+         $credentials = [
+        'user_mail' => $request->user_mail,
+        'password'  => $request->user_password,  // ⚠️ must be 'password'
+    ];
 
         if (!Auth::attempt($credentials)) {
             return response()->json([
