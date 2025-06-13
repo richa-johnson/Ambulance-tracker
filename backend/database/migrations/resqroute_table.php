@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('user', function (Blueprint $table) {
             $table->id('user_id')->primary()->autoIncrement();
             $table->string('user_name')->nullable(false);
+            $table->string('user_password')->nullable(false);
             $table->string('user_mail', 100)->nullable(false);
             $table->string('user_phone', 10)->nullable(false);
             $table->string('user_district')->nullable(false);
