@@ -1,8 +1,11 @@
-import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:ambulance_tracker/registration/facilities_screen.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:email_otp_auth/email_otp_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class DriverRegistration extends StatefulWidget {
   const DriverRegistration({super.key});
@@ -12,7 +15,7 @@ class DriverRegistration extends StatefulWidget {
 }
 
 class DriverRegistrationState extends State<DriverRegistration> {
-  String? selectedValue,selectedSector;
+  String? selectedValue, selectedSector;
   List<String> districts = [
     'Thiruvananthapuram',
     'Kollam',
@@ -29,8 +32,8 @@ class DriverRegistrationState extends State<DriverRegistration> {
     'Kannur',
     'Kasaragod',
   ];
-  List<String> sector=[
-     "Emergency Medical Services (EMS)",
+  List<String> sector = [
+    "Emergency Medical Services (EMS)",
     "Non-Emergency Transport",
     "Private Ambulance Services",
     "Military Ambulance Services",
@@ -40,12 +43,34 @@ class DriverRegistrationState extends State<DriverRegistration> {
     "Fire Department Ambulance",
     "Hospital-Based Ambulance",
     "Event Medical Coverage",
-    "Industrial/Occupational Health Ambulance"
+    "Industrial/Occupational Health Ambulance",
   ];
 
   final TextEditingController emailcontroller=TextEditingController();
   bool isValidEmail(String email){
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  File? image;
+
+  Future<void> pickImage() async {
+    if (Platform.isAndroid) {
+      var status = await Permission.photos.request(); // For Android 13+
+      if (status.isDenied || status.isPermanentlyDenied) {
+        print("Permission not granted");
+        return;
+      }
+    }
+
+    final pickedImage = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedImage != null) {
+      final imageFile = File(pickedImage.path);
+      setState(() {
+        image = imageFile;
+      });
+    } else {
+      print("No image selected");
+    }
   }
 
   @override
@@ -256,43 +281,59 @@ class DriverRegistrationState extends State<DriverRegistration> {
                           icon: Icon(Icons.add),
                           color: Colors.black.withAlpha(107),
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> FacilitiesScreen()));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FacilitiesScreen(),
+                              ),
+                            );
                           },
-                        )
+                        ),
                       ),
                     ),
                   ),
                 ),
                 SizedBox(height: 10),
-                SizedBox(
-                  width: 325,
-                  height: 55,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(227, 185, 197, 1.0),
+                ElevatedButton(
+                  onPressed: pickImage,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "IMPORT LICENSE",
-                            style: TextStyle(
-                              color: Color.fromRGBO(0, 0, 0, 42),
-                              fontSize: 16,
+                    backgroundColor: Color.fromRGBO(227, 185, 197, 1.0),
+                    elevation: 3,
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: SizedBox(
+                    width: 325,
+                    height: 55,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(227, 185, 197, 1.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              image != null ? image!.path : "IMPORT LICENSE",
+                              style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 42),
+                                fontSize: 14,
+                              ),
+                              overflow:
+                                  TextOverflow
+                                      .ellipsis, // Truncate long paths nicely
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(
+                          Icon(
                             Icons.add_a_photo,
                             color: Colors.black.withAlpha(107),
                             size: 20,
                           ),
-                          onPressed: homepage.new,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
