@@ -12,7 +12,7 @@ use PhpParser\Node\Expr\List_;
 class Driver extends Authenticatable{
     use HasFactory, Notifiable, HasApiTokens;
     protected $table='driver';
-    protected $primarykey='driver_id';
+    protected $primaryKey='driver_id';
     public $incrementing =true;
     /**
     *@var list<string>

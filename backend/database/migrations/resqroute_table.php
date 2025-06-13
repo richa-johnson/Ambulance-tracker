@@ -24,7 +24,7 @@ return new class extends Migration {
             $table->id('driver_id')->primary()->autoIncrement();
             $table->string('driver_name')->nullable(false);
             $table->string('driver_mail', 100)->nullable(false);
-              $table->string('user_password')->nullable(false);
+              $table->string('driver_password')->nullable(false);
             $table->string('driver_phone', 10)->nullable(false);
             $table->string('driver_vehno')->nullable(false);
              $table->string('driver_district')->nullable(false);
@@ -45,7 +45,7 @@ return new class extends Migration {
         });
 
         Schema::create('facility', function (Blueprint $table) {
-            $table->id('driver_id')->nullable(false);
+            $table->unsignedBigInteger('driver_id')->nullable(false);
             $table->string('facility')->nullable(false);
 
             $table->foreign('driver_id')->references('driver_id')->on('driver')->onDelete('cascade');
