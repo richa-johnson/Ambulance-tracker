@@ -12,7 +12,7 @@ Route::post('/auth/adminregister',[AuthManager::class,'adminregister']);
 
 Route::post('/auth/login', [AuthManager::class, "login"]);
     
-
+Route::post('/auth/driverregister',[AuthManager::class,'driverregister']);
 
 // Route::middleware('auth:sanctum')->group(function () {
 
@@ -31,3 +31,5 @@ Route::post('/auth/login', [AuthManager::class, "login"]);
 //         Route::get('/user/profile', [UserController::class, 'profile']);
 //     });
 // });
+
+

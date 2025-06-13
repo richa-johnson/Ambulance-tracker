@@ -45,7 +45,7 @@ return new class extends Migration {
         });
 
         Schema::create('facility', function (Blueprint $table) {
-            $table->id('driver_id')->nullable(false);
+            $table->unsignedBigInteger('driver_id')->nullable(false);
             $table->string('facility')->nullable(false);
 
             $table->foreign('driver_id')->references('driver_id')->on('driver')->onDelete('cascade');
