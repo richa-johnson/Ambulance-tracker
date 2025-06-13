@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code
+
 import 'package:ambulance_tracker/registration/facilities_screen.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
 import 'package:email_otp_auth/email_otp_auth.dart';
@@ -14,7 +16,7 @@ class DriverRegistration extends StatefulWidget {
   State<DriverRegistration> createState() => DriverRegistrationState();
 }
 
-class DriverRegistrationState extends State<DriverRegistration> {
+class DriverRegistrationState extends State<DriverRegistration>{
   String? selectedValue, selectedSector;
   List<String> districts = [
     'Thiruvananthapuram',
@@ -49,6 +51,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
   final TextEditingController emailcontroller=TextEditingController();
   bool isValidEmail(String email){
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  }
   File? image;
 
   Future<void> pickImage() async {
@@ -377,6 +380,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
     );
   }
 }
+
 
 class CustomTextField extends StatelessWidget {
   final String hint;
