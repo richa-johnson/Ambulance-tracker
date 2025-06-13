@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Driver;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;            // ← add this
+use Illuminate\Support\Facades\Hash;         // ← add this
 
 class AuthManager extends Controller
 {
@@ -52,19 +53,41 @@ class AuthManager extends Controller
         $validate= Validator::make($request->all(),
             [
                 'name'=> 'required',
-                'phone_no'=> ['required','regex:/^[0-9]{10}$/','unique:driver',],
-                'email'=>['required','email','unique:driver'],
-                'district'=>['required',Rule::in($alloweddistricts),],
+                'phone_no'=> ['required','regex:/^[0-9]{10}$/','unique:driver,driver_phone',],
+                'password'=>['required',],
+                'email'=>['required','email','unique:driver,driver_mail'],
+                'district'=>['required',],
                 'vehicle no'=>['required','regex:/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/',],
                 'capacity'=>'required',
-                'sector'=>['required',Rule::in($allowedsector),],
-                'facilities'=>'required|array',
-                'facilities.*'=>['required',Rule::in($alloedFacilities),],
-                'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
+                'sector'=>['required',],
+                //'facilities'=>'required|array',
+                //'facilities.*'=>['required',],
+                //'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
             ]);
         if ($validate->fails()){
             return response()->json(["status"=>"error","message"=>$validate->errors()->getMessages()],status:200);
         }
+        $data=$validate->validated();
+        //$licensePath = $request->file('license')->store('licenses', 'public');
+
+        $driver = Driver::create([
+            'driver_name'     => $data['name'],
+            'driver_mail'    => $data['email'],
+            'driver_password' => Hash::make($data['password']),
+            'driver_phone'=>$data['phone_no'],
+            'driver_district'=>$data['district'],
+            'driver_vehno'     => $data['vehicle no'],
+            'driver_status'     => 'unavailable',
+            'driver_capacity'     => $data['capacity'],
+            'driver_license'     => "licensePath",
+        ]);
+        $token = $driver->createToken('mobile_token')->plainTextToken;
+
+        return response()->json([
+            'status'  => 'success',
+            'data'    => ['user' => $driver, 'token' => $token],
+            'message' => 'Registered successfully',
+        ], 201);
     }
     /** POST /api/auth/login */
     public function login(Request $request)
