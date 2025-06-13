@@ -1,20 +1,33 @@
 import 'package:ambulance_tracker/registration/password.dart';
+import 'package:email_otp_auth/email_otp_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OtpVerification extends StatefulWidget {
-  const OtpVerification({super.key});
+  final String email;
+  const OtpVerification({super.key, required this.email});
 
   @override
   State<OtpVerification> createState() => _OtpVerificationState();
 }
 
 class _OtpVerificationState extends State<OtpVerification> {
-  final int otpLength = 5;
+  final int otpLength = 6;
   late List<FocusNode> focusNodes;
   late List<TextEditingController> controllers;
-  List<String> otpvalues=List.filled(5,'');
+  List<String> otpvalues=List.filled(6,'');
 
+  Future<void> sendOtpEmail(String email)async{
+    await EmailOtpAuth.sendOTP(email: email);
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("OTP sent to your via email to ${widget.email}")),
+    );
+  }
+  Future<void> verifyOtp() async{
+    String otp = otpvalues.join();
+    await EmailOtpAuth.verifyOtp(otp: otp);
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>Password()));
+  }
   @override
   void initState() {
     super.initState();
@@ -90,12 +103,17 @@ class _OtpVerificationState extends State<OtpVerification> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 50),
-                Padding(padding: EdgeInsets.only(right: 15,left: 15),
-                  child:Text(
-                    "Your One Time Password (OTP) has been sent via SMS to your registered mobile number.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Color.fromRGBO(87, 24, 44,1.0), fontSize: 18),
-                  ),
+                ElevatedButton(onPressed: (){
+                  sendOtpEmail(widget.email);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                  minimumSize: Size(265,55),
+                ),
+                child: Text(
+                  "SEND OTP",
+                  style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                ),
                 ),
                 SizedBox(height: 50),
                 Text(
@@ -132,9 +150,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                 SizedBox(height: 80),
                 ElevatedButton(onPressed: otpvalues.every((val) => val.isNotEmpty)
                 ?(){
-                  Navigator.push(context, 
-                  MaterialPageRoute(builder: (context)=>Password()),
-                  );
+                  verifyOtp();
                   }:null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
