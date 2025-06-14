@@ -36,8 +36,20 @@ return [
     */
 
     'guards' => [
-        'web' => [
+        'admin' => [
             'driver' => 'session',
+            'provider' => 'admins',
+        ],
+        'driver' => [
+            'driver' => 'session',
+            'provider' => 'drivers',
+        ],
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+        'api' => [
+            'driver' => 'sanctum', // keep this for API token handling
             'provider' => 'users',
         ],
     ],
@@ -58,11 +70,18 @@ return [
     | Supported: "database", "eloquent"
     |
     */
-
     'providers' => [
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+        'drivers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Driver::class,
+        ],
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\User::class,
         ],
 
         // 'users' => [
