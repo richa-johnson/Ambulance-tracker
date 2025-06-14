@@ -202,7 +202,7 @@ class _PasswordState extends State<Password> {
                           set.text.isNotEmpty) {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => loginPage()),
+                          MaterialPageRoute(builder: (context) => LoginPage()),
                         );
                         print("Password set successfully");
                       } else {

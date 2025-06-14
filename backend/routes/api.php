@@ -14,22 +14,25 @@ Route::post('/auth/login', [AuthManager::class, "login"]);
     
 Route::post('/auth/driverregister',[AuthManager::class,'driverregister']);
 
-// Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
-//     // Admin-only routes
-//     Route::middleware('ability:admin')->group(function () {
-//         Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-//     });
+    // // Admin-only routes
+    // Route::middleware('ability:admin')->group(function () {
+    //     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    // });
 
-//     // Driver-only routes
-//     Route::middleware('ability:driver')->group(function () {
-//         Route::get('/driver/requests', [DriverController::class, 'requests']);
-//     });
+    // // Driver-only routes
+    // Route::middleware('ability:driver')->group(function () {
+    //     Route::get('/driver/requests', [DriverController::class, 'requests']);
+    // });
 
-//     // User-only routes
-//     Route::middleware('ability:user')->group(function () {
-//         Route::get('/user/profile', [UserController::class, 'profile']);
-//     });
-// });
+    // // User-only routes
+    // Route::middleware('ability:user')->group(function () {
+    //     Route::get('/user/profile', [UserController::class, 'profile']);
+    // });
+
+    Route::post('/auth/logout',[AuthManager::class,'logout']);
+    Route::get('/auth/user',[AuthManager::class,'user']);
+});
 
 

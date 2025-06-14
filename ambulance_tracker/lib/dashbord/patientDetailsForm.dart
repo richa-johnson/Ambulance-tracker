@@ -2,7 +2,7 @@
 import 'package:ambulance_tracker/dashbord/availableAmbulance.dart';
 import 'package:ambulance_tracker/registration/basic.dart';
 import 'package:flutter/material.dart';
-import 'package:ambulance_tracker/registration/user.dart';
+import 'package:ambulance_tracker/registration/userRegistration.dart';
 import 'package:flutter/services.dart';
 
 class patientDetailsForm extends StatefulWidget {
@@ -15,6 +15,7 @@ class patientDetailsForm extends StatefulWidget {
 class _patientDetailsFormState extends State<patientDetailsForm> {
   List<String> bloodGroup = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
   String? selectedDistrict;
+   final txtEmail    = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +105,7 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                CustomInputField(hintText: 'NAME'),
+                CustomInputField(    controller: txtEmail,hintText: 'NAME'),
                 const SizedBox(height: 20),
                 CustomInputFieldNumber(hintText: 'AGE'),
                 const SizedBox(height: 20),
