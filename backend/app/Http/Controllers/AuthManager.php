@@ -70,14 +70,14 @@ class AuthManager extends Controller
                 'sector' => ['required',],
                 'facilities' => 'required|array',
                 'facilities.*' => ['required',],
-                //'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
+                'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
             ]
         );
         if ($validate->fails()) {
             return response()->json(["status" => "error", "message" => $validate->errors()->getMessages()], status: 200);
         }
         $data = $validate->validated();
-        //$licensePath = $request->file('license')->store('licenses', 'public');
+        $licensePath = $request->file('license')->store('licenses', 'public');
 
         $driver = Driver::create([
             'driver_name' => $data['name'],
@@ -88,7 +88,7 @@ class AuthManager extends Controller
             'driver_vehno' => $data['vehicle no'],
             'driver_status' => 'unavailable',
             'driver_capacity' => $data['capacity'],
-            'driver_license' => "licensePath",
+            'driver_license' => $licensePath,
         ]);
         foreach ($data['facilities'] as $facility) {
             Facility::create([
