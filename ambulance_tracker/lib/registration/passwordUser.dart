@@ -234,7 +234,7 @@ class _PasswordUserState extends State<PasswordUser> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => loginPage(),
+                                builder: (context) => LoginPage(),
                               ),
                             );
                           } else {

@@ -213,26 +213,34 @@ class _userRegistrationState extends State<userRegistration> {
   }
 }
 
-class CustomInputField extends StatelessWidget {
-  final TextEditingController controller;
+class CustomInputField extends StatelessWidget{
+   final TextEditingController controller;
   final String hintText;
-  const CustomInputField({
-    super.key,
-    required this.hintText,
-    required this.controller,
-  });
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
 
+  const CustomInputField({
+    required this.controller,
+    required this.hintText,
+    this.obscureText = false,
+    this.keyboardType,
+    this.validator,
+  });
+  
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Container(
       width: 325,
       height: 66,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(227, 185, 197, 1.0),
-        borderRadius: BorderRadius.circular(10),
+        color: Color.fromRGBO(227, 185, 197,1.0),
+        borderRadius: BorderRadius.circular(10)
       ),
       child: TextField(
-        controller: controller,
+        controller:controller,
+       obscureText: obscureText,
+         keyboardType: keyboardType,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
@@ -240,7 +248,7 @@ class CustomInputField extends StatelessWidget {
             fontSize: 16,
             color: Color.fromRGBO(0, 0, 0, 42),
           ),
-          contentPadding: EdgeInsets.only(left: 19, top: 20),
+          contentPadding: EdgeInsets.only(left:19,top:20),
         ),
       ),
     );
