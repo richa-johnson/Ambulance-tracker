@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
-use App\Models\Driver;
+use App\Models\ambulanceDriver;
 use App\Models\Facility;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -64,19 +64,19 @@ class AuthManager extends Controller
                 'password' => ['required',],
                 'email' => ['required', 'email', 'unique:driver,driver_mail'],
                 'district' => ['required',],
-                'vehicle no' => ['required', 'regex:/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/',],
+                'vehicle_no' => ['required', 'regex:/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/',],
                 'capacity' => 'required',
                 'sector' => ['required',],
                 'facilities' => 'required|array',
                 'facilities.*' => ['required',],
-                //'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
+                'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
             ]
         );
         if ($validate->fails()) {
             return response()->json(["status" => "error", "message" => $validate->errors()->getMessages()], status: 200);
         }
         $data = $validate->validated();
-        //$licensePath = $request->file('license')->store('licenses', 'public');
+        $licensePath = $request->file('license')->store('licenses', 'public');
 
         $driver = Driver::create([
             'driver_name' => $data['name'],
@@ -84,10 +84,10 @@ class AuthManager extends Controller
             'driver_password' => Hash::make($data['password']),
             'driver_phone' => $data['phone_no'],
             'driver_district' => $data['district'],
-            'driver_vehno' => $data['vehicle no'],
+            'driver_vehno' => $data['vehicle_no'],
             'driver_status' => 'unavailable',
             'driver_capacity' => $data['capacity'],
-            'driver_license' => "licensePath",
+            'driver_license' => $licensePath,
         ]);
         foreach ($data['facilities'] as $facility) {
             Facility::create([
