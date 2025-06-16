@@ -1,6 +1,11 @@
+import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/activityHistory.dart';
 import 'package:ambulance_tracker/dashbord/driverDetails.dart';
 import 'package:ambulance_tracker/dashbord/userDetails.dart';
+import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/services/user_services.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -11,6 +16,34 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  Future<bool> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("No token found.");
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse(logoutURL),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    print("Logout response: ${response.statusCode}");
+
+    if (response.statusCode == 200) {
+      await prefs.remove('token');
+      await prefs.remove('userId');
+      return true;
+    } else {
+      ScaffoldMessenger.of(
+        context
+      ).showSnackBar(SnackBar(content: Text("Logout failed")));
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +109,30 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     Padding(
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        print("Logout button pressed");
+                        final success = await _logout(context);
+                        print("Logout success: $success");
+                        if (!mounted) return;
+                        if (success) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (_) => LoginPage(),
+                            ),
+                            (route) => false,
+                          );
+                        }
+                        ;
+                      },
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(
+                          color: Color.fromRGBO(0, 0, 0, 1),
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -195,51 +252,91 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 child: Column(
                   children: [
                     SizedBox(height: 40),
-                    ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>UserDetails()),);}, 
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserDetails(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                        minimumSize: Size(265,55),
+                        minimumSize: Size(265, 55),
                       ),
                       child: Text(
                         "USER DETAILS",
-                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                        style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 1.0),
+                          fontSize: 24,
+                        ),
                       ),
                     ),
                     SizedBox(height: 30),
-                    ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DriverDetails()),);}, 
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DriverDetails(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                        minimumSize: Size(265,55),
+                        minimumSize: Size(265, 55),
                       ),
                       child: Text(
                         "DRIVER DETAILS",
-                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                        style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 1.0),
+                          fontSize: 24,
+                        ),
                       ),
                     ),
                     SizedBox(height: 30),
-                    ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>ActivityHistory()),);}, 
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ActivityHistory(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                        minimumSize: Size(265,55),
+                        minimumSize: Size(265, 55),
                       ),
                       child: Text(
                         "ACTIVITY HISTORY",
-                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                        style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 1.0),
+                          fontSize: 24,
+                        ),
                       ),
                     ),
                     SizedBox(height: 30),
-                    ElevatedButton(onPressed: (){
-                      Navigator.push(context,MaterialPageRoute(builder: (context)=>ActivityHistory()),);}, 
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ActivityHistory(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                        minimumSize: Size(265,55),
+                        minimumSize: Size(265, 55),
                       ),
                       child: Text(
                         "TRACK AMBULANCE",
-                        style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
+                        style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 1.0),
+                          fontSize: 24,
+                        ),
                       ),
                     ),
                   ],

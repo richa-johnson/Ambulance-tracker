@@ -4,6 +4,7 @@ const userregisterURL = "$baseURL/auth/userregister";
 const driverregisterURL = "$baseURL/auth/driverregister";
 const adminregisterURL = "$baseURL/auth/adminregister";
 const userURL = "$baseURL/auth/getuser";
+const logoutURL="$baseURL/auth/logout";
 
 const serverError = 'server error';
 const unauthorized = 'Unauthorized';
