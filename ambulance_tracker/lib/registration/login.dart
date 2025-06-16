@@ -1,6 +1,6 @@
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/registration/forgotpassword.dart';
-import 'package:ambulance_tracker/registration/user.dart';
+import 'package:ambulance_tracker/registration/userRegistration.dart';
 import 'package:flutter/material.dart';
 
 class loginPage extends StatefulWidget {
@@ -11,6 +11,8 @@ class loginPage extends StatefulWidget {
 }
 
 class _loginPageState extends State<loginPage> {
+  final TextEditingController phonecontroller = TextEditingController();
+  final TextEditingController passwordcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,33 +54,39 @@ class _loginPageState extends State<loginPage> {
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
-          child:Padding(
+          child: Padding(
             padding: const EdgeInsets.only(top: 114),
-            child:SingleChildScrollView(
+            child: SingleChildScrollView(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
               child: Column(
                 children: [
                   Text(
-                  "LOGIN",
-                  style: TextStyle(
-                    color: Color.fromRGBO(87, 24, 44, 1),
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                    "LOGIN",
+                    style: TextStyle(
+                      color: Color.fromRGBO(87, 24, 44, 1),
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 50),
-                  CustomInputField(hintText: 'PHONE NUMBER'),
+                  CustomInputField(hintText: 'PHONE NUMBER',controller: phonecontroller,),
                   const SizedBox(height: 20),
-                  CustomInputField(hintText: 'PASSWORD'),
+                  CustomInputField(hintText: 'PASSWORD',controller: passwordcontroller,),
                   const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Padding(padding: EdgeInsets.only(right: 50),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 50),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Forgotpassword()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Forgotpassword(),
+                            ),
+                          );
                         },
                         child: Text(
                           "forgot password?",
@@ -94,20 +102,26 @@ class _loginPageState extends State<loginPage> {
                     ),
                   ),
                   SizedBox(height: 72),
-                  ElevatedButton(onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context)=>userdashboard()),
-                    );
-                  }, 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                    minimumSize: Size(265,55),
-                  ),
-                  child: Text(
-                    "SUBMIT",
-                    style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
-                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => userdashboard(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                      minimumSize: Size(265, 55),
+                    ),
+                    child: Text(
+                      "SUBMIT",
+                      style: TextStyle(
+                        color: Color.fromRGBO(255, 255, 255, 1.0),
+                        fontSize: 24,
+                      ),
+                    ),
                   ),
                 ],
               ),

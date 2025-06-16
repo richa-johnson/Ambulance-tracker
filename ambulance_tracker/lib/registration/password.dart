@@ -1,8 +1,11 @@
+import 'dart:io';
 import "package:ambulance_tracker/registration/login.dart";
 import "package:flutter/material.dart";
+import 'package:http/http.dart' as http;
 
 class Password extends StatefulWidget {
-  const Password({super.key});
+  final Map<String, dynamic> Data;
+  const Password({super.key, required this.Data});
 
   @override
   State<Password> createState() => _PasswordState();
@@ -197,23 +200,98 @@ class _PasswordState extends State<Password> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (set.text.trim() == confirm.text.trim() &&
                           set.text.isNotEmpty) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => loginPage()),
+                        final fullData = {
+                          ...widget
+                              .Data, // contains name, email, phone_no, etc.
+                          "password": set.text.trim(),
+                        };
+
+                        File imageFile =
+                            fullData["license"]; // Get license File
+                        fullData.remove(
+                          "license",
+                        ); // Remove it from map since it'll go as file
+
+                        final url = Uri.parse(
+                          "http://10.0.2.2:8000/api/auth/driverregister",
                         );
-                        print("Password set successfully");
+
+                        var request = http.MultipartRequest("POST", url);
+
+                        // Add image file (license)
+                        request.files.add(
+                          await http.MultipartFile.fromPath(
+                            'license',
+                            imageFile.path,
+                          ),
+                        );
+
+                        // Add other fields
+                        fullData.forEach((key, value) {
+                          if (key == "facilities" && value is List) {
+                            for (int i = 0; i < value.length; i++) {
+                              request.fields["facilities[$i]"] = value[i];
+                            }
+                          } else {
+                            request.fields[key] = value.toString();
+                          }
+                        });
+
+                        try {
+                          var streamedResponse = await request.send();
+                          var response = await http.Response.fromStream(
+                            streamedResponse,
+                          );
+
+                          if (response.statusCode == 200 ||
+                              response.statusCode == 201) {
+                            print("Driver registered successfully");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Registration Successful"),
+                              ),
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => loginPage(),
+                              ),
+                            );
+                          } else {
+                            print("Failed response: ${response.body}");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Registration failed. Please try again.",
+                                ),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          print("Error during API call: ${e.toString()}");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Something went wrong. Please try again.",
+                              ),
+                            ),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("Fix errors before submitting"),
+                            content: Text(
+                              "Passwords do not match or are empty.",
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );
                       }
                     },
+
                     child: Text(
                       "SUBMIT",
                       style: TextStyle(

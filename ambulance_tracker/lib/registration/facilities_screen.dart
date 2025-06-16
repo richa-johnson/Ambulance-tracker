@@ -2,7 +2,9 @@ import 'package:ambulance_tracker/registration/driver.dart';
 import 'package:flutter/material.dart';
 
 class FacilitiesScreen extends StatefulWidget {
-  const FacilitiesScreen({super.key});
+  final List<String>? previouslySelected;
+
+  const FacilitiesScreen({Key? key, this.previouslySelected}) : super(key: key);
 
   @override
   State<FacilitiesScreen> createState() => _FacilitiesScreenState();
@@ -11,32 +13,41 @@ class FacilitiesScreen extends StatefulWidget {
 class _FacilitiesScreenState extends State<FacilitiesScreen> {
   bool selectAll = false;
   final List<String> facilities = [
-    'Facility1',
-    'Facility2',
-    'abcd',
-    'Facility4',
-    'Facility5',
-    'Facility6',
-    'abdr7',
-    'Facility8',
-    'Facility9',
-    'Facility10',
-    'Facility11',
-    'Facility12',
-    'Facility13',
+    'Oxygen cylinder with mask',
+    'Stretcher and wheelchair',
+    'Basic monitoring equipment',
+    'Splints,immobilization devices',
+    'Suction device',
+    'Cardiac Ambulance',
+    'advanced Ventilator',
+    'Multi-parameter patient monitor',
+    'Intravenous (IV) supplies',
+    'Power backup',
+    'UV disinfection light',
+    'Paramedic staff and critical care physician',
+    'hydraulic lift for stretchers',
+    'GPS and route optimization system',
+    'Neonatal Ambulance',
+    'Mortuary Ambulance',
   ];
 
   late List<bool> checkboxValues;
   TextEditingController searchController = TextEditingController();
   List<String> filteredFacilities = [];
 
-  @override
-  void initState() {
-    super.initState();
-    checkboxValues = List.generate(facilities.length, (_) => false);
-    filteredFacilities = List.from(facilities); // show all at first
-    searchController.addListener(_filterFacilities);
-  }
+ @override
+void initState() {
+  super.initState();
+  checkboxValues = List.generate(facilities.length, (index) {
+    return widget.previouslySelected?.contains(facilities[index]) ?? false;
+  });
+  filteredFacilities = List.from(facilities);
+  searchController.addListener(_filterFacilities);
+
+  // update selectAll if all are selected
+  selectAll = checkboxValues.every((val) => val == true);
+}
+
 
   void _filterFacilities() {
     String query = searchController.text.toLowerCase();
@@ -230,17 +241,18 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
               //add icon
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
-                child:Row(
+                child: Row(
                   children: [
-                  
                     Icon(Icons.add_circle_outline),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5),
-                      child:Text('ADD',style: TextStyle(
-                      fontWeight:FontWeight.w500,
-                    ),),),
+                      child: Text(
+                        'ADD',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ),
                   ],
-                )
+                ),
               ),
               //applybutton
               Container(
@@ -253,7 +265,13 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
                     backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
                   ),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> DriverRegistration()));
+                    List<String> selected = [];
+                    for (int i = 0; i < facilities.length; i++) {
+                      if (checkboxValues[i]) {
+                        selected.add(facilities[i]);
+                      }
+                    }
+                    Navigator.pop(context, selected);
                   },
                   child: Text(
                     'APPLY',

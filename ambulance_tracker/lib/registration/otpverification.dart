@@ -5,7 +5,12 @@ import 'package:flutter/services.dart';
 
 class OtpVerification extends StatefulWidget {
   final String email;
-  const OtpVerification({super.key, required this.email});
+  final Map<String, dynamic> Data;
+  const OtpVerification({
+    super.key,
+    required this.email,
+    required this.Data,
+  });
 
   @override
   State<OtpVerification> createState() => _OtpVerificationState();
@@ -15,19 +20,26 @@ class _OtpVerificationState extends State<OtpVerification> {
   final int otpLength = 6;
   late List<FocusNode> focusNodes;
   late List<TextEditingController> controllers;
-  List<String> otpvalues=List.filled(6,'');
+  List<String> otpvalues = List.filled(6, '');
 
-  Future<void> sendOtpEmail(String email)async{
+  Future<void> sendOtpEmail(String email) async {
     await EmailOtpAuth.sendOTP(email: email);
     ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text("OTP sent to your via email to ${widget.email}")),
+      SnackBar(content: Text("OTP sent to your via email to ${widget.email}")),
     );
   }
-  Future<void> verifyOtp() async{
+
+  Future<void> verifyOtp() async {
     String otp = otpvalues.join();
     await EmailOtpAuth.verifyOtp(otp: otp);
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>Password()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Password(Data: widget.Data),
+      ),
+    );
   }
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +57,7 @@ class _OtpVerificationState extends State<OtpVerification> {
     }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,97 +101,111 @@ class _OtpVerificationState extends State<OtpVerification> {
           ),
           child: Padding(
             padding: EdgeInsets.only(top: 72),
-            child:SingleChildScrollView(
+            child: SingleChildScrollView(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-            child: Column(
-              children: [
-                Text(
-                  "OTP VERIFICATION",
-                  style: TextStyle(
-                    color: Color.fromRGBO(87, 24, 44,1.0),fontSize: 32,
-                    fontWeight: FontWeight.bold
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 50),
-                ElevatedButton(onPressed: (){
-                  sendOtpEmail(widget.email);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                  minimumSize: Size(265,55),
-                ),
-                child: Text(
-                  "SEND OTP",
-                  style: TextStyle(color: Color.fromRGBO(255,255,255,1.0), fontSize: 24),
-                ),
-                ),
-                SizedBox(height: 50),
-                Text(
-                  "ENTER OTP CODE",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color.fromRGBO(87, 24, 44,1.0),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(otpLength, (index) {
-                    return CustomOtp(
-                      controller: controllers[index],
-                      focusNode: focusNodes[index],
-                      onChanged: (value) {
-                        setState(() {
-                          otpvalues[index]=value;
-                        });
-                        if (value.isNotEmpty && index < otpLength - 1) {
-                          FocusScope.of(context).requestFocus(focusNodes[index + 1]);
-                        } else if (value.isEmpty && index > 0) {
-                          FocusScope.of(context).requestFocus(focusNodes[index - 1]);
-                        } else if (index == otpLength - 1) {
-                          focusNodes[index].unfocus();
-                        }
-                      },
-                    );
-                  }),
-                ),
-                SizedBox(height: 80),
-                ElevatedButton(onPressed: otpvalues.every((val) => val.isNotEmpty)
-                ?(){
-                  verifyOtp();
-                  }:null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                    minimumSize: Size(161,47),
-                  ),
-                  child: Text(
-                    "VERIFY",
+              child: Column(
+                children: [
+                  Text(
+                    "OTP VERIFICATION",
                     style: TextStyle(
-                      color: Color.fromRGBO(255,255,255,1.0), fontSize: 24
+                      color: Color.fromRGBO(87, 24, 44, 1.0),
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 50),
+                  ElevatedButton(
+                    onPressed: () {
+                      sendOtpEmail(widget.email);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                      minimumSize: Size(265, 55),
+                    ),
+                    child: Text(
+                      "SEND OTP",
+                      style: TextStyle(
+                        color: Color.fromRGBO(255, 255, 255, 1.0),
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 50),
+                  Text(
+                    "ENTER OTP CODE",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromRGBO(87, 24, 44, 1.0),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(otpLength, (index) {
+                      return CustomOtp(
+                        controller: controllers[index],
+                        focusNode: focusNodes[index],
+                        onChanged: (value) {
+                          setState(() {
+                            otpvalues[index] = value;
+                          });
+                          if (value.isNotEmpty && index < otpLength - 1) {
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(focusNodes[index + 1]);
+                          } else if (value.isEmpty && index > 0) {
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(focusNodes[index - 1]);
+                          } else if (index == otpLength - 1) {
+                            focusNodes[index].unfocus();
+                          }
+                        },
+                      );
+                    }),
+                  ),
+                  SizedBox(height: 80),
+                  ElevatedButton(
+                    onPressed:
+                        otpvalues.every((val) => val.isNotEmpty)
+                            ? () {
+                              verifyOtp();
+                            }
+                            : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                      minimumSize: Size(161, 47),
+                    ),
+                    child: Text(
+                      "VERIFY",
+                      style: TextStyle(
+                        color: Color.fromRGBO(255, 255, 255, 1.0),
+                        fontSize: 24,
+                      ),
                     ),
                   ),
                   SizedBox(height: 120),
                   Text(
                     "DID NOT RECEIVE OTP?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color.fromRGBO(87, 24, 44,1.0)),
+                    style: TextStyle(color: Color.fromRGBO(87, 24, 44, 1.0)),
                   ),
                   Text(
                     "RESEND",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color.fromRGBO(0, 0, 255,1.0),
-                    decoration: TextDecoration.underline,
-                    decorationColor: Color.fromRGBO(0, 0, 255, 1),
+                    style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 255, 1.0),
+                      decoration: TextDecoration.underline,
+                      decorationColor: Color.fromRGBO(0, 0, 255, 1),
                     ),
                   ),
-              ],
-            ),
+                ],
+              ),
             ),
           ),
         ),
@@ -186,7 +213,8 @@ class _OtpVerificationState extends State<OtpVerification> {
     );
   }
 }
-class CustomOtp extends StatelessWidget{
+
+class CustomOtp extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final Function(String) onChanged;
@@ -199,7 +227,7 @@ class CustomOtp extends StatelessWidget{
   });
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Container(
       height: 46,
       width: 40,
@@ -212,17 +240,11 @@ class CustomOtp extends StatelessWidget{
         focusNode: focusNode,
         maxLength: 1,
         textAlign: TextAlign.center,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          counterText: '',
-        ),
+        decoration: InputDecoration(border: InputBorder.none, counterText: ''),
         keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-        ],
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         onChanged: onChanged,
       ),
     );
-  } 
+  }
 }
-

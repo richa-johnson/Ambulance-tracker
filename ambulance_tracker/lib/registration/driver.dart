@@ -2,7 +2,6 @@
 
 import 'package:ambulance_tracker/registration/facilities_screen.dart';
 import 'package:ambulance_tracker/registration/otpverification.dart';
-import 'package:email_otp_auth/email_otp_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +15,7 @@ class DriverRegistration extends StatefulWidget {
   State<DriverRegistration> createState() => DriverRegistrationState();
 }
 
-class DriverRegistrationState extends State<DriverRegistration>{
+class DriverRegistrationState extends State<DriverRegistration> {
   String? selectedValue, selectedSector;
   List<String> districts = [
     'Thiruvananthapuram',
@@ -47,11 +46,17 @@ class DriverRegistrationState extends State<DriverRegistration>{
     "Event Medical Coverage",
     "Industrial/Occupational Health Ambulance",
   ];
+  List<String> selectedFacilities = [];
+  final TextEditingController emailcontroller = TextEditingController();
+  final TextEditingController namecontroller = TextEditingController();
+  final TextEditingController phonecontroller = TextEditingController();
+  final TextEditingController vehicleNocontroller = TextEditingController();
+  final TextEditingController capacitycontroller = TextEditingController();
 
-  final TextEditingController emailcontroller=TextEditingController();
-  bool isValidEmail(String email){
+  bool isValidEmail(String email) {
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
   }
+
   File? image;
 
   Future<void> pickImage() async {
@@ -74,6 +79,16 @@ class DriverRegistrationState extends State<DriverRegistration>{
     } else {
       print("No image selected");
     }
+  }
+
+  @override
+  void dispose() {
+    namecontroller.dispose();
+    phonecontroller.dispose();
+    vehicleNocontroller.dispose();
+    capacitycontroller.dispose();
+    emailcontroller.dispose();
+    super.dispose();
   }
 
   @override
@@ -136,9 +151,9 @@ class DriverRegistrationState extends State<DriverRegistration>{
                   ),
                 ),
                 SizedBox(height: 30),
-                CustomTextField(hint: 'NAME'),
+                CustomTextField(hint: 'NAME', controller: namecontroller),
                 SizedBox(height: 10),
-                CustomTextField(hint: 'PHONE NO'),
+                CustomTextField(hint: 'PHONE NO', controller: phonecontroller),
                 SizedBox(height: 10),
                 SizedBox(
                   width: 325,
@@ -158,7 +173,10 @@ class DriverRegistrationState extends State<DriverRegistration>{
                           color: Color.fromRGBO(0, 0, 0, 42),
                           fontSize: 16,
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -210,9 +228,15 @@ class DriverRegistrationState extends State<DriverRegistration>{
                   ),
                 ),
                 SizedBox(height: 10),
-                CustomTextField(hint: 'VEHICLE NO'),
+                CustomTextField(
+                  hint: 'VEHICLE NO',
+                  controller: vehicleNocontroller,
+                ),
                 SizedBox(height: 10),
-                CustomTextField(hint: 'CAPACITY'),
+                CustomTextField(
+                  hint: 'CAPACITY',
+                  controller: capacitycontroller,
+                ),
                 SizedBox(height: 10),
                 SizedBox(
                   width: 325,
@@ -247,10 +271,13 @@ class DriverRegistrationState extends State<DriverRegistration>{
                               );
                             }).toList(),
                         onChanged: (String? newValue) {
-                          setState(() {
-                            selectedValue = newValue!;
-                          });
+                          if (newValue != null) {
+                            setState(() {
+                              selectedSector = newValue;
+                            });
+                          }
                         },
+
                         icon: Icon(
                           Icons.arrow_drop_down,
                           color: Colors.black.withAlpha(107),
@@ -263,39 +290,49 @@ class DriverRegistrationState extends State<DriverRegistration>{
                 SizedBox(
                   width: 325,
                   height: 55,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(227, 185, 197, 1.0),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'FACILITIES',
-                        hintStyle: TextStyle(
-                          color: Color.fromRGBO(0, 0, 0, 42), // opacity ~ 42%
-                          fontSize: 16,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.add),
-                          color: Colors.black.withAlpha(107),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FacilitiesScreen(),
-                              ),
-                            );
-                          },
-                        ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(227, 185, 197, 1.0),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    onPressed: () async {
+                      final List<String>? result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => FacilitiesScreen(
+                                previouslySelected:
+                                    selectedFacilities, // Pass selected list
+                              ),
+                        ),
+                      );
+                      if (result != null) {
+                        setState(() {
+                          selectedFacilities = result;
+                        });
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "FACILITIES",
+                          style: TextStyle(
+                            color: Color.fromRGBO(0, 0, 0, 0.6), // ~42% opacity
+                            fontSize: 16,
+                          ),
+                        ),
+                        Icon(Icons.add, color: Colors.black.withAlpha(107)),
+                      ],
                     ),
                   ),
                 ),
+
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: pickImage,
@@ -353,13 +390,34 @@ class DriverRegistrationState extends State<DriverRegistration>{
                     ),
                     onPressed: () {
                       String email = emailcontroller.text.trim();
-                     if(isValidEmail(email)){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerification(email: email)));
-                     }else{
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Invalid Email Id"))
-                      );
-                     }
+                      if (isValidEmail(email)) {
+                        Map<String, dynamic> driverData = {
+                          "name": namecontroller.text,
+                          "email": emailcontroller.text,
+                          "phone_no": phonecontroller.text,
+                          "district": selectedValue,
+                          "vehicle_no": vehicleNocontroller.text,
+                          "capacity": capacitycontroller.text,
+                          "sector": selectedSector,
+                          "facilities": selectedFacilities,
+                          "license": image,
+                        };
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => OtpVerification(
+                                  email: email,
+                                  Data: driverData,
+                                ),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Invalid Email Id")),
+                        );
+                      }
+
                       print('Account Registered');
                     },
                     child: Text(
@@ -381,11 +439,15 @@ class DriverRegistrationState extends State<DriverRegistration>{
   }
 }
 
-
 class CustomTextField extends StatelessWidget {
   final String hint;
+  final TextEditingController controller;
 
-  const CustomTextField({required this.hint, super.key});
+  const CustomTextField({
+    required this.hint,
+    required this.controller,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -398,6 +460,7 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: TextField(
+          controller: controller,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hint,
