@@ -37,6 +37,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       await prefs.remove('userId');
       return true;
     } else {
+      if (!mounted) return false;
       ScaffoldMessenger.of(
         context
       ).showSnackBar(SnackBar(content: Text("Logout failed")));
@@ -118,13 +119,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         if (!mounted) return;
                         if (success) {
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (_) => LoginPage(),
-                            ),
+                            MaterialPageRoute(builder: (_) => LoginPage()),
                             (route) => false,
                           );
                         }
-                        ;
                       },
                       child: Text(
                         "Logout",
