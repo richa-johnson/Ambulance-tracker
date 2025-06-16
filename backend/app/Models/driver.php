@@ -13,6 +13,7 @@ class Driver extends Authenticatable{
     use HasFactory, Notifiable, HasApiTokens;
     protected $table='driver';
     protected $primaryKey='driver_id';
+    protected $keyType = 'int';
     public $incrementing =true;
     /**
     *@var list<string>
@@ -32,5 +33,15 @@ class Driver extends Authenticatable{
         'driver_password',
         'remember_token',
     ] ;
+
+     public function username()
+    {
+        return 'driver_mail';
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->driver_password;
+    }
 
 }

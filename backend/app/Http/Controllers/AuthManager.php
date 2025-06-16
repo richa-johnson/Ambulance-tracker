@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Driver;
 use App\Models\Facility;
 use App\Models\User;
+use GuzzleHttp\Psr7\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -200,6 +201,19 @@ class AuthManager extends Controller
 
 
 
+    }
+
+    public function logout(){
+    auth()->user()->tokens()->delete();
+    return response([
+        "message"=>"logout success"
+    ],200);
+    }
+
+    public function user(){
+        return response([
+            'user'=>auth()->user(), 
+        ],200);
     }
 
 

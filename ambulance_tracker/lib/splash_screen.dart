@@ -1,7 +1,13 @@
 import 'dart:async';
+import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
+import 'package:ambulance_tracker/models/api_response.dart';
+import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ambulance_tracker/registration/RegisterScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,22 +19,52 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    
     super.initState();
 
-    Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
+    _loadUserInfo();
+  }
+
+  void _loadUserInfo() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    final token = await getToken();
+
+    if (!mounted) return;
+
+    if (token.isEmpty) {
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => RegisterScreen()),
+        (route) => false,
       );
-    });
+      return;
+    }
+    
+    final ApiResponse response = await getUserDetail();
+    if (!mounted) return;
+    
+    if (response.error == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (Context) => userdashboard()),
+        (route) => false,
+      );
+    } else if (response.error == unauthorized) {
+      await saveToken('');
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => RegisterScreen()),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('${response.error}')));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-         decoration: BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -39,12 +75,11 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         child: Center(
-           child: Image.asset(
+          child: Image.asset(
             'assets/title.png',
             fit: BoxFit.contain,
             height: 278,
-          )
-          .animate().fadeIn(duration: 2000.ms)
+          ).animate().fadeIn(duration: 2000.ms),
         ),
       ),
     );
