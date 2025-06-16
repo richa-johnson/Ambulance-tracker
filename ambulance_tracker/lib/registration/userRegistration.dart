@@ -216,10 +216,17 @@ class _userRegistrationState extends State<userRegistration> {
 class CustomInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+
   const CustomInputField({
     super.key,
-    required this.hintText,
     required this.controller,
+    required this.hintText,
+    this.obscureText = false,
+    this.keyboardType,
+    this.validator,
   });
 
   @override
@@ -233,6 +240,9 @@ class CustomInputField extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,

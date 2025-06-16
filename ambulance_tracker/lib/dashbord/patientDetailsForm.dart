@@ -15,6 +15,7 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
   final TextEditingController pnamecontroller = TextEditingController();
   List<String> bloodGroup = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
   String? selectedDistrict;
+   final txtEmail    = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

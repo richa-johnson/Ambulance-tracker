@@ -1,18 +1,79 @@
+import 'package:ambulance_tracker/dashbord/admindashboard.dart';
+import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
+import 'package:ambulance_tracker/models/user.dart';
 import 'package:ambulance_tracker/registration/forgotpassword.dart';
 import 'package:ambulance_tracker/registration/userRegistration.dart';
+import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class loginPage extends StatefulWidget {
-  const loginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<loginPage> createState() => _loginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _loginPageState extends State<loginPage> {
-  final TextEditingController phonecontroller = TextEditingController();
-  final TextEditingController passwordcontroller = TextEditingController();
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController txtEmail = TextEditingController();
+  TextEditingController txtPassword = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    txtEmail.dispose();
+    txtPassword.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    final response = await login(txtEmail.text.trim(), txtPassword.text.trim());
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (response.error != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(response.error!)));
+      return;
+    } else {
+      _saveAndRedirectToHome(response.data as User);
+    }
+  }
+
+  void _saveAndRedirectToHome(User user) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    await pref.setString('token', user.token ?? "");
+    await pref.setInt('userId', user.id ?? 0);
+    if (user.role == 'user') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const userdashboard()),
+        (route) => false,
+      );
+    } else if (user.role == 'driver') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const driverDashboard()),
+        (route) => false,
+      );
+    } else if (user.role == 'admin') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AdminDashboard()),
+        (route) => false,
+      );
+    }else{
+      //
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,70 +121,85 @@ class _loginPageState extends State<loginPage> {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                children: [
-                  Text(
-                    "LOGIN",
-                    style: TextStyle(
-                      color: Color.fromRGBO(87, 24, 44, 1),
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Text(
+                      "LOGIN",
+                      style: TextStyle(
+                        color: Color.fromRGBO(87, 24, 44, 1),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 50),
-                  CustomInputField(hintText: 'PHONE NUMBER',controller: phonecontroller,),
-                  const SizedBox(height: 20),
-                  CustomInputField(hintText: 'PASSWORD',controller: passwordcontroller,),
-                  const SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 50),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Forgotpassword(),
+                    const SizedBox(height: 50),
+
+                    CustomInputField(
+                      controller: txtEmail,
+                      hintText: 'EMAIL ID',
+                      keyboardType: TextInputType.emailAddress,
+                      validator:
+                          (v) => v == null || v.isEmpty ? 'Enter email' : null,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomInputField(
+                      controller: txtPassword,
+                      hintText: 'PASSWORD',
+                      obscureText: true,
+                      validator:
+                          (v) =>
+                              v == null || v.isEmpty ? 'Enter password' : null,
+                    ),
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 50),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Forgotpassword(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "forgot password?",
+                            textAlign: TextAlign.end,
+                            style: TextStyle(
+                              color: Color.fromRGBO(0, 0, 255, 1.0),
+                              fontSize: 15,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Color.fromRGBO(0, 0, 255, 1.0),
                             ),
-                          );
-                        },
-                        child: Text(
-                          "forgot password?",
-                          textAlign: TextAlign.end,
-                          style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 255, 1.0),
-                            fontSize: 15,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Color.fromRGBO(0, 0, 0, 1.0),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 72),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => userdashboard(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                      minimumSize: Size(265, 55),
-                    ),
-                    child: Text(
-                      "SUBMIT",
-                      style: TextStyle(
-                        color: Color.fromRGBO(255, 255, 255, 1.0),
-                        fontSize: 24,
+                    SizedBox(height: 72),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
+                        minimumSize: Size(265, 55),
                       ),
+                      child:
+                          _isLoading
+                              ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                              : const Text(
+                                'SUBMIT',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                ),
+                              ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
