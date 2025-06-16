@@ -1,3 +1,5 @@
+import 'package:ambulance_tracker/dashbord/admindashboard.dart';
+import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/models/user.dart';
 import 'package:ambulance_tracker/registration/forgotpassword.dart';
@@ -49,14 +51,27 @@ class _LoginPageState extends State<LoginPage> {
 
   void _saveAndRedirectToHome(User user) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    
+
     await pref.setString('token', user.token ?? "");
     await pref.setInt('userId', user.id ?? 0);
-    
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const userdashboard()),
-      (route) => false,
-    );
+    if (user.role == 'user') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const userdashboard()),
+        (route) => false,
+      );
+    } else if (user.role == 'driver') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const driverDashboard()),
+        (route) => false,
+      );
+    } else if (user.role == 'admin') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AdminDashboard()),
+        (route) => false,
+      );
+    }else{
+      //
+    }
   }
 
   @override

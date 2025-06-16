@@ -17,7 +17,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
- 
   @override
   void initState() {
     super.initState();
@@ -26,30 +25,38 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _loadUserInfo() async {
-     await Future.delayed(const Duration(seconds: 2));
-    String token = await getToken();
-    if (token .isEmpty) {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    final token = await getToken();
+
+    if (!mounted) return;
+
+    if (token.isEmpty) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => RegisterScreen()),
+        (route) => false,
+      );
+      return;
+    }
+    
+    final ApiResponse response = await getUserDetail();
+    if (!mounted) return;
+    
+    if (response.error == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (Context) => userdashboard()),
+        (route) => false,
+      );
+    } else if (response.error == unauthorized) {
+      await saveToken('');
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => RegisterScreen()),
         (route) => false,
       );
     } else {
-      ApiResponse response = await getUserDetail();
-      if (response.error == null) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (Context) => userdashboard()),
-          (route) => false,
-        );
-      } else if (response.error == unauthorized) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => RegisterScreen()),
-          (route) => false,
-        );
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${response.error}')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('${response.error}')));
     }
   }
 

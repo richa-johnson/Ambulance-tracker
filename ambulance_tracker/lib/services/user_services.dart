@@ -64,10 +64,12 @@ Future<ApiResponse> getUserDetail() async {
   ApiResponse apiResponse = ApiResponse();
   try {
     String token = await getToken();
-    final response = await http.post(
+    final response = await http.get(
       Uri.parse(userURL),
       headers: {'Accept': 'aplication/json', 'Authorization': 'Bearer $token'},
     );
+    print('Status: ${response.statusCode}');
+    print('Body  : ${response.body}');
 
     switch (response.statusCode) {
       case 200:
@@ -91,6 +93,11 @@ Future<ApiResponse> getUserDetail() async {
 Future<String> getToken() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
   return pref.getString('token') ?? '';
+}
+
+Future<void> saveToken(String token) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('token', token);
 }
 
 Future<int> getUserId() async {
