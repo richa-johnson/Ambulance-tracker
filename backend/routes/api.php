@@ -39,3 +39,5 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum'])->get('/admin/users',[AdminController::class,'getAllUsers']);
  
 Route::middleware(['auth:sanctum'])->get('/admin/drivers',[AdminController::class,'getAlldrivers']);
+Route::middleware('auth:sanctum')          // or auth:api / passport
+      ->post('/driver/location', [DriverController::class, 'updateLocation']);
