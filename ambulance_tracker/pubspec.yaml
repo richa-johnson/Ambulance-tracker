@@ -41,6 +41,14 @@ dependencies:
   flutter_animate: ^4.5.2
   email_otp_auth: 
 
+  #Open Street Map
+  geolocator: ^14.0.1
+  latlong2: ^0.9.1
+  flutter_map: ^8.1.1
+  flutter_map_location_marker: ^10.1.0
+  location: ^8.0.0
+  flutter_polyline_points: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
