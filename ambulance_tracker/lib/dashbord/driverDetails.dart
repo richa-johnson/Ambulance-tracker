@@ -18,17 +18,22 @@ class _DriverDetailsState extends State<DriverDetails> {
   @override
   void initState() {
     super.initState();
-    fetchUsers();
+    fetchdrivers();
   }
 
-  Future<void> fetchUsers() async {
+  Future<void> fetchdrivers() async {
+  try {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     if (token == null) {
-      print("No token found.Please login.");
+      print("No token found. Please login.");
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
+
     final response = await http.get(
       Uri.parse(getDriverURL),
       headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
@@ -36,6 +41,7 @@ class _DriverDetailsState extends State<DriverDetails> {
 
     print("Response status: ${response.statusCode}");
     print("Response body: ${response.body}");
+
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final List<dynamic> data =
@@ -46,12 +52,19 @@ class _DriverDetailsState extends State<DriverDetails> {
         isLoading = false;
       });
     } else {
+      print("Failed to load users: ${response.body}");
       setState(() {
         isLoading = false;
       });
-      print("Failed to load users: ${response.body}");
     }
+  } catch (e) {
+    print("Error fetching drivers: $e");
+    setState(() {
+      isLoading = false;
+    });
   }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +113,7 @@ class _DriverDetailsState extends State<DriverDetails> {
                 SizedBox(height: 20),
                   Expanded(
                     child: isLoading
-                    ? CircularProgressIndicator()
+                    ? Center(child: CircularProgressIndicator())
                     : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: SingleChildScrollView(
@@ -204,17 +217,18 @@ class DriverModel {
   });
 
   factory DriverModel.fromJson(Map<String, dynamic> json) {
-    return DriverModel(
-      slno: json['slno'].toString(),
-      name: json['name'],
-      phoneno: json['phoneno'],
-      emailid: json['emailid'],
-      district: json['district'],
-      vehicleno: json['vehicleno'],
-      capacity: json['capacity'],
-      sector: json['sector'],
-      facilities: json['facilities'],
-      license: json['license']
-    );
-  }
+  return DriverModel(
+    slno: json['slno'].toString(),
+    name: json['name'] ?? '',
+    phoneno: json['phoneno'] ?? '',
+    emailid: json['emailid'] ?? '',
+    district: json['district'] ?? '',
+    vehicleno: json['vehicleno'] ?? '',
+    capacity: json['capacity'] ?? '',
+    sector: json['sector'] ?? '',
+    facilities: json['facilities'] ?? 'N/A',
+    license: json['license'] ?? ''
+  );
+}
+
 }
