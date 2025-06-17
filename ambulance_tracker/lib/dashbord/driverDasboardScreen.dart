@@ -1,8 +1,12 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
+import 'package:ambulance_tracker/registration/login.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class driverDashboard extends StatefulWidget {
   const driverDashboard({super.key});
@@ -28,6 +32,29 @@ class _driverDashboardState extends State<driverDashboard> {
   String drname = "driver name";
   String phno = "Phone no";
   String vhno = "Vehicle no";
+  Future<bool> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) {
+      print("No token found");
+      return false;
+    }
+    final response = await http.post(
+      Uri.parse(logoutURL),
+      headers: {'Authorization': 'Bearer $token', 'accept': 'application/json'},
+    );
+    if (response.statusCode == 200) {
+      await prefs.remove('token');
+      await prefs.remove('userId');
+      return true;
+    } else {
+      if (!mounted) return false;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Logout Failed")));
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +120,95 @@ class _driverDashboardState extends State<driverDashboard> {
                       icon: Icon(Icons.arrow_back, color: Colors.black),
                     ),
                     Padding(
-                      padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>driverEdit()));
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: PopupMenuButton<String>(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Color.fromRGBO(189, 83, 114, 1.0),
+                            width: 2,
+                          ),
+                        ),
+                        icon: Icon(
+                          Icons.person,
+                          size: 30,
+                          color: Color.fromRGBO(87, 24, 44, 1.0),
+                        ),
+                        onSelected: (value) async {
+                          if (value == 'edit') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => driverEdit(),
+                              ),
+                            );
+                          } else if (value == 'logout') {
+                            final success = await _logout(context);
+                            if (!mounted) return;
+                            if (success) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(builder: (_) => LoginPage()),
+                                (route) => false,
+                              );
+                            }
+                          }
                         },
-                        icon: Icon(Icons.person),
-                        iconSize: 30,
+                        itemBuilder:
+                            (BuildContext context) => <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.edit,
+                                      color: Color.fromRGBO(87, 24, 44, 1.0),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Edit Profile',
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(87, 24, 44, 1.0),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                enabled: false,
+                                height: 0,
+                                padding: EdgeInsets.zero,
+                                child: Divider(
+                                  thickness: 1.5,
+                                  height: 0,
+                                  color: Color.fromRGBO(189, 83, 114, 1.0),
+                                  indent: 10,
+                                  endIndent: 10,
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'logout',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.logout,
+                                      color: Color.fromRGBO(87, 24, 44, 1.0),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(87, 24, 44, 1.0),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                       ),
                     ),
                   ],
@@ -597,7 +706,14 @@ class _driverDashboardState extends State<driverDashboard> {
                                               ),
                                               IconButton(
                                                 onPressed: () {
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>DriverHistory()));
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              DriverHistory(),
+                                                    ),
+                                                  );
                                                 },
                                                 icon: Icon(Icons.arrow_forward),
                                                 color: Colors.white,
@@ -607,8 +723,8 @@ class _driverDashboardState extends State<driverDashboard> {
                                         ),
                                       ),
                                     ],
-                                  )
-                                     ),
+                                  ),
+                        ),
                       ],
                     ),
                   ],
