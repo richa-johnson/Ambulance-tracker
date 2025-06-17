@@ -2,6 +2,7 @@ import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:get/get.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
+import 'package:flutter/foundation.dart';     
 
 class LocationService {
   LocationService.init();
@@ -70,6 +71,9 @@ class LocationService {
     }
 
     final LocationData data = await _location.getLocation();
+
+      debugPrint('📍 lat=${data.latitude}, lng=${data.longitude}');
+      
     contoller.updateDriveLocation(data);
     contoller.updateIsAccessingLocation(false);
   }

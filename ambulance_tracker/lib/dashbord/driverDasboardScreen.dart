@@ -63,8 +63,9 @@ class _driverDashboardState extends State<driverDashboard> {
 
   @override
   void initState() {
-    LocationService.instance.getUserLocation(contoller: locationController);
+     LocationService.instance.getUserLocation(contoller: locationController);
     super.initState();
+    
   }
 
   @override
