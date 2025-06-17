@@ -1,4 +1,9 @@
+import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDetails extends StatefulWidget {
   const UserDetails({super.key});
@@ -8,7 +13,46 @@ class UserDetails extends StatefulWidget {
 }
 
 class _UserDetailsState extends State<UserDetails> {
-  String slno="1   ",name="dIYA  ",phoneno="78987968  ",emailid="HJKHALJNCLkhjnmhjgkhjbknhjloikjnm  ",district="MDJDS  ";
+  List<UserModel> userList = [];
+  bool isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("No token found.Please login.");
+      return;
+    }
+    final response = await http.get(
+      Uri.parse(getUserURL),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+    final List<dynamic> data = decoded is List
+        ? decoded
+        : (decoded['data'] ?? []); 
+      setState(() {
+        userList = data.map((json) => UserModel.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print("Failed to load users: ${response.body}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,57 +95,86 @@ class _UserDetailsState extends State<UserDetails> {
             color: Colors.white,
           ),
           child: Column(
-              children: [
-                SizedBox(height: 20),
-                Text("USER DETAILS", textAlign: TextAlign.center,style: TextStyle(color: Color.fromRGBO(87, 24, 44,1), fontWeight: FontWeight.bold,fontSize: 32),),
-                SizedBox(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Table(
-                            defaultColumnWidth: IntrinsicColumnWidth(),
-                            border: TableBorder.all(
-                              color: Color.fromRGBO(0, 0, 0, 1),
-                              width: 1.0,
-                              style: BorderStyle.solid
+            children: [
+              SizedBox(height: 20),
+              Text(
+                "USER DETAILS",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color.fromRGBO(87, 24, 44, 1),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child:
+                    isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Table(
+                                defaultColumnWidth: IntrinsicColumnWidth(),
+                                border: TableBorder.all(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  width: 1.0,
+                                  style: BorderStyle.solid,
+                                ),
+                                children: [
+                                  UserDetailsTable(
+                                    slno: "Sl No  ",
+                                    name: "Name  ",
+                                    phoneno: "Phone No  ",
+                                    emailid: "Email Id  ",
+                                    district: "District  ",
+                                  ).build(),
+                                  for (var user in userList)
+                                    UserDetailsTable(
+                                      slno: user.slno,
+                                      name: user.name,
+                                      phoneno: user.phoneno,
+                                      emailid: user.emailid,
+                                      district: user.district,
+                                    ).build(),
+                                ],
+                              ),
                             ),
-                            children: [
-                              UserDetailsTable(slno: "Sl No  ", name: "Name  ", phoneno: "Phone No  ", emailid: "Email Id  ", district: "District  ").build(),
-                              for (int i=0;i<30;i++)
-                                UserDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district).build(),
-                            ],
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
-class UserDetailsTable{
+class UserDetailsTable {
   final String slno;
   final String name;
   final String phoneno;
   final String emailid;
   final String district;
- 
-  UserDetailsTable({required this.slno,required this.name,required this.phoneno,required this.emailid,required this.district});
+
+  UserDetailsTable({
+    required this.slno,
+    required this.name,
+    required this.phoneno,
+    required this.emailid,
+    required this.district,
+  });
 
   TableRow build() {
-  TextStyle textStyle = TextStyle(
-    color: Colors.black,
-    fontWeight: FontWeight.w900,
-    fontSize: 17,
-  );
+    TextStyle textStyle = TextStyle(
+      color: Colors.black,
+      fontWeight: FontWeight.w900,
+      fontSize: 17,
+    );
 
     return TableRow(
       children: [
@@ -127,3 +200,28 @@ class UserDetailsTable{
   }
 }
 
+class UserModel {
+  final String slno;
+  final String name;
+  final String phoneno;
+  final String emailid;
+  final String district;
+
+  UserModel({
+    required this.slno,
+    required this.name,
+    required this.phoneno,
+    required this.emailid,
+    required this.district,
+  });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      slno: json['slno'].toString(),
+      name: json['name'],
+      phoneno: json['phoneno'],
+      emailid: json['emailid'],
+      district: json['district'],
+    );
+  }
+}

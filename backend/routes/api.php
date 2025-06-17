@@ -33,6 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/auth/logout',[AuthManager::class,'logout']);
     Route::get('/auth/user',[AuthManager::class,'user']);
+  
 });
 
+Route::middleware(['auth:sanctum','ability:admin'])->get('/admin/users',[AdminController::class,'getAllUsers']);
+ 
 
