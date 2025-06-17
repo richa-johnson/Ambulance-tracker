@@ -18,4 +18,18 @@ class AdminController extends Controller
 
         return response()->json($users);
     }
+    public function getAlldriver() {
+        $users = ambulanceDriver::all([
+            'driver_id as slno',
+            'driver_name as name',
+            'driver_phone as phoneno',
+            'driver_mail as emailid',
+            'driver_district as district',
+            'driver_vehno as vehicleno',
+            'driver_capacity as capacity',
+            'driver_sector as sector',
+        ]);
+
+        return response()->json($users);
+    }
 }

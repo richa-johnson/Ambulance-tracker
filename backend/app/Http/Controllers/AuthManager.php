@@ -79,16 +79,17 @@ class AuthManager extends Controller
         $data = $validate->validated();
         $licensePath = $request->file('license')->store('licenses', 'public');
 
-        $driver = Driver::create([
+        $driver = ambulanceDriver::create([
             'driver_name' => $data['name'],
             'driver_mail' => $data['email'],
             'driver_password' => Hash::make($data['password']),
             'driver_phone' => $data['phone_no'],
             'driver_district' => $data['district'],
             'driver_vehno' => $data['vehicle_no'],
-            'driver_status' => 'unavailable',
+            'driver_sector' => $data['sector'],
             'driver_capacity' => $data['capacity'],
             'driver_license' => $licensePath,
+            'driver_status' => 'unavailable',
         ]);
         foreach ($data['facilities'] as $facility) {
             Facility::create([

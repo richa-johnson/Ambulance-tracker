@@ -25,9 +25,10 @@ class ambulanceDriver extends Authenticatable{
         'driver_mail',
         'driver_password',
         'driver_vehno',
-        'driver_status',
+        'driver_sector',
         'driver_capacity',
         'driver_license',
+        'driver_status',
     ];
     protected $hidden = [
         'driver_password',

@@ -36,6 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
   
 });
 
-Route::middleware(['auth:sanctum','ability:admin'])->get('/admin/users',[AdminController::class,'getAllUsers']);
+Route::middleware(['auth:sanctum'])->get('/admin/users',[AdminController::class,'getAllUsers']);
  
-
+Route::middleware(['auth:sanctum'])->get('/admin/drivers',[AdminController::class,'getAlldrivers']);

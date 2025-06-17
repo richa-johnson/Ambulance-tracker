@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:ambulance_tracker/constant.dart';
 import "package:ambulance_tracker/registration/login.dart";
 import "package:flutter/material.dart";
 import 'package:http/http.dart' as http;
@@ -216,7 +217,7 @@ class _PasswordState extends State<Password> {
                         ); // Remove it from map since it'll go as file
 
                         final url = Uri.parse(
-                          "http://10.0.2.2:8000/api/auth/driverregister",
+                          driverregisterURL
                         );
 
                         var request = http.MultipartRequest("POST", url);

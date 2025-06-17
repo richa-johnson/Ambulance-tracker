@@ -24,14 +24,15 @@ return new class extends Migration {
             $table->id('driver_id')->primary()->autoIncrement();
             $table->string('driver_name')->nullable(false);
             $table->string('driver_mail', 100)->nullable(false);
-              $table->string('driver_password')->nullable(false);
+            $table->string('driver_password')->nullable(false);
             $table->string('driver_phone', 10)->nullable(false);
+            $table->string('driver_district')->nullable(false);
             $table->string('driver_vehno')->nullable(false);
-             $table->string('driver_district')->nullable(false);
-            $table->string('driver_location')->nullable(true);
-            $table->string('driver_status')->nullable(false);
+            $table->string('driver_sector')->nullable(false);
             $table->string('driver_capacity')->nullable(false);
             $table->string('driver_license')->nullable(false);
+            $table->string('driver_location')->nullable(true);
+            $table->string('driver_status')->nullable(false);
             $table->timestamps();
 
         });
