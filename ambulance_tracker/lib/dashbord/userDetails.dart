@@ -38,9 +38,9 @@ class _UserDetailsState extends State<UserDetails> {
     print("Response body: ${response.body}");
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-    final List<dynamic> data = decoded is List
-        ? decoded
-        : (decoded['data'] ?? []); 
+      final List<dynamic> data =
+          decoded is List ? decoded : (decoded['data'] ?? []);
+
       setState(() {
         userList = data.map((json) => UserModel.fromJson(json)).toList();
         isLoading = false;

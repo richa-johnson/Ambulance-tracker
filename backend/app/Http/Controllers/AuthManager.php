@@ -86,9 +86,10 @@ class AuthManager extends Controller
             'driver_phone' => $data['phone_no'],
             'driver_district' => $data['district'],
             'driver_vehno' => $data['vehicle_no'],
-            'driver_status' => 'unavailable',
+            'driver_sector' => $data['sector'],
             'driver_capacity' => $data['capacity'],
             'driver_license' => $licensePath,
+            'driver_status' => 'unavailable',
         ]);
         foreach ($data['facilities'] as $facility) {
             Facility::create([

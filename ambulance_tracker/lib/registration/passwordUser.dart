@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/constant.dart';
 import "package:ambulance_tracker/registration/login.dart";
 import "package:flutter/material.dart";
 import 'package:http/http.dart' as http;
@@ -210,7 +211,7 @@ class _PasswordUserState extends State<PasswordUser> {
                         };
 
                         final url = Uri.parse(
-                          "http://10.0.2.2:8000/api/auth/userregister",
+                          userregisterURL
                         );
 
                         try {
