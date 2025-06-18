@@ -15,6 +15,7 @@
         "flutter_map_location_marker",
         "flutter_polyline_points",
         "geolocator",
+        "get",
         "http",
         "image_picker",
         "latlong2",
@@ -60,6 +61,14 @@
         "test_api",
         "vector_math",
         "vm_service"
+      ]
+    },
+    {
+      "name": "get",
+      "version": "4.7.2",
+      "dependencies": [
+        "flutter",
+        "web"
       ]
     },
     {
@@ -373,6 +382,11 @@
       ]
     },
     {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
       "name": "location_web",
       "version": "6.0.0",
       "dependencies": [
@@ -548,11 +562,6 @@
         "flutter",
         "shared_preferences_platform_interface"
       ]
-    },
-    {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
     },
     {
       "name": "http_parser",

@@ -3,12 +3,15 @@
 import 'dart:convert';
 
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
 import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/services/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 class driverDashboard extends StatefulWidget {
   const driverDashboard({super.key});
@@ -30,6 +33,8 @@ class _driverDashboardState extends State<driverDashboard> {
 
   bool onRun = false;
   bool isAvailable = false;
+
+  final LocationController locationController = Get.put(LocationController());
 
   String drname = "driver name";
   String phno = "Phone no";
@@ -85,6 +90,13 @@ class _driverDashboardState extends State<driverDashboard> {
     } catch (e) {
       print('Error updating status: $e');
     }
+  }
+
+  @override
+  void initState() {
+     LocationService.instance.getUserLocation(contoller: locationController);
+    super.initState();
+    
   }
 
   @override
