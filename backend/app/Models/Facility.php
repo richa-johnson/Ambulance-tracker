@@ -18,4 +18,8 @@ class Facility extends Model
 
     protected $primaryKey = null;
     public $incrementing = false;
+    public function driver()
+    {
+        return $this->belongsTo(ambulanceDriver::class, 'driver_id', 'driver_id');
+    }
 }

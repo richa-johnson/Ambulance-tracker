@@ -130,7 +130,7 @@ class _DriverDetailsState extends State<DriverDetails> {
                             children: [
                               DriverDetailsTable(slno: "Sl No  ", name: "Name  ", phoneno: "Phone No  ", emailid: "Email Id  ", district: "District  ", vehicleno: "Vehicle No", capacity: "Capacity", sector: "Sector", facilities: "Facilities", license: "License").build(),
                               for (var driver in DriverList)
-                                DriverDetailsTable(slno: driver.slno, name: driver.name, phoneno: driver.phoneno, emailid: driver.emailid, district: driver.district, vehicleno: driver.vehicleno, capacity: driver.capacity, sector: driver.sector, facilities: driver.facilities, license: driver.license).build(),
+                                DriverDetailsTable(slno: driver.slno, name: driver.name, phoneno: driver.phoneno, emailid: driver.emailid, district: driver.district, vehicleno: driver.vehicleno, capacity: driver.capacity, sector: driver.sector, facilities: driver.facilities.join(', '), license: driver.license).build(),
                             ],
                           ),
                         ),
@@ -203,7 +203,7 @@ class DriverModel {
   final String district;
   final String vehicleno;
   final String capacity;
-  final String facilities;
+  final List<String> facilities;
   final String sector;
   final String license;
 
@@ -226,7 +226,7 @@ class DriverModel {
     vehicleno: json['vehicleno'] ?? '',
     capacity: json['capacity'] ?? '',
     sector: json['sector'] ?? '',
-    facilities: json['facilities'] ?? 'N/A',
+    facilities: List<String>.from(json['facilities'] ?? []),
     license: json['license'] ?? ''
   );
 }
