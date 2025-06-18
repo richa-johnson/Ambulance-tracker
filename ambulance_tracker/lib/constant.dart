@@ -7,6 +7,7 @@ const userURL = "$baseURL/auth/user";
 const logoutURL='$baseURL/auth/logout';
 const getUserURL = '$baseURL/admin/users';
 const getDriverURL = '$baseURL/admin/drivers';
+const driverStatusURL = '$baseURL/driver/status';
 const serverError = 'server error';
 const unauthorized = 'Unauthorized';
 const somethingwentwrong = 'something went wrong, try again!';

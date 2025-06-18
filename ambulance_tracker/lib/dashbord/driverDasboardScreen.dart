@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
@@ -53,6 +55,35 @@ class _driverDashboardState extends State<driverDashboard> {
         context,
       ).showSnackBar(SnackBar(content: Text("Logout Failed")));
       return false;
+    }
+  }
+
+  Future<void> updateDriverStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+
+    if (token == null) {
+      print("No token found");
+      return;
+    }
+    final Uri url = Uri.parse(driverStatusURL);
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+      if (response.statusCode == 200) {
+        print('Status updated to $status');
+      } else {
+        print('Failed to update status: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating status: $e');
     }
   }
 
@@ -393,6 +424,7 @@ class _driverDashboardState extends State<driverDashboard> {
                                           setState(() {
                                             isAvailable = true;
                                           });
+                                          updateDriverStatus('available');
                                         },
                                         child: Center(
                                           child: Text(
@@ -416,6 +448,7 @@ class _driverDashboardState extends State<driverDashboard> {
                                               setState(() {
                                                 isAvailable = false;
                                               }),
+                                              updateDriverStatus('unavailable'),
                                             },
                                         child: Center(
                                           child: Text(
