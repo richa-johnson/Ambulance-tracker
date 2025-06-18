@@ -50,7 +50,7 @@ return [
         ],
         'api' => [
             'driver' => 'sanctum', // keep this for API token handling
-            'provider' => 'users',
+            'provider' => null,
         ],
     ],
 
