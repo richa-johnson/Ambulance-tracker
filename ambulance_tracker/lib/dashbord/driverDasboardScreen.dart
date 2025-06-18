@@ -63,9 +63,11 @@ class _driverDashboardState extends State<driverDashboard> {
 
   @override
   void initState() {
-     LocationService.instance.getUserLocation(contoller: locationController);
     super.initState();
-    
+   WidgetsBinding.instance.addPostFrameCallback(
+      (_) => LocationService.instance
+          .startTracking(controller: locationController, context: context),
+    );
   }
 
   @override
