@@ -1,6 +1,6 @@
 class ApiResponse{
   Object? data;
   String? error;
-
-   ApiResponse({this.data, this.error}); 
+ String? role; 
+   ApiResponse({this.data,this.role, this.error}); 
 }

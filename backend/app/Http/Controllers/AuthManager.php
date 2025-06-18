@@ -70,7 +70,7 @@ class AuthManager extends Controller
                 'sector' => ['required',],
                 'facilities' => 'required|array',
                 'facilities.*' => ['required',],
-                'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
+                'license' => 'required|image|mimes:jpg,jpeg,png|max:5120'
             ]
         );
         if ($validate->fails()) {
@@ -204,17 +204,27 @@ class AuthManager extends Controller
 
     }
 
-    public function logout(){
-    auth()->user()->tokens()->delete();
-    return response([
-        "message"=>"logout success"
-    ],200);
+    public function logout()
+    {
+        auth()->user()->tokens()->delete();
+        return response([
+            "message" => "logout success"
+        ], 200);
     }
 
-    public function user(){
-        return response([
-            'user'=>auth()->user(), 
-        ],200);
+    public function user()
+    {
+          if (Auth::guard('admin')->check()) {
+        return response(['user' => Auth::guard('admin')->user(), 'role' => 'admin'], 200);
+    }
+    if (Auth::guard('driver')->check()) {
+        return response(['user' => Auth::guard('driver')->user(), 'role' => 'driver'], 200);
+    }
+    if (Auth::check()) {
+        return response(['user' => Auth::user(), 'role' => 'user'], 200);
+    }
+
+    return response(['error' => 'Unauthorized'], 401);
     }
 
 

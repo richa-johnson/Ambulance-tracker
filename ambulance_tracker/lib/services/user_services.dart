@@ -66,14 +66,15 @@ Future<ApiResponse> getUserDetail() async {
     String token = await getToken();
     final response = await http.get(
       Uri.parse(userURL),
-      headers: {'Accept': 'aplication/json', 'Authorization': 'Bearer $token'},
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
     print('Status: ${response.statusCode}');
     print('Body  : ${response.body}');
 
     switch (response.statusCode) {
       case 200:
-        apiResponse.data = User.fromJson(jsonDecode(response.body));
+        final body = jsonDecode(response.body);
+        apiResponse.data = body;
         break;
 
       case 401:
