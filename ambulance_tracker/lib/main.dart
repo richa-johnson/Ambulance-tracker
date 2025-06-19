@@ -3,6 +3,7 @@ import 'package:ambulance_tracker/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ambulance_tracker/location/location.dart';
 
+import "package:ambulance_tracker/dashbord/patientDetailsForm.dart";
 void main() {
   runApp(const MyApp());
 }
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'resQroute',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: patientDetailsForm(),
     );
   }
 }
