@@ -44,5 +44,9 @@ class ambulanceDriver extends Authenticatable{
     {
         return $this->driver_password;
     }
+    public function facilities(){
+
+    return $this->hasMany(Facility::class, 'driver_id', 'driver_id');
+    }
 
 }

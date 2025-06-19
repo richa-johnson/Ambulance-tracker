@@ -20,18 +20,25 @@ class AdminController extends Controller
         return response()->json($users);
     }
     public function getAlldrivers() {
-        $drivers = ambulanceDriver::all([
-            'driver_id as slno',
-            'driver_name as name',
-            'driver_phone as phoneno',
-            'driver_mail as emailid',
-            'driver_district as district',
-            'driver_vehno as vehicleno',
-            'driver_sector as sector',
-            'driver_capacity as capacity',
-            'driver_license as license',
-        ]);
+    $drivers = ambulanceDriver::with('facilities')->get()
+        ->makeHidden(['driver_password', 'remember_token']);
 
-        return response()->json($drivers);
-    }
+    $data = $drivers->map(function ($driver) {
+        return [
+            'slno' => $driver->driver_id,
+            'name' => $driver->driver_name,
+            'phoneno' => $driver->driver_phone,
+            'emailid' => $driver->driver_mail,
+            'district' => $driver->driver_district,
+            'vehicleno' => $driver->driver_vehno,
+            'sector' => $driver->driver_sector,
+            'capacity' => $driver->driver_capacity,
+            'license' => $driver->driver_license,
+            'facilities' => $driver->facilities->pluck('facility')->toArray(),
+        ];
+    });
+
+    return response()->json($data);
+}
+
 }
