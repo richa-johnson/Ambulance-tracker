@@ -1,7 +1,5 @@
-import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:ambulance_tracker/location/location.dart';
 
 void main() {
   runApp(const MyApp());

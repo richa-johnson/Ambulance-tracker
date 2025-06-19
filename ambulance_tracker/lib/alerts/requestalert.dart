@@ -40,7 +40,7 @@ class RequestAlertState extends State<RequestAlert> {
                       );
                     },
                     child: Text(
-                      "Track User",
+                      "Confirm",
                       style: TextStyle(color: Color.fromRGBO(159, 13, 55, 1.0)),
                     ),
                   ),
