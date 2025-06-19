@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:ambulance_tracker/alerts/requestpage.dart';
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
@@ -197,6 +198,8 @@ class _driverDashboardState extends State<driverDashboard> {
                                 (route) => false,
                               );
                             }
+                          } else if (value == 'requestPage'){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsPage()));
                           }
                         },
                         itemBuilder:
@@ -205,10 +208,6 @@ class _driverDashboardState extends State<driverDashboard> {
                                 value: 'edit',
                                 child: Row(
                                   children: [
-                                    Icon(
-                                      Icons.edit,
-                                      color: Color.fromRGBO(87, 24, 44, 1.0),
-                                    ),
                                     SizedBox(width: 10),
                                     Text(
                                       'Edit Profile',
@@ -233,6 +232,35 @@ class _driverDashboardState extends State<driverDashboard> {
                                   endIndent: 10,
                                 ),
                               ),
+                              PopupMenuItem<String>(
+                                value: 'requestPage',
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'User Requests',
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(87, 24, 44, 1.0),
+                                        fontSize: 16,                      
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                enabled: false,
+                                height: 0,
+                                padding: EdgeInsets.zero,
+                                child: Divider(
+                                  thickness: 1.5,
+                                  height: 0,
+                                  color: Color.fromRGBO(189, 83, 114, 1.0),
+                                  indent: 10,
+                                  endIndent: 10,
+                                ),
+                              ),
+                              
                               PopupMenuItem<String>(
                                 value: 'logout',
                                 child: Row(
