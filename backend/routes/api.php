@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthManager;
+use App\Http\Controllers\BookingController;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -40,5 +42,11 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum'])->get('/admin/users',[AdminController::class,'getAllUsers']);
 Route::get('/user/availableAmbulances',[DriverController::class,'getAvailabledrivers']);
 Route::middleware(['auth:sanctum'])->get('/admin/drivers',[AdminController::class,'getAlldrivers']);
+
 Route::middleware('auth:sanctum')         
       ->post('/driver/location', [DriverController::class, 'updateLocation']);
+
+Route::middleware(['auth:sanctum'])->get('/booking/store',[BookingController::class,'store']);
+Route::middleware(['auth:sanctum'])->get('/booking/{booking}/response',[BookingController::class,'respond']);
+Route::middleware(['auth:sanctum'])->get('/booking/expire',[BookingController::class,'expireOldBookings']);
+Route::middleware(['auth:sanctum'])->post('/bookings/{booking}/patients', [BookingController::class, 'storePatients']);
