@@ -2,6 +2,7 @@ import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/models/user.dart';
+import 'package:ambulance_tracker/registration/RegisterScreen.dart';
 import 'package:ambulance_tracker/registration/forgotpassword.dart';
 import 'package:ambulance_tracker/registration/userRegistration.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
@@ -231,6 +232,40 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                       ),
+                      SizedBox(height: 150),
+                      Text(
+                      'DON\'T HAVE AN ACCOUNT?',
+                      strutStyle: StrutStyle(
+                        forceStrutHeight: true,
+                        height: 1.0,
+                      ),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color.fromRGBO(87, 24, 44, 1.0),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegisterScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'REGISTER',
+                        strutStyle: StrutStyle(
+                          forceStrutHeight: true,
+                          height: 1.0,
+                        ),
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                     ],
                   ),
                 ),

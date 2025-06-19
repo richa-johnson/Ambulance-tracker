@@ -42,3 +42,4 @@ Route::get('/user/availableAmbulances',[DriverController::class,'getAvailabledri
 Route::middleware(['auth:sanctum'])->get('/admin/drivers',[AdminController::class,'getAlldrivers']);
 Route::middleware('auth:sanctum')         
       ->post('/driver/location', [DriverController::class, 'updateLocation']);
+

@@ -52,6 +52,14 @@ class DriverRegistrationState extends State<DriverRegistration> {
   final TextEditingController phonecontroller = TextEditingController();
   final TextEditingController vehicleNocontroller = TextEditingController();
   final TextEditingController capacitycontroller = TextEditingController();
+  String? nameError;
+  String? phoneError;
+  String? emailError;
+  String? districtError;
+  String? vehiclenoError;
+  String? capacityError;
+  String? sectorError;
+  String? licenseError;
 
   bool isValidEmail(String email) {
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
@@ -151,10 +159,43 @@ class DriverRegistrationState extends State<DriverRegistration> {
                   ),
                 ),
                 SizedBox(height: 30),
+                if (nameError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        nameError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 CustomTextField(hint: 'NAME', controller: namecontroller),
                 SizedBox(height: 10),
+                if (phoneError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        phoneError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 CustomTextField(hint: 'PHONE NO', controller: phonecontroller),
                 SizedBox(height: 10),
+                if (emailError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        emailError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 SizedBox(
                   width: 325,
                   height: 55,
@@ -182,6 +223,17 @@ class DriverRegistrationState extends State<DriverRegistration> {
                   ),
                 ),
                 SizedBox(height: 10),
+                if (districtError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        districtError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 SizedBox(
                   width: 325,
                   height: 55,
@@ -228,16 +280,49 @@ class DriverRegistrationState extends State<DriverRegistration> {
                   ),
                 ),
                 SizedBox(height: 10),
+                if (vehiclenoError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        vehiclenoError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 CustomTextField(
                   hint: 'VEHICLE NO',
                   controller: vehicleNocontroller,
                 ),
                 SizedBox(height: 10),
+                if (capacityError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        capacityError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 CustomTextField(
                   hint: 'CAPACITY',
                   controller: capacitycontroller,
                 ),
                 SizedBox(height: 10),
+                if (sectorError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        sectorError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
                 SizedBox(
                   width: 325,
                   height: 55,
@@ -334,6 +419,18 @@ class DriverRegistrationState extends State<DriverRegistration> {
                 ),
 
                 SizedBox(height: 10),
+                if (licenseError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, bottom: 4),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        licenseError!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
+
                 ElevatedButton(
                   onPressed: pickImage,
                   style: ElevatedButton.styleFrom(
@@ -389,36 +486,82 @@ class DriverRegistrationState extends State<DriverRegistration> {
                       ),
                     ),
                     onPressed: () {
-                      String email = emailcontroller.text.trim();
-                      if (isValidEmail(email)) {
-                        Map<String, dynamic> driverData = {
-                          "name": namecontroller.text,
-                          "email": emailcontroller.text,
-                          "phone_no": phonecontroller.text,
-                          "district": selectedValue,
-                          "vehicle_no": vehicleNocontroller.text,
-                          "capacity": capacitycontroller.text,
-                          "sector": selectedSector,
-                          "facilities": selectedFacilities,
-                          "license": image,
-                        };
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => OtpVerification(
-                                  email: email,
-                                  Data: driverData,
-                                ),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Invalid Email Id")),
-                        );
-                      }
+                      setState(() {
+                        nameError =
+                            phoneError =
+                                emailError =
+                                    districtError =
+                                        vehiclenoError =
+                                            capacityError =
+                                                sectorError =
+                                                    licenseError = null;
 
-                      print('Account Registered');
+                        if (namecontroller.text.trim().length < 2) {
+                          nameError = "Please enter a valid name";
+                        }
+                        if (!RegExp(
+                          r'^\d{10}$',
+                        ).hasMatch(phonecontroller.text.trim())) {
+                          phoneError = "Enter a valid 10-digit phone number";
+                        }
+                        if (!isValidEmail(emailcontroller.text.trim())) {
+                          emailError = "Enter a valid email address";
+                        }
+                        if (selectedValue == null) {
+                          districtError = "Please select a district";
+                        }
+                        if (!RegExp(
+                          r'^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$',
+                        ).hasMatch(
+                          vehicleNocontroller.text.trim().toUpperCase(),
+                        )) {
+                          vehiclenoError =
+                              "Enter a valid vehicle number (e.g. KL01AB1234)";
+                        }
+                        if (capacitycontroller.text.trim().isEmpty ||
+                            int.tryParse(capacitycontroller.text.trim()) ==
+                                null) {
+                          capacityError = "Enter numeric capacity";
+                        }
+                        if (selectedSector == null) {
+                          sectorError = "Please select a sector";
+                        }
+                        if (image == null) {
+                          licenseError = "Please upload your license";
+                        }
+
+                        if (nameError == null &&
+                            phoneError == null &&
+                            emailError == null &&
+                            districtError == null &&
+                            vehiclenoError == null &&
+                            capacityError == null &&
+                            sectorError == null &&
+                            licenseError == null) {
+                          // Submit the data
+                          Map<String, dynamic> driverData = {
+                            "name": namecontroller.text,
+                            "email": emailcontroller.text,
+                            "phone_no": phonecontroller.text,
+                            "district": selectedValue,
+                            "vehicle_no": vehicleNocontroller.text,
+                            "capacity": capacitycontroller.text,
+                            "sector": selectedSector,
+                            "facilities": selectedFacilities,
+                            "license": image,
+                          };
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => OtpVerification(
+                                    email: emailcontroller.text,
+                                    Data: driverData,
+                                  ),
+                            ),
+                          );
+                        }
+                      });
                     },
                     child: Text(
                       'SUBMIT',

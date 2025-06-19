@@ -30,6 +30,10 @@ class _userRegistrationState extends State<userRegistration> {
   final TextEditingController emailcontroller = TextEditingController();
   final TextEditingController namecontroller = TextEditingController();
   final TextEditingController phonecontroller = TextEditingController();
+  String? nameError;
+  String? phoneError;
+  String? emailError;
+  String? districtError;
   bool isValidEmail(String email) {
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
   }
@@ -93,16 +97,19 @@ class _userRegistrationState extends State<userRegistration> {
                     ),
                   ),
                   const SizedBox(height: 50),
+                  if (nameError != null) errorText(nameError!),
                   CustomInputField(
                     hintText: 'NAME',
                     controller: namecontroller,
                   ),
                   const SizedBox(height: 20),
+                  if (phoneError != null) errorText(phoneError!),
                   CustomInputField(
                     hintText: 'PHONE NUMBER',
                     controller: phonecontroller,
                   ),
                   const SizedBox(height: 20),
+                  if (emailError != null) errorText(emailError!),
                   Container(
                     width: 325,
                     height: 66,
@@ -125,6 +132,7 @@ class _userRegistrationState extends State<userRegistration> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  if (districtError != null) errorText(districtError!),
                   Container(
                     width: 325,
                     height: 66,
@@ -165,31 +173,48 @@ class _userRegistrationState extends State<userRegistration> {
                   SizedBox(height: 72),
                   ElevatedButton(
                     onPressed: () {
-                      String email = emailcontroller.text.trim();
-                      if (isValidEmail(email)) {
-                        Map<String, dynamic> userData = {
-                          "user_name": namecontroller.text,
-                          "user_mail": emailcontroller.text,
-                          "user_phone": phonecontroller.text,
-                          "user_district": selectedDistrict,
-                        };
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => OtpVerificationUser(
-                                  email: email,
-                                  UserData: userData,
-                                ),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Enter a valid email address"),
-                          ),
-                        );
-                      }
+                      setState(() {
+                        nameError =
+                            phoneError = emailError = districtError = null;
+
+                        if (namecontroller.text.trim().isEmpty) {
+                          nameError = "Please enter your name";
+                        }
+                        if (!isValidEmail(emailcontroller.text.trim())) {
+                          emailError = "Enter a valid email address";
+                        }
+                        if (phonecontroller.text.trim().length != 10 ||
+                            !RegExp(
+                              r'^\d{10}$',
+                            ).hasMatch(phonecontroller.text.trim())) {
+                          phoneError = "Enter a valid 10-digit phone number";
+                        }
+                        if (selectedDistrict == null) {
+                          districtError = "Please select a district";
+                        }
+
+                        if (nameError == null &&
+                            phoneError == null &&
+                            emailError == null &&
+                            districtError == null) {
+                          Map<String, dynamic> userData = {
+                            "user_name": namecontroller.text,
+                            "user_mail": emailcontroller.text,
+                            "user_phone": phonecontroller.text,
+                            "user_district": selectedDistrict,
+                          };
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => OtpVerificationUser(
+                                    email: emailcontroller.text,
+                                    UserData: userData,
+                                  ),
+                            ),
+                          );
+                        }
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
@@ -211,10 +236,18 @@ class _userRegistrationState extends State<userRegistration> {
       ),
     );
   }
+Widget errorText(String msg) => Padding(
+        padding: const EdgeInsets.only(left: 30, bottom: 4),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(msg, style: TextStyle(color: Colors.red)),
+        ),
+      );
 }
 
-class CustomInputField extends StatelessWidget{
-   final TextEditingController controller;
+
+class CustomInputField extends StatelessWidget {
+  final TextEditingController controller;
   final String hintText;
   final bool obscureText;
   final TextInputType? keyboardType;
@@ -229,15 +262,14 @@ class CustomInputField extends StatelessWidget{
     this.validator,
   });
 
-  
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Container(
       width: 325,
       height: 66,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(227, 185, 197,1.0),
-        borderRadius: BorderRadius.circular(10)
+        color: Color.fromRGBO(227, 185, 197, 1.0),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: TextField(
         controller: controller,
@@ -251,7 +283,7 @@ class CustomInputField extends StatelessWidget{
             fontSize: 16,
             color: Color.fromRGBO(0, 0, 0, 42),
           ),
-          contentPadding: EdgeInsets.only(left:19,top:20),
+          contentPadding: EdgeInsets.only(left: 19, top: 20),
         ),
       ),
     );
