@@ -1,5 +1,9 @@
+import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
+import 'package:ambulance_tracker/dashbord/driverDetails.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AvailableAmbulance extends StatefulWidget {
   const AvailableAmbulance({super.key});
@@ -10,6 +14,19 @@ class AvailableAmbulance extends StatefulWidget {
 
 class AvailableAmbulanceState extends State<AvailableAmbulance> {
   bool isPressed = false;
+
+  Future<List<DriverModel>> fetchDrivers() async {
+    final response = await http.get(Uri.parse(getAvailabledriversURL));
+    print('Status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200) {
+      final List jsonData = jsonDecode(response.body);
+      return jsonData.map((e) => DriverModel.fromJson(e)).toList();
+    } else {
+      throw Exception("Failed to load drivers");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +91,12 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>patientDetailsForm()));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => patientDetailsForm(),
+                              ),
+                            );
                           },
                           icon: Icon(Icons.arrow_back),
                           iconSize: 30,
@@ -260,13 +282,27 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                     ],
                   ),
                 ),
-
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
+                FutureBuilder<List<DriverModel>>(
+                  future: fetchDrivers(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else {
+                      final drivers = snapshot.data!;
+                      return Column(
+                        children:
+                            drivers
+                                .map((driver) => CustomCard(driver: driver))
+                                .toList(),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -277,23 +313,15 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
 }
 
 class CustomCard extends StatefulWidget {
-  const CustomCard({super.key});
+  final DriverModel driver;
+
+  const CustomCard({super.key, required this.driver});
 
   @override
   State<CustomCard> createState() => _CustomCardState();
 }
 
 class _CustomCardState extends State<CustomCard> {
-  String capacity = "Capacity";
-  String District = "District";
-  List<String> facilities = [
-    "Facility 1",
-    "Facility 2",
-    "Facility 3",
-    "Facility 4",
-    "Facility 5",
-  ];
-
   bool isPressed = false;
   @override
   Widget build(BuildContext context) {
@@ -316,7 +344,7 @@ class _CustomCardState extends State<CustomCard> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Driver Name',
+                  widget.driver.name,
                   style: TextStyle(fontSize: 24, color: Colors.white),
                 ),
               ),
@@ -331,15 +359,10 @@ class _CustomCardState extends State<CustomCard> {
                       Icon(Icons.phone, color: Colors.white),
                       SizedBox(width: 5),
                       Text(
-                        "9462825234",
+                        widget.driver.phoneno,
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ],
-                  ),
-                  SizedBox(width: 75),
-                  Text(
-                    "Private",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ],
               ),
@@ -353,7 +376,7 @@ class _CustomCardState extends State<CustomCard> {
                     children: [
                       SizedBox(width: 25),
                       Text(
-                        "Vehicle No",
+                        widget.driver.vehicleno,
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ],
@@ -429,7 +452,7 @@ class _CustomCardState extends State<CustomCard> {
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    "Driver Name",
+                                    widget.driver.name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 24,
@@ -451,8 +474,9 @@ class _CustomCardState extends State<CustomCard> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        SizedBox(height: 4),
                                         Text(
-                                          District,
+                                          "Sector: ${widget.driver.sector}",
                                           style: TextStyle(
                                             color: Color.fromRGBO(
                                               159,
@@ -463,7 +487,7 @@ class _CustomCardState extends State<CustomCard> {
                                             fontSize: 18,
                                           ),
                                         ),
-                                        SizedBox(height: 4),
+                                        SizedBox(height: 10),
                                         Text(
                                           "Facilities",
                                           style: TextStyle(
@@ -479,7 +503,7 @@ class _CustomCardState extends State<CustomCard> {
                                         ),
                                         SizedBox(height: 4),
                                         Text(
-                                          "• $capacity",
+                                          "Capacity: ${widget.driver.capacity}",
                                           style: TextStyle(
                                             color: Color.fromRGBO(
                                               159,
@@ -490,7 +514,7 @@ class _CustomCardState extends State<CustomCard> {
                                             fontSize: 18,
                                           ),
                                         ),
-                                        ...facilities.map(
+                                        ...widget.driver.facilities.map(
                                           (facility) => Padding(
                                             padding: EdgeInsets.symmetric(
                                               vertical: 2,
