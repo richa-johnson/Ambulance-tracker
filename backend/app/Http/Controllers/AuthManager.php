@@ -70,7 +70,7 @@ class AuthManager extends Controller
                 'sector' => ['required',],
                 'facilities' => 'required|array',
                 'facilities.*' => ['required',],
-                'license'=>'required|image|mimes:jpg,jpeg,png|max:5120'
+                'license' => 'required|image|mimes:jpg,jpeg,png|max:5120'
             ]
         );
         if ($validate->fails()) {
@@ -86,9 +86,10 @@ class AuthManager extends Controller
             'driver_phone' => $data['phone_no'],
             'driver_district' => $data['district'],
             'driver_vehno' => $data['vehicle_no'],
-            'driver_status' => 'unavailable',
+            'driver_sector' => $data['sector'],
             'driver_capacity' => $data['capacity'],
             'driver_license' => $licensePath,
+            'driver_status' => 'unavailable',
         ]);
         foreach ($data['facilities'] as $facility) {
             Facility::create([
@@ -203,17 +204,27 @@ class AuthManager extends Controller
 
     }
 
-    public function logout(){
-    auth()->user()->tokens()->delete();
-    return response([
-        "message"=>"logout success"
-    ],200);
+    public function logout()
+    {
+        auth()->user()->tokens()->delete();
+        return response([
+            "message" => "logout success"
+        ], 200);
     }
 
-    public function user(){
-        return response([
-            'user'=>auth()->user(), 
-        ],200);
+    public function user()
+    {
+          if (Auth::guard('admin')->check()) {
+        return response(['user' => Auth::guard('admin')->user(), 'role' => 'admin'], 200);
+    }
+    if (Auth::guard('driver')->check()) {
+        return response(['user' => Auth::guard('driver')->user(), 'role' => 'driver'], 200);
+    }
+    if (Auth::check()) {
+        return response(['user' => Auth::user(), 'role' => 'user'], 200);
+    }
+
+    return response(['error' => 'Unauthorized'], 401);
     }
 
 

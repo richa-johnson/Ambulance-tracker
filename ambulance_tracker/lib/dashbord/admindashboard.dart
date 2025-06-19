@@ -176,7 +176,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             top: 40,
                             left: 40,
                             child: Text(
-                              'TAP',
+                              'CARE',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 30,
@@ -197,7 +197,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             left: 40,
 
                             child: Text(
-                              'TRACK',
+                              'CONTROL',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 30,
@@ -217,7 +217,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             left: 40,
 
                             child: Text(
-                              'TRUST',
+                              'CONNEXT',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 30,

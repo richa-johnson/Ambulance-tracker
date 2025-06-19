@@ -212,6 +212,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "get",
+      "rootUri": "file:///C:/Users/Richa/AppData/Local/Pub/Cache/hosted/pub.dev/get-4.7.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "http",
       "rootUri": "file:///C:/Users/Richa/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.4.0",
       "packageUri": "lib/",

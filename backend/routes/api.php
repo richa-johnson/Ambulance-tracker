@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DriverStatus;
 
 Route::post('/auth/userregister',[AuthManager::class,'userregister']);
 Route::post('/auth/adminregister',[AuthManager::class,'adminregister']);
@@ -33,6 +34,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/auth/logout',[AuthManager::class,'logout']);
     Route::get('/auth/user',[AuthManager::class,'user']);
+    Route::put('/driver/status',[DriverStatus::class,'updateDriverStatus']);
 });
 
-
+Route::middleware(['auth:sanctum'])->get('/admin/users',[AdminController::class,'getAllUsers']);
+ 
+Route::middleware(['auth:sanctum'])->get('/admin/drivers',[AdminController::class,'getAlldrivers']);
+Route::middleware('auth:sanctum')          // or auth:api / passport
+      ->post('/driver/location', [DriverController::class, 'updateLocation']);

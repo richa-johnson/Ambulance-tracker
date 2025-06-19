@@ -25,9 +25,10 @@ class ambulanceDriver extends Authenticatable{
         'driver_mail',
         'driver_password',
         'driver_vehno',
-        'driver_status',
+        'driver_sector',
         'driver_capacity',
         'driver_license',
+        'driver_status',
     ];
     protected $hidden = [
         'driver_password',
@@ -42,6 +43,10 @@ class ambulanceDriver extends Authenticatable{
     public function getAuthPassword()
     {
         return $this->driver_password;
+    }
+    public function facilities(){
+
+    return $this->hasMany(Facility::class, 'driver_id', 'driver_id');
     }
 
 }

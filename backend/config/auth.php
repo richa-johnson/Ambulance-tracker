@@ -50,7 +50,7 @@ return [
         ],
         'api' => [
             'driver' => 'sanctum', // keep this for API token handling
-            'provider' => 'users',
+            'provider' => null,
         ],
     ],
 
@@ -77,7 +77,7 @@ return [
         ],
         'drivers' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Driver::class,
+            'model' => App\Models\ambulanceDriver::class,
         ],
         'users' => [
             'driver' => 'eloquent',

@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:ambulance_tracker/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class DriverDetails extends StatefulWidget {
   const DriverDetails({super.key});
@@ -8,7 +13,58 @@ class DriverDetails extends StatefulWidget {
 }
 
 class _DriverDetailsState extends State<DriverDetails> {
-  String slno="1   ",name="dIYA  ",phoneno="78987968  ",emailid="HJKHALJNCLkhjnmhjgkhjbknhjloikjnm  ",district="MDJDS  ",vehicleno="238924",capacity="3",sector="gobewrmfscnt",facilities="jklsadfhaskjam",license="sdfhlkajsvnssmc";
+  List<DriverModel> DriverList = [];
+  bool isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    fetchdrivers();
+  }
+
+  Future<void> fetchdrivers() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("No token found. Please login.");
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse(getDriverURL),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final List<dynamic> data =
+          decoded is List ? decoded : (decoded['data'] ?? []);
+
+      setState(() {
+        DriverList = data.map((json) => DriverModel.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } else {
+      print("Failed to load users: ${response.body}");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  } catch (e) {
+    print("Error fetching drivers: $e");
+    setState(() {
+      isLoading = false;
+    });
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +112,9 @@ class _DriverDetailsState extends State<DriverDetails> {
                 Text("DRIVER DETAILS", textAlign: TextAlign.center,style: TextStyle(color: Color.fromRGBO(87, 24, 44,1), fontWeight: FontWeight.bold,fontSize: 32),),
                 SizedBox(height: 20),
                   Expanded(
-                    child: SingleChildScrollView(
+                    child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
@@ -71,8 +129,8 @@ class _DriverDetailsState extends State<DriverDetails> {
                             ),
                             children: [
                               DriverDetailsTable(slno: "Sl No  ", name: "Name  ", phoneno: "Phone No  ", emailid: "Email Id  ", district: "District  ", vehicleno: "Vehicle No", capacity: "Capacity", sector: "Sector", facilities: "Facilities", license: "License").build(),
-                              for (int i=0;i<10;i++)
-                                DriverDetailsTable(slno: slno, name: name, phoneno: phoneno, emailid: emailid, district: district, vehicleno: vehicleno, capacity: capacity, sector: sector, facilities: facilities, license: license).build(),
+                              for (var driver in DriverList)
+                                DriverDetailsTable(slno: driver.slno, name: driver.name, phoneno: driver.phoneno, emailid: driver.emailid, district: driver.district, vehicleno: driver.vehicleno, capacity: driver.capacity, sector: driver.sector, facilities: driver.facilities.join(', '), license: driver.license).build(),
                             ],
                           ),
                         ),
@@ -137,3 +195,40 @@ class DriverDetailsTable{
   }
 }
 
+class DriverModel {
+  final String slno;
+  final String name;
+  final String phoneno;
+  final String emailid;
+  final String district;
+  final String vehicleno;
+  final String capacity;
+  final List<String> facilities;
+  final String sector;
+  final String license;
+
+  DriverModel({
+    required this.slno,
+    required this.name,
+    required this.phoneno,
+    required this.emailid,
+    required this.district,
+    required this.vehicleno,required this.capacity,required this.sector,required this.facilities,required this.license
+  });
+
+  factory DriverModel.fromJson(Map<String, dynamic> json) {
+  return DriverModel(
+    slno: json['slno'].toString(),
+    name: json['name'] ?? '',
+    phoneno: json['phoneno'] ?? '',
+    emailid: json['emailid'] ?? '',
+    district: json['district'] ?? '',
+    vehicleno: json['vehicleno'] ?? '',
+    capacity: json['capacity'] ?? '',
+    sector: json['sector'] ?? '',
+    facilities: List<String>.from(json['facilities'] ?? []),
+    license: json['license'] ?? ''
+  );
+}
+
+}

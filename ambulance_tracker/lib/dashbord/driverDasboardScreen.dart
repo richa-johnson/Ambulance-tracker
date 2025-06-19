@@ -1,12 +1,17 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
 import 'package:ambulance_tracker/registration/login.dart';
+import 'package:ambulance_tracker/services/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 class driverDashboard extends StatefulWidget {
   const driverDashboard({super.key});
@@ -28,6 +33,8 @@ class _driverDashboardState extends State<driverDashboard> {
 
   bool onRun = false;
   bool isAvailable = false;
+
+  final LocationController locationController = Get.put(LocationController());
 
   String drname = "driver name";
   String phno = "Phone no";
@@ -54,6 +61,44 @@ class _driverDashboardState extends State<driverDashboard> {
       ).showSnackBar(SnackBar(content: Text("Logout Failed")));
       return false;
     }
+  }
+
+  Future<void> updateDriverStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+
+    if (token == null) {
+      print("No token found");
+      return;
+    }
+    final Uri url = Uri.parse(driverStatusURL);
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+      if (response.statusCode == 200) {
+        print('Status updated to $status');
+      } else {
+        print('Failed to update status: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+   WidgetsBinding.instance.addPostFrameCallback(
+      (_) => LocationService.instance
+          .startTracking(controller: locationController, context: context),
+    );
   }
 
   @override
@@ -393,6 +438,7 @@ class _driverDashboardState extends State<driverDashboard> {
                                           setState(() {
                                             isAvailable = true;
                                           });
+                                          updateDriverStatus('available');
                                         },
                                         child: Center(
                                           child: Text(
@@ -416,6 +462,7 @@ class _driverDashboardState extends State<driverDashboard> {
                                               setState(() {
                                                 isAvailable = false;
                                               }),
+                                              updateDriverStatus('unavailable'),
                                             },
                                         child: Center(
                                           child: Text(
