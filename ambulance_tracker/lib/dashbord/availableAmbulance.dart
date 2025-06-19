@@ -1,6 +1,7 @@
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:ambulance_tracker/dashbord/driverDetails.dart';
+import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -14,6 +15,37 @@ class AvailableAmbulance extends StatefulWidget {
 
 class AvailableAmbulanceState extends State<AvailableAmbulance> {
   bool isPressed = false;
+  Map<String, dynamic>? userDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserDetails();
+  }
+
+  void _loadUserDetails() async {
+    final response = await getUserDetail();
+    if (response.error == null) {
+      final data = response.data as Map<String, dynamic>;
+
+      // Extract the nested 'user' object
+      final user = data['user'] as Map<String, dynamic>;
+
+      print("Signed-in User Details:");
+      print("ID       : ${user['id']}");
+      print("Name     : ${user['name']}");
+      print("Phone No : ${user['phone_no']}");
+      print("District : ${user['district']}");
+      print("Email    : ${user['mail']}");
+
+      // Optional: You can store in variables if needed
+      // String name = user['user_name'];
+      // String phone = user['user_phone'];
+      // etc.
+    } else {
+      print("Failed to fetch user details: ${response.error}");
+    }
+  }
 
   Future<List<DriverModel>> fetchDrivers() async {
     final response = await http.get(Uri.parse(getAvailabledriversURL));
