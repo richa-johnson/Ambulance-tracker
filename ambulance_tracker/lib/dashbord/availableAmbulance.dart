@@ -1,19 +1,32 @@
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:ambulance_tracker/dashbord/driverDetails.dart';
+import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:ambulance_tracker/models/driver_model.dart';
 
 class AvailableAmbulance extends StatefulWidget {
   const AvailableAmbulance({super.key});
+final String pickupLocation;
+  final int    patientCount;
+  final List<Map<String, dynamic>> patientList;
 
+  const AvailableAmbulance({
+    Key? key,
+    required this.pickupLocation,
+    required this.patientCount,
+    required this.patientList,
+  }) 
+  
   @override
   State<AvailableAmbulance> createState() => AvailableAmbulanceState();
 }
 
 class AvailableAmbulanceState extends State<AvailableAmbulance> {
   bool isPressed = false;
+  
 
   Future<List<DriverModel>> fetchDrivers() async {
     final response = await http.get(Uri.parse(getAvailabledriversURL));
@@ -297,7 +310,7 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
                       return Column(
                         children:
                             drivers
-                                .map((driver) => CustomCard(driver: driver))
+                                .map((driver) => CustomCard(driver: driver,pickupLocation: ,))
                                 .toList(),
                       );
                     }
@@ -314,8 +327,17 @@ class AvailableAmbulanceState extends State<AvailableAmbulance> {
 
 class CustomCard extends StatefulWidget {
   final DriverModel driver;
+  final String pickupLocation;
+  final int patientCount;
+  final List<Map<String, dynamic>> patientList;
 
-  const CustomCard({super.key, required this.driver});
+  const CustomCard({
+    super.key,
+    required this.driver,
+    required this.pickupLocation,
+    required this.patientCount,
+    required this.patientList,
+  });
 
   @override
   State<CustomCard> createState() => _CustomCardState();
@@ -323,234 +345,102 @@ class CustomCard extends StatefulWidget {
 
 class _CustomCardState extends State<CustomCard> {
   bool isPressed = false;
+
+  // ------------------------- API helpers ------------------------------------
+  Future<int> _createBooking({
+    required String token,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$baseURL/booking'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'driver_id': widget.driver.id,
+        'p_location': widget.pickupLocation,
+        'p_count':    widget.patientCount,
+      }),
+    );
+    if (res.statusCode == 201) {
+      return (jsonDecode(res.body)['booking_id']) as int;
+    }
+    throw Exception('Booking failed: ${res.body}');
+  }
+
+  Future<void> _sendPatients({
+    required String token,
+    required int bookingId,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$baseURL/booking/$bookingId/patients'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'patients': widget.patientList}),
+    );
+    if (res.statusCode != 204) {
+      throw Exception('Patients upload failed: ${res.body}');
+    }
+  }
+
+  Future<void> _bookDriver() async {
+    try {
+      final token = await getToken();   // TODO: implement this helper
+      final id    = await _createBooking(token: token);
+      await _sendPatients(token: token, bookingId: id);
+
+      setState(() => isPressed = true);
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Request sent!')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    }
+  }
+
+  // -------------------------- UI -------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            10,
-          ), // Fixed: .circular instead of Geometry
-        ),
-        color: Color.fromRGBO(159, 13, 55, 1.0),
-        margin: EdgeInsets.all(16),
+    return Card(
+      margin: const EdgeInsets.all(12),
+      color: const Color(0xFF9F0D37),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Replaced ListTile with Padding + Text for better spacing control
-            Padding(
-              padding: EdgeInsets.only(top: 16, bottom: 8, left: 25),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.driver.name,
-                  style: TextStyle(fontSize: 24, color: Colors.white),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Row(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width: 15),
-                      Icon(Icons.phone, color: Colors.white),
-                      SizedBox(width: 5),
-                      Text(
-                        widget.driver.phoneno,
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-              child: Row(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width: 25),
-                      Text(
-                        widget.driver.vehicleno,
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 110),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isPressed ? Colors.green : Colors.white,
-                      minimumSize: Size(81, 30),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      isPressed ? "Request Sent" : "Book Now",
-                      style: TextStyle(
-                        color:
-                            isPressed
-                                ? Colors.white
-                                : Color.fromRGBO(159, 13, 55, 1.0),
-                        fontSize: 10,
-                      ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        isPressed = !isPressed;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 300,
-              height: 1,
-              color: Color.fromRGBO(231, 164, 164, 1.0),
-            ),
+            Text(widget.driver.name,
+                style: const TextStyle(fontSize: 24, color: Colors.white)),
+            const SizedBox(height: 4),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                      ),
-                      builder: (BuildContext context) {
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    height: 3,
-                                    color: const Color.fromARGB(
-                                      115,
-                                      110,
-                                      108,
-                                      108,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    widget.driver.name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(159, 13, 55, 1.0),
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        double
-                                            .infinity, // Makes it use full available width
-                                    alignment:
-                                        Alignment
-                                            .centerLeft, // Aligns the column to the left
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ), // Optional horizontal padding
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "Sector: ${widget.driver.sector}",
-                                          style: TextStyle(
-                                            color: Color.fromRGBO(
-                                              159,
-                                              13,
-                                              55,
-                                              1.0,
-                                            ),
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          "Facilities",
-                                          style: TextStyle(
-                                            color: Color.fromRGBO(
-                                              159,
-                                              13,
-                                              55,
-                                              1.0,
-                                            ),
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "Capacity: ${widget.driver.capacity}",
-                                          style: TextStyle(
-                                            color: Color.fromRGBO(
-                                              159,
-                                              13,
-                                              55,
-                                              1.0,
-                                            ),
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        ...widget.driver.facilities.map(
-                                          (facility) => Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 2,
-                                            ),
-                                            child: Text(
-                                              "• $facility",
-                                              style: TextStyle(
-                                                color: Color.fromRGBO(
-                                                  159,
-                                                  13,
-                                                  55,
-                                                  1.0,
-                                                ),
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-
-                  child: Text(
-                    "View More",
-                    style: TextStyle(color: Color.fromRGBO(231, 164, 164, 1.0)),
-                  ),
-                ),
+                const Icon(Icons.phone, color: Colors.white, size: 16),
+                const SizedBox(width: 6),
+                Text(widget.driver.phoneno,
+                    style: const TextStyle(color: Colors.white)),
               ],
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    isPressed ? Colors.green : Colors.white,
+              ),
+              onPressed: isPressed ? null : _bookDriver,
+              child: Text(
+                isPressed ? 'Request Sent' : 'Book Now',
+                style: TextStyle(
+                  color: isPressed
+                      ? Colors.white
+                      : const Color(0xFF9F0D37),
+                ),
+              ),
             ),
           ],
         ),

@@ -300,7 +300,9 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
   if (okInputs && okLocation) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const AvailableAmbulance()),
+      MaterialPageRoute(builder: (_) => const AvailableAmbulance(pickupLocation: _pickupLocation!,
+      patientCount:  _patientCount,
+      patientList:   patients,)),
     );
   } else {
     final msg = !okInputs
