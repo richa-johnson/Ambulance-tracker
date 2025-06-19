@@ -61,6 +61,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id')->nullable(false);
             $table->string('p_location')->nullable(false);
             $table->integer('p_count')->nullable(false);
+            $table->string('b_status')->nullable(false);
 
             $table->timestamp('created_at')->nullable(false);
             $table->timestamp('end_time')->nullable(true);
