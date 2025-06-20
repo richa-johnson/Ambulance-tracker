@@ -8,6 +8,7 @@ const logoutURL = '$baseURL/auth/logout';
 const getUserURL = '$baseURL/admin/users';
 const getDriverURL = '$baseURL/admin/drivers';
 const driverStatusURL = '$baseURL/driver/status';
+const driverLocURL = '$baseURL/admin/trackAmbulance/driver';
 
 const serverError = 'server error';
 const unauthorized = 'Unauthorized';

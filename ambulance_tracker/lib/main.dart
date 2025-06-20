@@ -1,3 +1,5 @@
+import 'package:ambulance_tracker/dashbord/admindashboard.dart';
+import 'package:ambulance_tracker/dashbord/trackAmbulanceScreen.dart';
 import 'package:ambulance_tracker/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'resQroute',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: AdminDashboard(),
     );
   }
 }

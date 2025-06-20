@@ -107,7 +107,7 @@ class _CustomCardState extends State<CustomCard> {
               ),
               onPressed: isPressed ? null : _bookDriver,
               child: Text(
-                isPressed ? 'Request Sent' : 'Book Now',
+                isPressed ? 'Request Sent' : 'Book Now',
                 style: TextStyle(
                   color:
                       isPressed ? Colors.white : const Color(0xFF9F0D37),
