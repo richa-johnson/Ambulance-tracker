@@ -4,6 +4,7 @@ import 'package:ambulance_tracker/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class DriverDetails extends StatefulWidget {
   const DriverDetails({super.key});
@@ -194,7 +195,7 @@ class _DriverDetailsState extends State<DriverDetails> {
                                     sector: "Sector",
                                     facilities: "Facilities",
                                     license: "License",
-                                  ).build(),
+                                  ).build(context),
                                   for (var driver in filteredList)
                                     DriverDetailsTable(
                                       slno: driver.slno,
@@ -207,7 +208,7 @@ class _DriverDetailsState extends State<DriverDetails> {
                                       sector: driver.sector,
                                       facilities: driver.facilities.join(', '),
                                       license: driver.license,
-                                    ).build(),
+                                    ).build(context),
                                 ],
                               ),
                             ),
@@ -246,8 +247,15 @@ class DriverDetailsTable {
     required this.facilities,
     required this.license,
   });
+  Future<void> openLicense(Uri uri) async {
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $uri';
+    }
+  }
 
-  TableRow build() {
+  TableRow build(BuildContext context) {
     TextStyle textStyle = TextStyle(
       color: Colors.black,
       fontWeight: FontWeight.w900,
@@ -265,7 +273,58 @@ class DriverDetailsTable {
         tableCell(capacity, textStyle),
         tableCell(sector, textStyle),
         tableCell(facilities, textStyle),
-        tableCell(license, textStyle),
+        license == "License"
+            ? tableCell("License", textStyle) // heading row
+            : Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: () {
+                  print("License URL: $license");
+                  showDialog(
+                    context: context,
+                    builder:
+                        (BuildContext context) => AlertDialog(
+                          title: Text("License Preview"),
+                          content: Image.network(
+                            license,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              print("Error loading image: $error");
+                              return Text('Image not found');
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              child: Text("Close"),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            TextButton(
+                              child: Text("Open in Browser"),
+                              onPressed: () async {
+                                final uri = Uri.parse(license);
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(
+                                    uri,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                } else {
+                                  print("Could not launch $license");
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                  );
+                },
+                child: Text(
+                  'View',
+                  style: textStyle.copyWith(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
       ],
     );
   }
@@ -319,7 +378,7 @@ class DriverModel {
       capacity: json['capacity'] ?? '',
       sector: json['sector'] ?? '',
       facilities: List<String>.from(json['facilities'] ?? []),
-      license: json['license'] ?? '',
+      license: '$portURL/storage/${json['license'] ?? ''}',
     );
   }
 
