@@ -13,6 +13,8 @@ class UserDetails extends StatefulWidget {
 }
 
 class _UserDetailsState extends State<UserDetails> {
+  TextEditingController searchController = TextEditingController();
+  List<UserModel> filteredList = [];
   List<UserModel> userList = [];
   bool isLoading = true;
   @override
@@ -43,6 +45,7 @@ class _UserDetailsState extends State<UserDetails> {
 
       setState(() {
         userList = data.map((json) => UserModel.fromJson(json)).toList();
+        filteredList = List.from(userList); // initialize filtered list
         isLoading = false;
       });
     } else {
@@ -51,6 +54,19 @@ class _UserDetailsState extends State<UserDetails> {
       });
       print("Failed to load users: ${response.body}");
     }
+  }
+
+  void _filterUsers(String query) {
+    final lowerQuery = query.toLowerCase();
+    setState(() {
+      filteredList =
+          userList.where((user) {
+            return user.name.toLowerCase().contains(lowerQuery) ||
+                user.phoneno.toLowerCase().contains(lowerQuery) ||
+                user.emailid.toLowerCase().contains(lowerQuery) ||
+                user.district.toLowerCase().contains(lowerQuery);
+          }).toList();
+    });
   }
 
   @override
@@ -97,6 +113,22 @@ class _UserDetailsState extends State<UserDetails> {
           child: Column(
             children: [
               SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: TextField(
+                  controller: searchController,
+                  onChanged: _filterUsers,
+                  decoration: InputDecoration(
+                    hintText: 'Search by name, phone, email or district',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
               Text(
                 "USER DETAILS",
                 textAlign: TextAlign.center,
@@ -132,7 +164,7 @@ class _UserDetailsState extends State<UserDetails> {
                                     emailid: "Email Id  ",
                                     district: "District  ",
                                   ).build(),
-                                  for (var user in userList)
+                                  for (var user in filteredList)
                                     UserDetailsTable(
                                       slno: user.slno,
                                       name: user.name,

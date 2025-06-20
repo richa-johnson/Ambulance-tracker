@@ -13,6 +13,8 @@ class DriverDetails extends StatefulWidget {
 }
 
 class _DriverDetailsState extends State<DriverDetails> {
+  TextEditingController searchController = TextEditingController();
+  List<DriverModel> filteredList = [];
   List<DriverModel> DriverList = [];
   bool isLoading = true;
   @override
@@ -22,48 +24,71 @@ class _DriverDetailsState extends State<DriverDetails> {
   }
 
   Future<void> fetchdrivers() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
 
-    if (token == null) {
-      print("No token found. Please login.");
+      if (token == null) {
+        print("No token found. Please login.");
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(getDriverURL),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final List<dynamic> data =
+            decoded is List ? decoded : (decoded['data'] ?? []);
+
+        setState(() {
+          DriverList = data.map((json) => DriverModel.fromJson(json)).toList();
+          filteredList = List.from(DriverList);
+          isLoading = false;
+        });
+      } else {
+        print("Failed to load users: ${response.body}");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching drivers: $e");
       setState(() {
         isLoading = false;
       });
-      return;
     }
+  }
 
-    final response = await http.get(
-      Uri.parse(getDriverURL),
-      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
-    );
-
-    print("Response status: ${response.statusCode}");
-    print("Response body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      final List<dynamic> data =
-          decoded is List ? decoded : (decoded['data'] ?? []);
-
-      setState(() {
-        DriverList = data.map((json) => DriverModel.fromJson(json)).toList();
-        isLoading = false;
-      });
-    } else {
-      print("Failed to load users: ${response.body}");
-      setState(() {
-        isLoading = false;
-      });
-    }
-  } catch (e) {
-    print("Error fetching drivers: $e");
+  void _filterDrivers(String query) {
+    final lowerQuery = query.toLowerCase();
     setState(() {
-      isLoading = false;
+      filteredList =
+          DriverList.where((driver) {
+            return driver.name.toLowerCase().contains(lowerQuery) ||
+                driver.phoneno.toLowerCase().contains(lowerQuery) ||
+                driver.emailid.toLowerCase().contains(lowerQuery) ||
+                driver.district.toLowerCase().contains(lowerQuery) ||
+                driver.vehicleno.toLowerCase().contains(lowerQuery) ||
+                driver.sector.toLowerCase().contains(lowerQuery) ||
+                driver.license.toLowerCase().contains(lowerQuery) ||
+                driver.facilities.any(
+                  (f) => f.toLowerCase().contains(lowerQuery),
+                );
+          }).toList();
     });
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -107,45 +132,97 @@ class _DriverDetailsState extends State<DriverDetails> {
             color: Colors.white,
           ),
           child: Column(
-              children: [
-                SizedBox(height: 20),
-                Text("DRIVER DETAILS", textAlign: TextAlign.center,style: TextStyle(color: Color.fromRGBO(87, 24, 44,1), fontWeight: FontWeight.bold,fontSize: 32),),
-                SizedBox(height: 20),
-                  Expanded(
-                    child: isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Table(
-                            defaultColumnWidth: IntrinsicColumnWidth(),
-                            border: TableBorder.all(
-                              color: Color.fromRGBO(0, 0, 0, 1),
-                              width: 1.0,
-                              style: BorderStyle.solid
-                            ),
-                            children: [
-                              DriverDetailsTable(slno: "Sl No  ", name: "Name  ", phoneno: "Phone No  ", emailid: "Email Id  ", district: "District  ", vehicleno: "Vehicle No", capacity: "Capacity", sector: "Sector", facilities: "Facilities", license: "License").build(),
-                              for (var driver in DriverList)
-                                DriverDetailsTable(slno: driver.slno, name: driver.name, phoneno: driver.phoneno, emailid: driver.emailid, district: driver.district, vehicleno: driver.vehicleno, capacity: driver.capacity, sector: driver.sector, facilities: driver.facilities.join(', '), license: driver.license).build(),
-                            ],
-                          ),
-                        ),
-                      ),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: TextField(
+                  controller: searchController,
+                  onChanged: _filterDrivers,
+                  decoration: InputDecoration(
+                    hintText: 'Search by name, phone, email, vehicle, etc.',
+                    prefixIcon: Icon(Icons.search),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        searchController.clear();
+                        _filterDrivers('');
+                      },
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-              ],
-            ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "DRIVER DETAILS",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color.fromRGBO(87, 24, 44, 1),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child:
+                    isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Table(
+                                defaultColumnWidth: IntrinsicColumnWidth(),
+                                border: TableBorder.all(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  width: 1.0,
+                                  style: BorderStyle.solid,
+                                ),
+                                children: [
+                                  DriverDetailsTable(
+                                    slno: "Sl No  ",
+                                    name: "Name  ",
+                                    phoneno: "Phone No  ",
+                                    emailid: "Email Id  ",
+                                    district: "District  ",
+                                    vehicleno: "Vehicle No",
+                                    capacity: "Capacity",
+                                    sector: "Sector",
+                                    facilities: "Facilities",
+                                    license: "License",
+                                  ).build(),
+                                  for (var driver in filteredList)
+                                    DriverDetailsTable(
+                                      slno: driver.slno,
+                                      name: driver.name,
+                                      phoneno: driver.phoneno,
+                                      emailid: driver.emailid,
+                                      district: driver.district,
+                                      vehicleno: driver.vehicleno,
+                                      capacity: driver.capacity,
+                                      sector: driver.sector,
+                                      facilities: driver.facilities.join(', '),
+                                      license: driver.license,
+                                    ).build(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
-class DriverDetailsTable{
+class DriverDetailsTable {
   final String slno;
   final String name;
   final String phoneno;
@@ -156,15 +233,26 @@ class DriverDetailsTable{
   final String facilities;
   final String sector;
   final String license;
- 
-  DriverDetailsTable({required this.slno,required this.name,required this.phoneno,required this.emailid,required this.district,required this.vehicleno,required this.capacity,required this.sector,required this.facilities,required this.license});
+
+  DriverDetailsTable({
+    required this.slno,
+    required this.name,
+    required this.phoneno,
+    required this.emailid,
+    required this.district,
+    required this.vehicleno,
+    required this.capacity,
+    required this.sector,
+    required this.facilities,
+    required this.license,
+  });
 
   TableRow build() {
-  TextStyle textStyle = TextStyle(
-    color: Colors.black,
-    fontWeight: FontWeight.w900,
-    fontSize: 17,
-  );
+    TextStyle textStyle = TextStyle(
+      color: Colors.black,
+      fontWeight: FontWeight.w900,
+      fontSize: 17,
+    );
 
     return TableRow(
       children: [
@@ -213,24 +301,27 @@ class DriverModel {
     required this.phoneno,
     required this.emailid,
     required this.district,
-    required this.vehicleno,required this.capacity,required this.sector,required this.facilities,required this.license
+    required this.vehicleno,
+    required this.capacity,
+    required this.sector,
+    required this.facilities,
+    required this.license,
   });
 
   factory DriverModel.fromJson(Map<String, dynamic> json) {
-  return DriverModel(
-    slno: json['slno'].toString(),
-    name: json['name'] ?? '',
-    phoneno: json['phoneno'] ?? '',
-    emailid: json['emailid'] ?? '',
-    district: json['district'] ?? '',
-    vehicleno: json['vehicleno'] ?? '',
-    capacity: json['capacity'] ?? '',
-    sector: json['sector'] ?? '',
-    facilities: List<String>.from(json['facilities'] ?? []),
-    license: json['license'] ?? ''
-  );
-}
+    return DriverModel(
+      slno: json['slno'].toString(),
+      name: json['name'] ?? '',
+      phoneno: json['phoneno'] ?? '',
+      emailid: json['emailid'] ?? '',
+      district: json['district'] ?? '',
+      vehicleno: json['vehicleno'] ?? '',
+      capacity: json['capacity'] ?? '',
+      sector: json['sector'] ?? '',
+      facilities: List<String>.from(json['facilities'] ?? []),
+      license: json['license'] ?? '',
+    );
+  }
 
   get id => null;
-
 }
