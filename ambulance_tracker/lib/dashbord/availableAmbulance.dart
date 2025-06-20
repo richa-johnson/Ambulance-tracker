@@ -8,7 +8,7 @@ import 'custom_card.dart'; // put CustomCard in its own file or below
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AvailableAmbulance extends StatefulWidget {
-  /// REQUIRED DATA coming from patientDetailsForm
+
   final String pickupLocation;
   final int patientCount;
   final List<Map<String, dynamic>> patientList;
@@ -90,7 +90,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     throw Exception('Failed to load drivers');
   }
 
-  // ─────────────────────────── UI ────────────────────────────
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
