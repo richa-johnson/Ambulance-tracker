@@ -40,6 +40,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_animate: ^4.5.2
   email_otp_auth: 
+  url_launcher: ^6.2.5
+
 
   #Open Street Map
   geolocator: ^14.0.1

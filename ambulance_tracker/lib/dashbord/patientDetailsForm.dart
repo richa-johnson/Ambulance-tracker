@@ -244,13 +244,12 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                                 controller: _ageCtrls[i],
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
-                                    return 'Age required';
+                                    return null; // ✅ allow blank
                                   }
                                   final age = int.tryParse(v);
-                                  if (age == null) {
-                                    return 'Enter a valid number';
+                                  if (age == null || age <= 0) {
+                                    return 'Enter a valid age';
                                   }
-                                  if (age <= 0) return 'Age must be positive';
                                   return null;
                                 },
                               ),
@@ -316,7 +315,10 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                       _patientCount,
                       (i) => {
                         'name': _nameCtrls[i].text,
-                        'age': int.parse(_ageCtrls[i].text),
+                        'age':
+                            _ageCtrls[i].text.isEmpty
+                                ? null // ✅ send null if left blank
+                                : int.parse(_ageCtrls[i].text),
                         'blood': _bloodSelected[i],
                       },
                     );

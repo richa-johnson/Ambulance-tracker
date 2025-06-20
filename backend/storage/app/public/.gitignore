@@ -1,3 +1,13 @@
+<<<<<<< HEAD
 *
 !licenses/
 !.gitignore
+=======
+!*.jpg
+!*.jpeg
+!*.png
+!*.webp
+!*.pdf
+!.gitignore
+
+>>>>>>> c6e2123ff4a58a5acb685e31f7c79d3cd263a65d

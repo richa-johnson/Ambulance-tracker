@@ -4,7 +4,8 @@ class Driver {
   final String phoneno;
   final String vehicleno;
   final String sector;
-  final int capacity;
+  final String capacity;
+  final String disrtict;
   final List<String> facilities;
 
   Driver({
@@ -14,17 +15,20 @@ class Driver {
     required this.vehicleno,
     required this.sector,
     required this.capacity,
+    required this.disrtict,
     required this.facilities,
   });
 
   factory Driver.fromJson(Map<String, dynamic> json) {
+    final rawId = json['slno'];
     return Driver(
-      id: json['driver_id'],
+      id: int.parse(rawId.toString()),
       name: json['name'],
       phoneno: json['phoneno'],
       vehicleno: json['vehicleno'],
+      disrtict: json['district'],
       sector: json['sector'],
-      capacity: json['capacity'],
+       capacity: json['capacity']?.toString() ?? '',
       facilities: List<String>.from(json['facilities'] ?? []),
     );
   }
