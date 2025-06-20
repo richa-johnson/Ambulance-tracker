@@ -242,6 +242,17 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                               CustomInputFieldNumber(
                                 hintText: 'AGE',
                                 controller: _ageCtrls[i],
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return 'Age required';
+                                  }
+                                  final age = int.tryParse(v);
+                                  if (age == null) {
+                                    return 'Enter a valid number';
+                                  }
+                                  if (age <= 0) return 'Age must be positive';
+                                  return null;
+                                },
                               ),
                               const SizedBox(height: 20),
                               Container(
@@ -301,11 +312,26 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                   final okLocation = _hasLocation && selectedLatLng != null;
 
                   if (okInputs && okLocation) {
-                    
+                    final patients = List.generate(
+                      _patientCount,
+                      (i) => {
+                        'name': _nameCtrls[i].text,
+                        'age': int.parse(_ageCtrls[i].text),
+                        'blood': _bloodSelected[i],
+                      },
+                    );
+                    final String locString =
+                        "${selectedLatLng!.latitude},${selectedLatLng!.longitude}";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const AvailableAmbulance(),
+                        builder:
+                            (_) => AvailableAmbulance(
+                              pickupLocation:
+                                  locString, // String, matches CustomCard
+                              patientCount: _patientCount,
+                              patientList: patients,
+                            ),
                       ),
                     );
                   } else {
@@ -378,4 +404,3 @@ class CustomInputFieldNumber extends StatelessWidget {
     );
   }
 }
-

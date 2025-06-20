@@ -231,4 +231,6 @@ class DriverModel {
   );
 }
 
+  get id => null;
+
 }
