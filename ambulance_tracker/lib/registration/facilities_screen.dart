@@ -34,28 +34,96 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
   late List<bool> checkboxValues;
   TextEditingController searchController = TextEditingController();
   List<String> filteredFacilities = [];
+  void _showAddFacilityDialog() {
+    TextEditingController newFacilityController = TextEditingController();
 
- @override
-void initState() {
-  super.initState();
-  checkboxValues = List.generate(facilities.length, (index) {
-    return widget.previouslySelected?.contains(facilities[index]) ?? false;
-  });
-  filteredFacilities = List.from(facilities);
-  searchController.addListener(_filterFacilities);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Add New Facility'),
+          content: TextField(
+            controller: newFacilityController,
+            decoration: InputDecoration(
+              hintText: 'Enter facility name',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text('CANCEL'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String newFacility = newFacilityController.text.trim();
 
-  // update selectAll if all are selected
-  selectAll = checkboxValues.every((val) => val == true);
-}
+                if (newFacility.isEmpty) {
+                  // Optionally show a warning/snackbar
+                  return;
+                }
 
+                // Check for duplicates case-insensitively
+                bool alreadyExists = facilities.any(
+                  (facility) =>
+                      facility.toLowerCase() == newFacility.toLowerCase(),
+                );
+
+                if (!alreadyExists) {
+                  setState(() {
+                    facilities.add(newFacility);
+                    checkboxValues.add(true); // auto-select new item
+                    _filterFacilities(); // refresh sorted/filtered list
+                  });
+                }
+
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text('ADD'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkboxValues = List.generate(facilities.length, (index) {
+      return widget.previouslySelected?.contains(facilities[index]) ?? false;
+    });
+    filteredFacilities = List.from(facilities);
+    searchController.addListener(_filterFacilities);
+
+    // update selectAll if all are selected
+    selectAll = checkboxValues.every((val) => val == true);
+  }
 
   void _filterFacilities() {
     String query = searchController.text.toLowerCase();
+    List<String> result =
+        facilities
+            .where((facility) => facility.toLowerCase().contains(query))
+            .toList();
+
+    // Bring selected ones first
+    result.sort((a, b) {
+      int aIndex = facilities.indexOf(a);
+      int bIndex = facilities.indexOf(b);
+      bool aSelected = checkboxValues[aIndex];
+      bool bSelected = checkboxValues[bIndex];
+
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+      return a.compareTo(b); // Alphabetical fallback
+    });
+
     setState(() {
-      filteredFacilities =
-          facilities
-              .where((facility) => facility.toLowerCase().contains(query))
-              .toList();
+      filteredFacilities = result;
     });
   }
 
@@ -72,6 +140,7 @@ void initState() {
     setState(() {
       checkboxValues[index] = value ?? false;
       selectAll = checkboxValues.every((item) => item);
+      _filterFacilities(); // re-sort list based on updated selection
     });
   }
 
@@ -208,7 +277,6 @@ void initState() {
                 ),
               ),
 
-              // checkboxlist
               Expanded(
                 child: SizedBox(
                   width: 350,
@@ -238,23 +306,27 @@ void initState() {
                   ),
                 ),
               ),
-              //add icon
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    Icon(Icons.add_circle_outline),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: Text(
-                        'ADD',
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
+                child: Center(
+                  child: GestureDetector(
+                    onTap: _showAddFacilityDialog,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_circle_outline),
+                        SizedBox(width: 5),
+                        Text(
+                          'ADD',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-              //applybutton
+
               Container(
                 margin: EdgeInsets.symmetric(vertical: 10),
                 child: ElevatedButton(
