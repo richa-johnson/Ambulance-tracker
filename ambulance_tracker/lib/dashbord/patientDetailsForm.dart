@@ -1,12 +1,10 @@
 import 'package:ambulance_tracker/dashbord/availableAmbulance.dart';
-import 'package:ambulance_tracker/registration/basic.dart';
+import 'package:ambulance_tracker/location/userLocation.dart'; // import your map page
 import 'package:flutter/material.dart';
-import 'package:ambulance_tracker/registration/userRegistration.dart';
+import 'package:latlong2/latlong.dart'; // required for LatLng
 import 'package:flutter/services.dart';
+import 'package:ambulance_tracker/registration/userRegistration.dart';
 
-// ─────────────────────────────────────────────────────────────
-//  PATIENT DETAILS PAGE
-// ─────────────────────────────────────────────────────────────
 class patientDetailsForm extends StatefulWidget {
   const patientDetailsForm({super.key});
 
@@ -15,10 +13,9 @@ class patientDetailsForm extends StatefulWidget {
 }
 
 class _patientDetailsFormState extends State<patientDetailsForm> {
-  // controllers
   final TextEditingController _numPatientsCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  // dropdown choices
+
   final List<String> _bloodGroups = [
     "A+",
     "A-",
@@ -31,29 +28,25 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
   ];
 
   bool _hasLocation = false;
+  LatLng? selectedLatLng;
 
-  // dynamic lists that grow / shrink with patient count
-  int _patientCount=1 ;
+  int _patientCount = 1;
   List<TextEditingController> _nameCtrls = [TextEditingController()];
   List<TextEditingController> _ageCtrls = [TextEditingController()];
   List<String?> _bloodSelected = [null];
 
-  // rebuild helpers
   void _rebuildLists(int count) {
     _patientCount = count;
     _nameCtrls = List.generate(count, (_) => TextEditingController());
     _ageCtrls = List.generate(count, (_) => TextEditingController());
     _bloodSelected = List.generate(count, (_) => null);
-    setState(() {}); // ← trigger rebuild
+    setState(() {});
   }
 
-  // ───────────────── ui ─────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-
-      // ------------ app bar ------------
       appBar: AppBar(
         title: Align(
           alignment: Alignment.topLeft,
@@ -66,8 +59,6 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-
-      // ------------ gradient background ------------
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -85,17 +76,12 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
           right: 10,
           bottom: 10,
         ),
-
-        // one single scrollable parent
         child: Container(
-          // no fixed height → allows natural scrolling
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
           ),
-
-          // --- white card content ---
           child: Column(
             children: [
               Expanded(
@@ -104,7 +90,6 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                     padding: const EdgeInsets.only(bottom: 32),
                     child: Column(
                       children: [
-                        // pink strip with profile icon
                         Container(
                           height: 76,
                           width: double.infinity,
@@ -123,12 +108,11 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                               ),
                               child: IconButton(
                                 icon: const Icon(Icons.person, size: 30),
-                                onPressed: () {}, // TODO
+                                onPressed: () {},
                               ),
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 30),
                         const Text(
                           'PATIENT DETAILS',
@@ -138,10 +122,7 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(height: 30),
-
-                        // -------- number of patients --------
                         Padding(
                           padding: const EdgeInsets.only(left: 40),
                           child: Align(
@@ -167,10 +148,9 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                             if (c != null && c >= 0) _rebuildLists(c);
                           },
                         ),
-
                         const SizedBox(height: 30),
 
-                        // -------- add location button --------
+                        /// ───────────── ADD LOCATION ─────────────
                         Padding(
                           padding: const EdgeInsets.only(left: 32),
                           child: Align(
@@ -185,9 +165,19 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                                 ),
                                 minimumSize: const Size(167, 42),
                               ),
-                              onPressed: () {
-                                setState(() => _hasLocation = true);
-                                // TODO: actually open your map picker here
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const SelectLocationPage(),
+                                  ),
+                                );
+                                if (result != null && result is LatLng) {
+                                  setState(() {
+                                    selectedLatLng = result;
+                                    _hasLocation = true;
+                                  });
+                                }
                               },
                               icon: const Icon(Icons.add, color: Colors.white),
                               label: const Text(
@@ -200,45 +190,71 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30),
-                          const SizedBox(height: 50),
 
-                        // -------- dynamic patient blocks --------
+                        if (selectedLatLng != null)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 32, top: 10),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Selected: (${selectedLatLng!.latitude.toStringAsFixed(5)}, ${selectedLatLng!.longitude.toStringAsFixed(5)})",
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        const SizedBox(height: 50),
+
                         ...List.generate(
                           _patientCount,
                           (i) => Column(
                             children: [
-                                // -------- patient details label --------
-                        Padding(
-                          padding: const EdgeInsets.only(left: 40, top: 30),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'ADD PATIENT DETAILS',
-                              style: TextStyle(
-                                color: const Color.fromRGBO(87, 24, 44, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 40,
+                                  top: 30,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'ADD PATIENT DETAILS',
+                                    style: TextStyle(
+                                      color: const Color.fromRGBO(
+                                        87,
+                                        24,
+                                        44,
+                                        1,
+                                      ),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-
-                    
                               CustomInputField(
                                 hintText: 'NAME',
                                 controller: _nameCtrls[i],
                               ),
-
                               const SizedBox(height: 20),
-
                               CustomInputFieldNumber(
                                 hintText: 'AGE',
                                 controller: _ageCtrls[i],
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return 'Age required';
+                                  }
+                                  final age = int.tryParse(v);
+                                  if (age == null) {
+                                    return 'Enter a valid number';
+                                  }
+                                  if (age <= 0) return 'Age must be positive';
+                                  return null;
+                                },
                               ),
-
                               const SizedBox(height: 20),
-
                               Container(
                                 width: 325,
                                 height: 66,
@@ -275,18 +291,16 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                                   ),
                                 ),
                               ),
-
                               const SizedBox(height: 30),
                             ],
                           ),
                         ),
-
-                        // -------- view ambulance button --------
                       ],
                     ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -294,29 +308,50 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                   minimumSize: const Size(265, 55),
                 ),
                 onPressed: () {
-                final okInputs  = _formKey.currentState!.validate();
-  final okLocation = _hasLocation;
+                  final okInputs = _formKey.currentState!.validate();
+                  final okLocation = _hasLocation && selectedLatLng != null;
 
-  if (okInputs && okLocation) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AvailableAmbulance()),
-    );
-  } else {
-    final msg = !okInputs
-        ? 'Please complete required fields'
-        : 'Please add a location';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: const Color.fromARGB(255, 158, 18, 8)),
-    );
-  }
+                  if (okInputs && okLocation) {
+                    final patients = List.generate(
+                      _patientCount,
+                      (i) => {
+                        'name': _nameCtrls[i].text,
+                        'age': int.parse(_ageCtrls[i].text),
+                        'blood': _bloodSelected[i],
+                      },
+                    );
+                    final String locString =
+                        "${selectedLatLng!.latitude},${selectedLatLng!.longitude}";
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => AvailableAmbulance(
+                              pickupLocation:
+                                  locString, // String, matches CustomCard
+                              patientCount: _patientCount,
+                              patientList: patients,
+                            ),
+                      ),
+                    );
+                  } else {
+                    final msg =
+                        !okInputs
+                            ? 'Please complete required fields'
+                            : 'Please add a location';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(msg),
+                        backgroundColor: const Color.fromARGB(255, 158, 18, 8),
+                      ),
+                    );
+                  }
                 },
                 child: const Text(
                   'VIEW AMBULANCE',
                   style: TextStyle(fontSize: 24, color: Colors.white),
                 ),
               ),
-
               const SizedBox(height: 23),
             ],
           ),
