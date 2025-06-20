@@ -62,7 +62,7 @@ class _CustomCardState extends State<CustomCard> {
 
   Future<void> _bookDriver() async {
     try {
-      final token = await getToken();           // or readAuthToken()
+      final token = await getToken();           
       final id    = await _createBooking(token);
       await _sendPatients(token, id);
 

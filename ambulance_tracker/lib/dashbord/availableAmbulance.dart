@@ -7,7 +7,7 @@ import '../constant.dart';
 import 'custom_card.dart';                  
 
 class AvailableAmbulance extends StatefulWidget {
-  /// REQUIRED DATA coming from patientDetailsForm
+
   final String pickupLocation;
   final int patientCount;
   final List<Map<String, dynamic>> patientList;

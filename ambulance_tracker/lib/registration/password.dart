@@ -18,6 +18,11 @@ class _PasswordState extends State<Password> {
   bool _obscureText = true;
   bool _obscure = true;
   String? errorText;
+  bool isPasswordValid(String password) {
+    final regex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
+    return regex.hasMatch(password);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -202,92 +207,100 @@ class _PasswordState extends State<Password> {
                       ),
                     ),
                     onPressed: () async {
-                      if (set.text.trim() == confirm.text.trim() &&
-                          set.text.isNotEmpty) {
-                        final fullData = {
-                          ...widget
-                              .Data, // contains name, email, phone_no, etc.
-                          "password": set.text.trim(),
-                        };
+                      final password = set.text.trim();
+                      final confirmPassword = confirm.text.trim();
 
-                        File imageFile =
-                            fullData["license"]; // Get license File
-                        fullData.remove(
-                          "license",
-                        ); // Remove it from map since it'll go as file
-
-                        final url = Uri.parse(
-                          driverregisterURL
-                        );
-
-                        var request = http.MultipartRequest("POST", url);
-
-                        // Add image file (license)
-                        request.files.add(
-                          await http.MultipartFile.fromPath(
-                            'license',
-                            imageFile.path,
+                      if (password.isEmpty || confirmPassword.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Password fields cannot be empty."),
+                            backgroundColor: Colors.red,
                           ),
                         );
+                        return;
+                      }
 
-                        // Add other fields
-                        fullData.forEach((key, value) {
-                          if (key == "facilities" && value is List) {
-                            for (int i = 0; i < value.length; i++) {
-                              request.fields["facilities[$i]"] = value[i];
-                            }
-                          } else {
-                            request.fields[key] = value.toString();
+                      if (password != confirmPassword) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Passwords do not match."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (!isPasswordValid(password)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Password must be at least 8 characters long and include:\n- Uppercase letter\n- Lowercase letter\n- Number\n- Special character",
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final fullData = {...widget.Data, "password": password};
+
+                      File imageFile = fullData["license"];
+                      fullData.remove("license");
+
+                      final url = Uri.parse(driverregisterURL);
+
+                      var request = http.MultipartRequest("POST", url);
+
+                      request.files.add(
+                        await http.MultipartFile.fromPath(
+                          'license',
+                          imageFile.path,
+                        ),
+                      );
+
+                      fullData.forEach((key, value) {
+                        if (key == "facilities" && value is List) {
+                          for (int i = 0; i < value.length; i++) {
+                            request.fields["facilities[$i]"] = value[i];
                           }
-                        });
+                        } else {
+                          request.fields[key] = value.toString();
+                        }
+                      });
 
-                        try {
-                          var streamedResponse = await request.send();
-                          var response = await http.Response.fromStream(
-                            streamedResponse,
+                      try {
+                        var streamedResponse = await request.send();
+                        var response = await http.Response.fromStream(
+                          streamedResponse,
+                        );
+
+                        if (response.statusCode == 200 ||
+                            response.statusCode == 201) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Registration Successful")),
                           );
-
-                          if (response.statusCode == 200 ||
-                              response.statusCode == 201) {
-                            print("Driver registered successfully");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Registration Successful"),
-                              ),
-                            );
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginPage(),
-                              ),
-                            );
-                          } else {
-                            print("Failed response: ${response.body}");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Registration failed. Please try again.",
-                                ),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          print("Error during API call: ${e.toString()}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                "Something went wrong. Please try again.",
+                                "Registration failed. Please try again.",
                               ),
                             ),
                           );
                         }
-                      } else {
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              "Passwords do not match or are empty.",
+                              "Something went wrong. Please try again.",
                             ),
-                            backgroundColor: Colors.red,
                           ),
                         );
                       }

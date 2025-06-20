@@ -18,6 +18,11 @@ class _PasswordUserState extends State<PasswordUser> {
   bool _obscureText = true;
   bool _obscure = true;
   String? errorText;
+  bool validatePassword(String password) {
+    final regex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
+    return regex.hasMatch(password);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -202,69 +207,84 @@ class _PasswordUserState extends State<PasswordUser> {
                       ),
                     ),
                     onPressed: () async {
-                      if (set.text.trim() == confirm.text.trim() &&
-                          set.text.isNotEmpty) {
-                        final fullData = {
-                          ...widget
-                              .UserData, // includes user_name, user_mail, etc.
-                          "user_password": set.text.trim(),
-                        };
+                      final password = set.text.trim();
+                      final confirmPassword = confirm.text.trim();
 
-                        final url = Uri.parse(
-                          userregisterURL
+                      if (password.isEmpty || confirmPassword.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Password fields cannot be empty."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (password != confirmPassword) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Passwords do not match."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (!validatePassword(password)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final fullData = {
+                        ...widget.UserData,
+                        "user_password": password,
+                      };
+
+                      final url = Uri.parse(userregisterURL);
+
+                      try {
+                        final response = await http.post(
+                          url,
+                          headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                          },
+                          body: jsonEncode(fullData),
                         );
 
-                        try {
-                          final response = await http.post(
-                            url,
-                            headers: {
-                              "Content-Type": "application/json",
-                              "Accept": "application/json",
-                            },
-                            body: jsonEncode(fullData),
+                        if (response.statusCode == 200 ||
+                            response.statusCode == 201) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Registration Successful")),
                           );
-
-                          if (response.statusCode == 200 ||
-                              response.statusCode == 201) {
-                            print("User registered successfully");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Registration Successful"),
-                              ),
-                            );
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginPage(),
-                              ),
-                            );
-                          } else {
-                            print("Failed response: ${response.body}");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Registration failed. Please try again.",
-                                ),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          print("Error during API call: ${e.toString()}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                "Something went wrong. Please try again.",
+                                "Registration failed. Please try again.",
                               ),
                             ),
                           );
                         }
-                      } else {
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              "Passwords do not match or are empty.",
+                              "Something went wrong. Please try again.",
                             ),
-                            backgroundColor: Colors.red,
                           ),
                         );
                       }
