@@ -9,6 +9,8 @@ const getUserURL = '$baseURL/admin/users';
 const getDriverURL = '$baseURL/admin/drivers';
 const driverStatusURL = '$baseURL/driver/status';
 const portURL = "http://10.0.2.2:8000";
+const driverLocURL = '$baseURL/admin/trackAmbulance/driver';
+
 const serverError = 'server error';
 const unauthorized = 'Unauthorized';
 const somethingwentwrong = 'something went wrong, try again!';

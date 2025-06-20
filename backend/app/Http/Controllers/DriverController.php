@@ -23,6 +23,31 @@ class DriverController extends Controller
         return response()->json(['status' => 'updated']);
     }
 
+    public function getDriverLocation($query)
+{
+    $driver = ambulanceDriver::where('driver_id', $query)
+        ->orWhere('driver_name', 'LIKE', "%$query%")
+        ->first();
+
+    if (!$driver || !$driver->driver_location) {
+        return response()->json(['error' => 'Driver not found'], 404);
+    }
+
+    $parts = explode(',', $driver->driver_location);
+    if (count($parts) !== 2) {
+        return response()->json(['error' => 'Invalid location format'], 400);
+    }
+
+    return response()->json([
+        'driver_id' => $driver->driver_id,
+        'driver_name' => $driver->driver_name,
+        'latitude' => (float) $parts[0],
+        'longitude' => (float) $parts[1],
+    ]);
+}
+
+
+
     public function getAvailabledrivers() {
     $drivers = ambulanceDriver::with('facilities')->get()
         ->makeHidden(['driver_password', 'remember_token']);

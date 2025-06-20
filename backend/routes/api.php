@@ -45,8 +45,10 @@ Route::middleware(['auth:sanctum'])->get('/admin/drivers',[AdminController::clas
 
 Route::middleware('auth:sanctum')         
       ->post('/driver/location', [DriverController::class, 'updateLocation']);
+Route::get('/admin/trackAmbulance/driver/{query}',[DriverController::class, 'getDriverLocation']);
 
-Route::middleware(['auth:sanctum'])->get('/booking/store',[BookingController::class,'store']);
+
+Route::middleware(['auth:sanctum'])->post('/booking/store',[BookingController::class,'store']);
 Route::middleware(['auth:sanctum'])->get('/booking/{booking}/response',[BookingController::class,'respond']);
 Route::middleware(['auth:sanctum'])->get('/booking/expire',[BookingController::class,'expireOldBookings']);
 Route::middleware(['auth:sanctum'])->post('/bookings/{booking}/patients', [BookingController::class, 'storePatients']);
