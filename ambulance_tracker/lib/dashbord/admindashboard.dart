@@ -2,11 +2,13 @@ import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/activityHistory.dart';
 import 'package:ambulance_tracker/dashbord/driverDetails.dart';
 import 'package:ambulance_tracker/dashbord/userDetails.dart';
+import 'package:ambulance_tracker/location/location.dart';
 import 'package:ambulance_tracker/registration/login.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:ambulance_tracker/location/driverLocation.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -321,7 +323,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ActivityHistory(),
+                            builder: (context) => DriverLocation(),
                           ),
                         );
                       },

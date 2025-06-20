@@ -38,6 +38,8 @@ Future<ApiResponse> login(String email, String password) async {
             User.fromJson(userJson)
               ..token = token
               ..role = role;
+     
+         // Use 0 if user.id is null
         apiResponse.data = user;
         apiResponse.error = null;
         break;
@@ -105,6 +107,8 @@ Future<int> getUserId() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
   return pref.getInt('userId') ?? 0;
 }
+
+
 
 Future<bool> logout() async {
   SharedPreferences pref = await SharedPreferences.getInstance();

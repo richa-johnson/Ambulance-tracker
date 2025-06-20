@@ -22,7 +22,7 @@ class BookingController extends Controller
             'user_id' => auth()->id(),
             'p_location' => $r->p_location,
             'p_count' => $r->p_count,
-            'created_at' => now(),  // keep it “on ice”
+            'created_at' => now(), 
         ]);
 
         \Log::info('✅ after Booking::create');

@@ -8,7 +8,7 @@ import '../constant.dart';
 import 'custom_card.dart'; // put CustomCard in its own file or below
 
 class AvailableAmbulance extends StatefulWidget {
-  /// REQUIRED DATA coming from patientDetailsForm
+
   final String pickupLocation;
   final int patientCount;
   final List<Map<String, dynamic>> patientList;
@@ -25,6 +25,21 @@ class AvailableAmbulance extends StatefulWidget {
 }
 
 class _AvailableAmbulanceState extends State<AvailableAmbulance> {
+
+  final ValueNotifier<bool> bookingLocked = ValueNotifier(false);   // <‑‑ ONE shared instance
+
+  @override
+  void dispose() {
+    bookingLocked.dispose();
+    super.dispose();
+  }
+
+  Map<String, dynamic>? userDetails;
+  bool isLoadingUser = true;
+
+
+  
+
   Future<List<Driver>> fetchDrivers() async {
     final res = await http.get(Uri.parse(getAvailabledriversURL));
     if (res.statusCode == 200) {
@@ -188,6 +203,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                               pickupLocation: widget.pickupLocation,
                               patientCount: widget.patientCount,
                               patientList: widget.patientList,
+                                bookingLocked: bookingLocked,
                             ),
                           )
                           .toList(),

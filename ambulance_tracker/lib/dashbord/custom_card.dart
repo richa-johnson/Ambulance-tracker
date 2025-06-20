@@ -11,6 +11,7 @@ class CustomCard extends StatefulWidget {
   final String pickupLocation;
   final int patientCount;
   final List<Map<String, dynamic>> patientList;
+  final ValueNotifier<bool> bookingLocked;
 
   const CustomCard({
     Key? key,
@@ -18,6 +19,7 @@ class CustomCard extends StatefulWidget {
     required this.pickupLocation,
     required this.patientCount,
     required this.patientList,
+    required this.bookingLocked,
   }) : super(key: key);
 
   @override
@@ -25,7 +27,9 @@ class CustomCard extends StatefulWidget {
 }
 
 class _CustomCardState extends State<CustomCard> {
-  bool isPressed = false;
+  bool isPressed = false; // this card’s button is now green/locked
+  bool isSubmitting = false; // show spinner while waiting
+  final ValueNotifier<bool> bookingLocked = ValueNotifier<bool>(false);
 
   Future<int> _createBooking(String token) async {
     final res = await http.post(
@@ -61,23 +65,21 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   Future<void> _bookDriver() async {
-    try {
-      final token = await getToken(); // or readAuthToken()
-      final id = await _createBooking(token);
-      await _sendPatients(token, id);
+    setState(() => isSubmitting = true);
 
-      setState(() => isPressed = true);
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Request sent!')));
+    try {
+      final token = await getToken();
+      final bookingId = await _createBooking(token); // your existing API call
+      if (bookingId != null) {
+        setState(() => isPressed = true);
+        widget.bookingLocked.value = true; // lock every card
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Booking failed: $e')));
+    } finally {
+      setState(() => isSubmitting = false);
     }
   }
 
@@ -109,9 +111,6 @@ class _CustomCardState extends State<CustomCard> {
                   d.phoneno,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                // const SizedBox(width: 75),
-                // Text(d.sector,
-                //     style: const TextStyle(color: Colors.white, fontSize: 18)),
               ],
             ),
 
@@ -125,24 +124,40 @@ class _CustomCardState extends State<CustomCard> {
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 const Spacer(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isPressed ? Colors.green : Colors.white,
-                    minimumSize: const Size(100, 32),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+             ValueListenableBuilder<bool>(
+                valueListenable: widget.bookingLocked,
+                builder: (_, locked, __) {
+                  final disabled = isPressed || locked || isSubmitting;
+
+                  return ElevatedButton(
+                    onPressed: disabled ? null : _bookDriver,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          isPressed ? Colors.green : Colors.white,
+                      minimumSize: const Size(100, 32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                  ),
-                  onPressed: isPressed ? null : _bookDriver,
-                  child: Text(
-                    isPressed ? 'Request Sent' : 'Book Now',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isPressed ? Colors.white : const Color(0xFF9F0D37),
-                    ),
-                  ),
-                ),
-              ],
+                    child: isSubmitting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            isPressed ? 'Request Sent' : 'Book Now',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isPressed
+                                  ? Colors.white
+                                  : const Color(0xFF9F0D37),
+                            ),
+                          ),
+                  );
+                },
+              ),   ],
             ),
 
             // ─── Divider ───────────────────────────────────────────────────
@@ -267,7 +282,7 @@ class _DriverDetailsSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    
+
                     ...facilities.map(
                       (f) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
