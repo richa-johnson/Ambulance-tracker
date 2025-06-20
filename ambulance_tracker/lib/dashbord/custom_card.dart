@@ -35,9 +35,9 @@ class _CustomCardState extends State<CustomCard> {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'driver_id':  widget.driver.id,
+        'driver_id': widget.driver.id,
         'p_location': widget.pickupLocation,
-        'p_count':    widget.patientCount,
+        'p_count': widget.patientCount,
       }),
     );
     if (res.statusCode == 201) {
@@ -62,19 +62,21 @@ class _CustomCardState extends State<CustomCard> {
 
   Future<void> _bookDriver() async {
     try {
-      final token = await getToken();           
-      final id    = await _createBooking(token);
+      final token = await getToken(); // or readAuthToken()
+      final id = await _createBooking(token);
       await _sendPatients(token, id);
 
       setState(() => isPressed = true);
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Request sent!')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Request sent!')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -89,15 +91,19 @@ class _CustomCardState extends State<CustomCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.driver.name,
-                style: const TextStyle(fontSize: 24, color: Colors.white)),
+            Text(
+              widget.driver.name,
+              style: const TextStyle(fontSize: 24, color: Colors.white),
+            ),
             const SizedBox(height: 4),
             Row(
               children: [
                 const Icon(Icons.phone, color: Colors.white, size: 16),
                 const SizedBox(width: 6),
-                Text(widget.driver.phoneno,
-                    style: const TextStyle(color: Colors.white)),
+                Text(
+                  widget.driver.phoneno,
+                  style: const TextStyle(color: Colors.white),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -109,8 +115,7 @@ class _CustomCardState extends State<CustomCard> {
               child: Text(
                 isPressed ? 'Request Sent' : 'Book Now',
                 style: TextStyle(
-                  color:
-                      isPressed ? Colors.white : const Color(0xFF9F0D37),
+                  color: isPressed ? Colors.white : const Color(0xFF9F0D37),
                 ),
               ),
             ),
