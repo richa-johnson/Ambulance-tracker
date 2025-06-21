@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/models/driver_model.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _CustomCardState extends State<CustomCard> {
 
   bool isPressed = false; // this card’s button is now green/locked
   bool isSubmitting = false; // show spinner while waiting
-  final ValueNotifier<bool> bookingLocked = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> bookingExpiredHandled = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -49,26 +50,38 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   void startBookingTimer(int bookingId, int driverId) {
+    countdownTimer?.cancel();
+    statusCheckTimer?.cancel();
+
+    if (!mounted) return;
+
     setState(() {
       currentBookingId = bookingId;
       remainingSeconds = 120;
       bookingStatus = 'pending';
+      bookingExpiredHandled.value = false;
     });
 
     countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
       setState(() {
         if (remainingSeconds > 0) {
           remainingSeconds--;
         } else {
           timer.cancel();
-
           expireBooking();
         }
       });
     });
 
     statusCheckTimer = Timer.periodic(Duration(seconds: 5), (_) async {
-      final token = await getToken(); // from shared_preferences
+      if (bookingExpiredHandled.value) return;
+
+      final token = await getToken();
       final url = Uri.parse('$baseURL/booking/$bookingId/status');
 
       final res = await http.get(
@@ -87,34 +100,93 @@ class _CustomCardState extends State<CustomCard> {
           countdownTimer?.cancel();
           statusCheckTimer?.cancel();
 
+          if (!mounted) return;
+
           setState(() {
             bookingStatus = status;
+            bookingExpiredHandled.value = true;
           });
 
           if (status == 'confirmed') {
-            showDialog(
-              context: context,
-              builder:
-                  (_) => AlertDialog(
-                    title: Text('✅ Booking Confirmed'),
-                    content: Text('Driver has accepted your request.'),
-                  ),
-            );
-            // Call sendPatients() if needed
-          } else if (status == 'cancelled' || status == 'expired') {
-            showDialog(
-              context: context,
-              builder:
-                  (_) => AlertDialog(
-                    title: Text('❌ Booking $status'),
-                    content: Text(
-                      'Driver rejected or timed out. Please try another.',
+            countdownTimer?.cancel();
+            statusCheckTimer?.cancel();
+            if (!mounted) return;
+            setState(() {
+              bookingStatus = status;
+              bookingExpiredHandled.value = true;
+            });
+
+            Future.microtask(() {
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (_) => AlertDialog(
+                      title: Text('✅ Booking Confirmed'),
+                      content: Text('Driver has accepted your request.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            if (!mounted) return;
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (_) => userdashboard(),
+                              ),
+                              (route) => false,
+                            );
+                          },
+                          child: Text('OK'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (mounted) Navigator.of(context).pop();
+                            // TODO: Track driver logic
+                          },
+                          child: Text('Track Driver'),
+                        ),
+                      ],
                     ),
-                  ),
-            );
+              );
+            });
+          } else if (status == 'cancelled') {
+            countdownTimer?.cancel();
+            statusCheckTimer?.cancel();
+            if (!mounted) return;
+            setState(() {
+              bookingStatus = status;
+              bookingExpiredHandled.value = true;
+            });
+
             if (widget.onBookingResult != null) {
               widget.onBookingResult!({'driverId': driverId, 'expired': true});
             }
+
+            Future.microtask(() {
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (_) => AlertDialog(
+                      title: Text('❌ Booking Cancelled'),
+                      content: Text(
+                        'Driver rejected the request. Please try another.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            if (widget.onBookingResult != null) {
+                              widget.onBookingResult!({'refresh': true});
+                            }
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    ),
+              );
+            });
           }
         }
       }
@@ -135,24 +207,44 @@ class _CustomCardState extends State<CustomCard> {
       if (data['b_status'] == 'expired') {
         print('✅ Booking expired on server.');
 
+        // ❗ Stop timers
+        countdownTimer?.cancel();
+        statusCheckTimer?.cancel();
+
+        if (!mounted) return;
         setState(() {
           bookingStatus = 'expired';
+          bookingExpiredHandled.value = true;
         });
 
-        showDialog(
-          context: context,
-          builder:
-              (_) => AlertDialog(
-                title: const Text('⏱️ Booking Expired'),
-                content: const Text(
-                  'Driver did not respond in time. Please try another ambulance.',
-                ),
-              ),
-        );
+        if (widget.onBookingResult != null) {
+          widget.onBookingResult!({
+            'driverId': data['driver_id'],
+            'expired': true,
+          });
+        }
 
-        Navigator.pop(context, {
-          'driverId': data['driver_id'],
-          'expired': true,
+        if (!mounted) return;
+        Future.microtask(() {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            builder:
+                (_) => AlertDialog(
+                  title: const Text('⏱️ Booking Expired'),
+                  content: const Text(
+                    'Driver did not respond in time. Please try another ambulance.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+          );
         });
       } else {
         print('ℹ️ Booking is still active: ${data['b_status']}');
@@ -179,30 +271,11 @@ class _CustomCardState extends State<CustomCard> {
       final data = jsonDecode(res.body);
       int bookingId = data['booking_id'];
 
-      /// ✅ Start 2-minute timer and polling
       startBookingTimer(bookingId, widget.driver.id);
-
       print("🚑 Booking successful. Timer started.");
+      return bookingId;
     } else {
-      print("❌ Booking failed. Status: ${res.statusCode}");
-    }
-    if (res.statusCode == 201) {
-      return jsonDecode(res.body)['booking_id'] as int;
-    }
-    throw Exception('Booking failed: ${res.body}');
-  }
-
-  Future<void> _sendPatients(String token, int bookingId) async {
-    final res = await http.post(
-      Uri.parse('$baseURL/booking/$bookingId/patients'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({'patients': widget.patientList}),
-    );
-    if (res.statusCode != 204) {
-      throw Exception('Patient upload failed: ${res.body}');
+      throw Exception('Booking failed: ${res.body}');
     }
   }
 
@@ -211,11 +284,9 @@ class _CustomCardState extends State<CustomCard> {
 
     try {
       final token = await getToken();
-      final bookingId = await _createBooking(token); // your existing API call
-      if (bookingId != null) {
-        setState(() => isPressed = true);
-        widget.bookingLocked.value = true; // lock every card
-      }
+      final bookingId = await _createBooking(token);
+      setState(() => isPressed = true);
+      widget.bookingLocked.value = true;
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -227,7 +298,7 @@ class _CustomCardState extends State<CustomCard> {
 
   @override
   Widget build(BuildContext context) {
-    final d = widget.driver; // shorthand
+    final d = widget.driver;
 
     return Card(
       margin: const EdgeInsets.all(12),
@@ -243,7 +314,6 @@ class _CustomCardState extends State<CustomCard> {
               d.name,
               style: const TextStyle(fontSize: 24, color: Colors.white),
             ),
-
             const SizedBox(height: 8),
             Row(
               children: [
@@ -255,8 +325,6 @@ class _CustomCardState extends State<CustomCard> {
                 ),
               ],
             ),
-
-            // ─── Vehicle number + Book Now button row ──────────────────────
             const SizedBox(height: 8),
             Row(
               children: [
@@ -270,7 +338,6 @@ class _CustomCardState extends State<CustomCard> {
                   valueListenable: widget.bookingLocked,
                   builder: (_, locked, __) {
                     final disabled = isPressed || locked || isSubmitting;
-
                     return ElevatedButton(
                       onPressed: disabled ? null : _bookDriver,
                       style: ElevatedButton.styleFrom(
@@ -291,7 +358,7 @@ class _CustomCardState extends State<CustomCard> {
                                 ),
                               )
                               : Text(
-                                isPressed ? 'Request Sent' : 'Book Now',
+                                isPressed ? 'Request Sent' : 'Book Now',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color:
@@ -316,12 +383,8 @@ class _CustomCardState extends State<CustomCard> {
               ),
               const SizedBox(height: 10),
             ],
-
-            // ─── Divider ───────────────────────────────────────────────────
             const SizedBox(height: 8),
             Container(height: 1, color: const Color(0xFFE7A4A4), width: 300),
-
-            // ─── View More button row ──────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -342,13 +405,13 @@ class _CustomCardState extends State<CustomCard> {
                           (_) => _DriverDetailsSheet(
                             name: d.name,
                             sector: d.sector,
-                            district: d.disrtict ?? '', // add field if needed
+                            district: d.disrtict ?? '',
                             capacity: d.capacity,
                             facilities: d.facilities,
                           ),
                     );
                   },
-                  child: const Text('View More'),
+                  child: const Text('View More'),
                 ),
               ],
             ),
@@ -359,9 +422,6 @@ class _CustomCardState extends State<CustomCard> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Bottom‑sheet for driver details
-// ─────────────────────────────────────────────────────────────────────────────
 class _DriverDetailsSheet extends StatelessWidget {
   final String name;
   final String district;
@@ -407,7 +467,6 @@ class _DriverDetailsSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // Details list -------------------------------------------------
               Container(
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -439,7 +498,6 @@ class _DriverDetailsSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-
                     ...facilities.map(
                       (f) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),

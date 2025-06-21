@@ -214,6 +214,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                           drivers
                               .map(
                                 (d) => CustomCard(
+                                  key: ValueKey(d.id), // ✅ Add this line
                                   driver: d,
                                   pickupLocation: widget.pickupLocation,
                                   patientCount: widget.patientCount,
