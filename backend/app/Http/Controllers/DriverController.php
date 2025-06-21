@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ambulanceDriver;
 
 class DriverController extends Controller
@@ -69,4 +70,17 @@ class DriverController extends Controller
 
     return response()->json($data);
     }
+public function status()
+{
+    // Find the driver row that belongs to this authenticated user
+   $driver = ambulanceDriver::find(Auth::id());
+
+    if (!$driver) {
+        // Return a default value or 404 if you prefer
+        return response()->json(['status' => 'unavailable'], 200);
+    }
+
+    return response()->json(['status' => $driver->driver_status]);
+}
+
 }

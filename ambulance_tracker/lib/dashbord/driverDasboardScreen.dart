@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:ambulance_tracker/alerts/requestpage.dart';
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
@@ -34,12 +35,13 @@ class _driverDashboardState extends State<driverDashboard> {
 
   bool onRun = false;
   bool isAvailable = false;
-
+final DriverBookingController bookingCtrl = Get.find();
   final LocationController locationController = Get.put(LocationController());
 
   String drname = "driver name";
   String phno = "Phone no";
   String vhno = "Vehicle no";
+
   Future<bool> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -54,6 +56,7 @@ class _driverDashboardState extends State<driverDashboard> {
     if (response.statusCode == 200) {
       await prefs.remove('token');
       await prefs.remove('userId');
+     
       return true;
     } else {
       if (!mounted) return false;

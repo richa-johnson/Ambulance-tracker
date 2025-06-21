@@ -1,21 +1,18 @@
-import 'package:ambulance_tracker/location/location.dart';
+// lib/screens/driver_dashboard.dart
+import 'package:ambulance_tracker/alerts/booking_card.dart';
+import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class RequestsPage extends StatefulWidget {
+class RequestsPage extends StatelessWidget {
   const RequestsPage({super.key});
+  
 
-  @override
-  State<RequestsPage> createState() => RequestsPageState();
-}
-
-class RequestsPageState extends State<RequestsPage> {
-  String userName = "Rajesh";
-  int ph = 9432456107;
-  int no = 3;
-  String blood = "O +ve";
   @override
   Widget build(BuildContext context) {
+    // 🔑 Put the controller once so it survives hot reloads
+    final ctrl = Get.put(DriverBookingController(), permanent: true);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -31,8 +28,9 @@ class RequestsPageState extends State<RequestsPage> {
         elevation: 0,
       ),
 
+      // ——— Gradient background identical to your RequestsPage ———
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -42,12 +40,16 @@ class RequestsPageState extends State<RequestsPage> {
             ],
           ),
         ),
+
+        // Push content below the translucent AppBar
         padding: EdgeInsets.only(
           top: MediaQuery.of(context).padding.top + kToolbarHeight,
-          left: 10.0,
-          right: 10.0,
-          bottom: 10.0,
+          left: 10,
+          right: 10,
+          bottom: 10,
         ),
+
+        // ——— White container that holds the scroll view ———
         child: Container(
           width: double.infinity,
           height: double.infinity,
@@ -55,116 +57,32 @@ class RequestsPageState extends State<RequestsPage> {
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Column(children: [CustomRequests(), CustomRequests()]),
-          ),
-        ),
-      ),
-    );
-  }
-}
+          child: Obx(() {
+            // Reactive part – updates every 10 s via the controller
+      
 
-class CustomRequests extends StatefulWidget {
-  const CustomRequests({super.key});
+            if (ctrl.bookings.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No pending bookings',
+                  style: TextStyle(fontSize: 18),
+                ),
+              );
+            }
 
-  @override
-  State<CustomRequests> createState() => _CustomRequestsState();
-}
-
-class _CustomRequestsState extends State<CustomRequests> {
-  String userName = "Rajesh";
-  String ph = '9432456107';
-  String no = '3';
-  String blood = "O +ve";
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        elevation: 5,
-        shape: BeveledRectangleBorder(borderRadius: BorderRadiusGeometry.zero),
-        color: Colors.white,
-        margin: EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Row(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width: 15),
-                      Text(
-                        userName,
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 75),
-                  Icon(Icons.phone, color: const Color.fromARGB(255, 8, 8, 8)),
-                  SizedBox(width: 5),
-                  Text(
-                    ph,
-                    style: TextStyle(
-                      color: const Color.fromARGB(255, 1, 1, 1),
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Row(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width: 15),
-                      Text(
-                        "No of Patients: $no",
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 13, 13, 13),
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 75),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Row(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width: 15),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RoutingPage(),
-                            ),
-                          );
-                        },
-                        child: Text("Confirm"),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 75),
-                  TextButton(onPressed: RequestsPage.new, child: Text("Deny")),
-                ],
-              ),
-            ),
-          ],
+            return ListView.builder(
+              padding: const EdgeInsets.only(bottom: 16),
+              itemCount: ctrl.bookings.length,
+              itemBuilder: (context, i) {
+                final b = ctrl.bookings[i];
+                return BookingCard(
+                  booking: b,
+                  onConfirm: () => ctrl.confirm(b.id),
+                  onCancel: () => ctrl.cancel(b.id),
+                );
+              },
+            );
+          }),
         ),
       ),
     );

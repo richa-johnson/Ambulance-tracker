@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
@@ -10,6 +11,8 @@ import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ambulance_tracker/registration/RegisterScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -64,6 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
           );
           break;
         case 'driver':
+        
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (Context) => driverDashboard()),
             (route) => false,
