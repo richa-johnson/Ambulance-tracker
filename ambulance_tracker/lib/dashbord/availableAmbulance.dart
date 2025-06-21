@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/driver_model.dart'; // adjust relative path
 import '../constant.dart';
-import 'custom_card.dart'; // put CustomCard in its own file or below
+import 'custom_card.dart';
+import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 
 class AvailableAmbulance extends StatefulWidget {
   final String pickupLocation;
@@ -16,7 +17,7 @@ class AvailableAmbulance extends StatefulWidget {
     required this.pickupLocation,
     required this.patientCount,
     required this.patientList,
-  }) : super(key: key); // <‑‑ initializer list only; no body here
+  }) : super(key: key);
 
   @override
   State<AvailableAmbulance> createState() => _AvailableAmbulanceState();
@@ -30,8 +31,20 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
   @override
   void initState() {
     super.initState();
+    fetchDrivers().then((drivers) {
+      setState(() {
+        allDrivers = drivers;
+        filteredDrivers = drivers;
+      });
+    });
     _driverFuture = fetchDrivers(); // ✅ assign the real future
   }
+
+  List<Driver> allDrivers = [];
+  List<Driver> filteredDrivers = [];
+  List<String> selectedFacilities = [];
+  String? selectedSector;
+  String? selectedCapacity;
 
   @override
   void dispose() {
@@ -53,19 +66,58 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     final res = await http.get(Uri.parse(getAvailabledriversURL));
     if (res.statusCode == 200) {
       final List list = jsonDecode(res.body);
+      final availableDrivers =
+          list.where((e) => e['status'] == 'available').toList();
+      final parts = widget.pickupLocation.split(',');
+      final pickupLat = double.tryParse(parts[0].trim()) ?? 0.0;
+      final pickupLng = double.tryParse(parts[1].trim()) ?? 0.0;
+      availableDrivers.sort((a, b) {
+        final aParts = (a['location'] ?? '0,0').split(',');
+        final bParts = (b['location'] ?? '0,0').split(',');
+        final aLat = double.tryParse(aParts[0].trim()) ?? 0.0;
+        final aLng = double.tryParse(aParts[1].trim()) ?? 0.0;
+        final bLat = double.tryParse(bParts[0].trim()) ?? 0.0;
+        final bLng = double.tryParse(bParts[1].trim()) ?? 0.0;
+        final distA = calculateDistance(pickupLat, pickupLng, aLat, aLng);
+        final distB = calculateDistance(pickupLat, pickupLng, bLat, bLng);
+        return distA.compareTo(distB);
+      });
       final List<Driver> fetchedDrivers =
-          list.map((e) => Driver.fromJson(e)).toList();
+          availableDrivers.map((e) => Driver.fromJson(e)).toList();
       setState(() {
         drivers = fetchedDrivers;
       });
       return fetchedDrivers;
-    } else {
-      throw Exception('Failed to load drivers');
     }
+    throw Exception('Failed to load drivers');
   }
 
-  // ─────────────────────────── UI ────────────────────────────
-  List<String> selectedFacilities = [];
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const R = 6371;
+    final dLat = (lat2 - lat1) * pi / 180;
+    final dLon = (lon2 - lon1) * pi / 180;
+    final a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1 * pi / 180) *
+            cos(lat2 * pi / 180) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return R * c;
+  }
+
+  void applyFilters() {
+    setState(() {
+      filteredDrivers =
+          allDrivers.where((driver) {
+            final sectorMatch =
+                selectedSector == null || driver.sector == selectedSector;
+            final capacityMatch =
+                selectedCapacity == null || driver.capacity == selectedCapacity;
+            return sectorMatch && capacityMatch;
+          }).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +135,6 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-
-      // ─── gradient background ─────────────────────────────────────────────
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -103,6 +153,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
           bottom: 10,
         ),
         child: Container(
+          height: double.infinity,
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -138,49 +189,18 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                                 ),
                               ),
                         ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTapDown: (TapDownDetails details) {
+                            _showFilterPopup(details.globalPosition);
+                          },
+                          child: const Icon(
+                            Icons.filter_list,
+                            color: Colors.black,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                ),
-
-                // ─── Sort / Filter bar ────────────────────────────────────
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withAlpha(107),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      // Sort -------------------------------------------------
-                      Expanded(
-                        child: InkWell(
-                          onTap: _openSortSheet,
-                          child: _SortOrFilterTile(
-                            icon: Icons.sort,
-                            label: 'Sort',
-                          ),
-                        ),
-                      ),
-                      Container(width: 1, height: 30, color: Colors.grey[300]),
-                      // Filter ----------------------------------------------
-                      Expanded(
-                        child: InkWell(
-                          onTap: _openFilterSheet,
-                          child: _SortOrFilterTile(
-                            icon: Icons.filter_list,
-                            label: 'Filter',
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
 
@@ -202,7 +222,10 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                     }
 
                     final drivers = snap.data ?? [];
-                    if (drivers.isEmpty) {
+                    final showDrivers =
+                        filteredDrivers.isNotEmpty ? filteredDrivers : drivers;
+
+                    if (showDrivers.isEmpty) {
                       return const Padding(
                         padding: EdgeInsets.all(32),
                         child: Text('No available ambulances'),
@@ -211,10 +234,10 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
 
                     return Column(
                       children:
-                          drivers
+                          showDrivers
                               .map(
                                 (d) => CustomCard(
-                                  key: ValueKey(d.id), // ✅ Add this line
+                                  key: ValueKey(d.id),
                                   driver: d,
                                   pickupLocation: widget.pickupLocation,
                                   patientCount: widget.patientCount,
@@ -236,7 +259,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                           content: Text(
                                             '⏱️ Booking expired. Please choose another ambulance.',
                                           ),
@@ -258,114 +281,127 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     );
   }
 
-  // ─────────── helpers for Sort / Filter bottom sheets ───────────
-  void _openSortSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder:
-          (_) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.near_me),
-                title: const Text('Sort by Nearest'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: implement nearest sorting
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.timer),
-                title: const Text('Sort by Availability'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: implement availability sorting
-                },
-              ),
-            ],
-          ),
-    );
-  }
+  void _showFilterPopup(Offset position) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final sectors = allDrivers.map((e) => e.sector).toSet().toList();
+    final capacities = allDrivers.map((e) => e.capacity).toSet().toList();
 
-  void _openFilterSheet() {
-    const facilities = ['Oxygen', 'ICU', 'Ventilator'];
-    List<String> tempSelected = [...selectedFacilities];
+    // Persist temporary state outside builder
+    String? tempSector = selectedSector;
+    String? tempCapacity = selectedCapacity;
 
-    showModalBottomSheet(
+    showMenu(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(position, position),
+        Offset.zero & overlay.size,
       ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
+      items: [
+        PopupMenuItem(
+          enabled: false,
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'Select Facilities',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'Sector',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  ...facilities.map(
-                    (f) => CheckboxListTile(
-                      title: Text(f),
-                      value: tempSelected.contains(f),
-                      onChanged:
-                          (v) => setModalState(() {
-                            v == true
-                                ? tempSelected.add(f)
-                                : tempSelected.remove(f);
-                          }),
-                    ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children:
+                        sectors.map((s) {
+                          final isSelected = tempSector == s;
+                          return ChoiceChip(
+                            label: Text(
+                              s,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            selected: isSelected,
+                            selectedColor: Color.fromRGBO(87, 24, 44, 2),
+                            backgroundColor: Colors.grey[200],
+                            onSelected: (_) {
+                              setModalState(() {
+                                tempSector = (tempSector == s) ? null : s;
+                              });
+                            },
+                          );
+                        }).toList(),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() => selectedFacilities = tempSelected);
-                      Navigator.pop(context);
-                      // TODO: apply filtering logic to driver list
-                    },
-                    child: const Text('Apply Filter'),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Capacity',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children:
+                        capacities.map((c) {
+                          final isSelected = tempCapacity == c;
+                          return ChoiceChip(
+                            label: Text(
+                              c,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            selected: isSelected,
+                            selectedColor: Color.fromRGBO(87, 24, 44, 2),
+                            backgroundColor: Colors.grey[200],
+                            onSelected: (_) {
+                              setModalState(() {
+                                tempCapacity = (tempCapacity == c) ? null : c;
+                              });
+                            },
+                          );
+                        }).toList(),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedSector = tempSector;
+                            selectedCapacity = tempCapacity;
+                          });
+                          applyFilters();
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          'Apply',
+                          style: TextStyle(
+                            color: Color.fromRGBO(87, 24, 44, 1),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedSector = null;
+                            selectedCapacity = null;
+                          });
+                          applyFilters();
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Clear'),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-// ───────────── small helper widget for the Sort / Filter row ────────────────
-class _SortOrFilterTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _SortOrFilterTile({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 18, color: Colors.black),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

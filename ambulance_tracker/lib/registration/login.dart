@@ -1,3 +1,4 @@
+import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
@@ -7,6 +8,8 @@ import 'package:ambulance_tracker/registration/forgotpassword.dart';
 import 'package:ambulance_tracker/registration/userRegistration.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -62,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
         (route) => false,
       );
     } else if (user.role == 'driver') {
+    
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const driverDashboard()),
         (route) => false,

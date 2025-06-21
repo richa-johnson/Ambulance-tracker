@@ -19,21 +19,7 @@ Route::post('/auth/driverregister',[AuthManager::class,'driverregister']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // // Admin-only routes
-    // Route::middleware('ability:admin')->group(function () {
-    //     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-    // });
-
-    // // Driver-only routes
-    // Route::middleware('ability:driver')->group(function () {
-    //     Route::get('/driver/requests', [DriverController::class, 'requests']);
-    // });
-
-    // // User-only routes
-    // Route::middleware('ability:user')->group(function () {
-    //     Route::get('/user/profile', [UserController::class, 'profile']);
-    // });
-
+ 
     Route::post('/auth/logout',[AuthManager::class,'logout']);
     Route::get('/auth/user',[AuthManager::class,'user']);
     Route::put('/driver/status',[DriverStatus::class,'updateDriverStatus']);
@@ -55,3 +41,12 @@ Route::middleware(['auth:sanctum'])->post('/bookings/{booking}/patients', [Booki
 Route::middleware('auth:sanctum')->get('/user/UserDetails', [DriverController::class, 'getSignedInUserDetails']);
 Route::middleware(['auth:sanctum'])->get('/booking/check-expiry', [BookingController::class, 'expireIfStillPending']);
 Route::middleware(['auth:sanctum'])->get('/booking/{booking}/status', [BookingController::class, 'getBookingStatus']);
+
+Route::middleware('auth:sanctum')->get('/driver/pending-bookings', [BookingController::class, 'pending']);
+
+Route::middleware('auth:sanctum')->post('/booking/{id}/confirm', [BookingController::class, 'confirm']);
+Route::middleware('auth:sanctum')->post('/booking/{id}/cancel', [BookingController::class, 'cancel']);
+Route::middleware('auth:sanctum')->post('/booking/{id}/complete', [BookingController::class, 'complete']);
+
+
+Route::middleware('auth:sanctum')->get('/driver/status', [DriverController::class, 'status']);
