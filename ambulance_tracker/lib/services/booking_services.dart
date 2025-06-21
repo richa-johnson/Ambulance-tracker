@@ -35,9 +35,10 @@ class BookingService {
   Future<List<Booking>> getPendingBookings() async {
     final token = await getToken();
     final url = Uri.parse('$baseURL/driver/pending-bookings');
-    final res = await http
-        .get(url, headers: {'Authorization': 'Bearer $token'})
-        .timeout(const Duration(seconds: 8));
+    final res = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
 
     if (res.statusCode == 200) {
       final body = jsonDecode(res.body) as List<dynamic>;
