@@ -6,6 +6,7 @@ use App\Models\ambulanceDriver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
 class BookingController extends Controller
 {
     public $timestamps = false;
@@ -45,10 +46,12 @@ class BookingController extends Controller
 
 
 
-    // POST /booking/{id}/confirm
+
     public function confirm($id)
     {
 
+          $driver = Auth::user()->driver;
+          
         $booking = Booking::where('driver_id', auth()->id())
             ->findOrFail($id);        // uses book_id under the hood
 
@@ -59,7 +62,7 @@ class BookingController extends Controller
 
         Booking::where('driver_id', auth()->id())
             ->where('b_status', 'pending')
-            ->where('id', '!=', $id)
+            ->where('book_id', '!=', $id)
             ->update(['b_status' => 'cancelled']);
 
         Driver::where('id', auth()->id())
@@ -71,22 +74,22 @@ class BookingController extends Controller
     }
 
     // POST /booking/{id}/cancel
-   public function cancel($id)
-{
-   $driver = ambulanceDriver::find(Auth::id());
+    public function cancel($id)
+    {
+        $driver = ambulanceDriver::find(Auth::id());
 
-    $booking = Booking::where('driver_id', $driver->driver_id)
-                      ->where('b_status', 'pending')
-                      ->where('book_id', $id)        // real PK
-                      ->firstOrFail();
+        $booking = Booking::where('driver_id', $driver->driver_id)
+            ->where('b_status', 'pending')
+            ->where('book_id', $id)        // real PK
+            ->firstOrFail();
 
-    $booking->b_status = 'cancelled';   // ← explicit
-    $booking->save();                   // ← forces SQL UPDATE
+        $booking->b_status = 'cancelled';   // ← explicit
+        $booking->save();                   // ← forces SQL UPDATE
 
-    Log::info('Booking cancelled', ['id' => $id]);
+        Log::info('Booking cancelled', ['id' => $id]);
 
-    return response()->json(['message' => 'Booking cancelled']);
-}
+        return response()->json(['message' => 'Booking cancelled']);
+    }
 
 
     public function expireOldBookings()
