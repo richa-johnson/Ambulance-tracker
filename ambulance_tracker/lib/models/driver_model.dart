@@ -19,17 +19,28 @@ class Driver {
     required this.facilities,
   });
 
-  factory Driver.fromJson(Map<String, dynamic> json) {
-    final rawId = json['slno'];
-    return Driver(
-      id: int.parse(rawId.toString()),
-      name: json['name'],
-      phoneno: json['phoneno'],
-      vehicleno: json['vehicleno'],
-      disrtict: json['district'],
-      sector: json['sector'],
-       capacity: json['capacity']?.toString() ?? '',
-      facilities: List<String>.from(json['facilities'] ?? []),
-    );
+ factory Driver.fromJson(Map<String, dynamic> json) {
+  final rawFacilities = json['facilities'];
+
+  List<String> parsedFacilities;
+  if (rawFacilities is List) {
+    parsedFacilities = rawFacilities.map((e) => e.toString().trim()).toList();
+  } else if (rawFacilities is String) {
+    parsedFacilities = rawFacilities.split(',').map((e) => e.trim()).toList();
+  } else {
+    parsedFacilities = [];
   }
+
+  return Driver(
+    id: int.parse(json['slno'].toString()),
+    name: json['name'],
+    phoneno: json['phoneno'],
+    vehicleno: json['vehicleno'],
+    disrtict: json['district'],
+    sector: json['sector'],
+    capacity: json['capacity']?.toString() ?? '',
+    facilities: parsedFacilities,
+  );
+}
+
 }
