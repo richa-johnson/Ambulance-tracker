@@ -391,8 +391,7 @@ class DriverRegistrationState extends State<DriverRegistration> {
                         MaterialPageRoute(
                           builder:
                               (context) => FacilitiesScreen(
-                                previouslySelected:
-                                    selectedFacilities, // Pass selected list
+                                previouslySelected: selectedFacilities,
                               ),
                         ),
                       );
@@ -403,15 +402,21 @@ class DriverRegistrationState extends State<DriverRegistration> {
                       }
                     },
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "FACILITIES",
-                          style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 0.6), // ~42% opacity
-                            fontSize: 16,
+                        Expanded(
+                          child: Text(
+                            selectedFacilities.isNotEmpty
+                                ? selectedFacilities.join(', ')
+                                : "FACILITIES",
+                            style: TextStyle(
+                              color: Color.fromRGBO(0, 0, 0, 42),
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        SizedBox(width: 8),
                         Icon(Icons.add, color: Colors.black.withAlpha(107)),
                       ],
                     ),

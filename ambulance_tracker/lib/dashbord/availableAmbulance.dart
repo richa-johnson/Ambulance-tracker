@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'dart:math';
 import '../models/driver_model.dart'; // adjust relative path
 import '../constant.dart';
 import 'custom_card.dart'; // put CustomCard in its own file or below
 
 class AvailableAmbulance extends StatefulWidget {
-
   final String pickupLocation;
   final int patientCount;
   final List<Map<String, dynamic>> patientList;
@@ -18,15 +17,16 @@ class AvailableAmbulance extends StatefulWidget {
     required this.pickupLocation,
     required this.patientCount,
     required this.patientList,
-  }) : super(key: key); // <‑‑ initializer list only; no body here
+  }) : super(key: key); 
 
   @override
   State<AvailableAmbulance> createState() => _AvailableAmbulanceState();
 }
 
 class _AvailableAmbulanceState extends State<AvailableAmbulance> {
-
-  final ValueNotifier<bool> bookingLocked = ValueNotifier(false);   // <‑‑ ONE shared instance
+  final ValueNotifier<bool> bookingLocked = ValueNotifier(
+    false,
+  ); 
 
   @override
   void dispose() {
@@ -37,25 +37,51 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
   Map<String, dynamic>? userDetails;
   bool isLoadingUser = true;
 
-
-  
-
   Future<List<Driver>> fetchDrivers() async {
     final res = await http.get(Uri.parse(getAvailabledriversURL));
     if (res.statusCode == 200) {
-      print(res.body);
       final List list = jsonDecode(
         res.body,
-      ); // assume backend sends a JSON array
-      return list.map((e) => Driver.fromJson(e)).toList();
+      ); 
+    final availableDrivers = list.where((e) => e['status'] == 'available').toList();
+    final parts = widget.pickupLocation.split(',');
+    final pickupLat = double.tryParse(parts[0].trim()) ?? 0.0;
+    final pickupLng = double.tryParse(parts[1].trim()) ?? 0.0;
+    availableDrivers.sort((a, b) {
+      final aParts = (a['location'] ?? '0,0').split(',');
+      final bParts = (b['location'] ?? '0,0').split(',');
+
+      final aLat = double.tryParse(aParts[0].trim()) ?? 0.0;
+      final aLng = double.tryParse(aParts[1].trim()) ?? 0.0;
+      final bLat = double.tryParse(bParts[0].trim()) ?? 0.0;
+      final bLng = double.tryParse(bParts[1].trim()) ?? 0.0;
+
+      final distA = calculateDistance(pickupLat, pickupLng, aLat, aLng);
+      final distB = calculateDistance(pickupLat, pickupLng, bLat, bLng);
+
+      return distA.compareTo(distB);
+    });
+
+    return availableDrivers.map((e) => Driver.fromJson(e)).toList();
     }
     throw Exception('Failed to load drivers');
   }
 
-  // ─────────────────────────── UI ────────────────────────────
-   List<String> selectedFacilities = []; 
-   
- @override
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  const R = 6371; // Earth radius in kilometers
+  final dLat = (lat2 - lat1) * pi / 180;
+  final dLon = (lon2 - lon1) * pi / 180;
+
+  final a = sin(dLat / 2) * sin(dLat / 2) +
+      cos(lat1 * pi / 180) * cos(lat2 * pi / 180) *
+      sin(dLon / 2) * sin(dLon / 2);
+  final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+  return R * c;
+}
+  List<String> selectedFacilities = [];
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -72,7 +98,6 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
         elevation: 0,
       ),
 
-      // ─── gradient background ─────────────────────────────────────────────
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -91,17 +116,18 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
           bottom: 10,
         ),
         child: Container(
+          height: double.infinity,
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
           child: SingleChildScrollView(
-            padding:
-                EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
             child: Column(
               children: [
-                // ─── pink header strip with back arrow ─────────────────────
                 Container(
                   height: 76,
                   decoration: const BoxDecoration(
@@ -117,19 +143,18 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.arrow_back, size: 30),
-                          onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const patientDetailsForm(),
-                            ),
-                          ),
+                          onPressed:
+                              () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const patientDetailsForm(),
+                                ),
+                              ),
                         ),
                       ],
                     ),
                   ),
                 ),
-
-                // ─── Sort / Filter bar ────────────────────────────────────
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
@@ -145,7 +170,6 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                   ),
                   child: Row(
                     children: [
-                      // Sort -------------------------------------------------
                       Expanded(
                         child: InkWell(
                           onTap: _openSortSheet,
@@ -156,7 +180,6 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                         ),
                       ),
                       Container(width: 1, height: 30, color: Colors.grey[300]),
-                      // Filter ----------------------------------------------
                       Expanded(
                         child: InkWell(
                           onTap: _openFilterSheet,
@@ -169,8 +192,6 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                     ],
                   ),
                 ),
-
-                // ─── Driver list (FutureBuilder inside) ───────────────────
                 FutureBuilder<List<Driver>>(
                   future: fetchDrivers(),
                   builder: (context, snap) {
@@ -194,19 +215,19 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                         child: Text('No available ambulances'),
                       );
                     }
-
                     return Column(
-                      children: drivers
-                          .map(
-                            (d) => CustomCard(
-                              driver: d,
-                              pickupLocation: widget.pickupLocation,
-                              patientCount: widget.patientCount,
-                              patientList: widget.patientList,
-                                bookingLocked: bookingLocked,
-                            ),
-                          )
-                          .toList(),
+                      children:
+                          drivers
+                              .map(
+                                (d) => CustomCard(
+                                  driver: d,
+                                  pickupLocation: widget.pickupLocation,
+                                  patientCount: widget.patientCount,
+                                  patientList: widget.patientList,
+                                  bookingLocked: bookingLocked,
+                                ),
+                              )
+                              .toList(),
                     );
                   },
                 ),
@@ -218,34 +239,32 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     );
   }
 
-  // ─────────── helpers for Sort / Filter bottom sheets ───────────
   void _openSortSheet() {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.near_me),
-            title: const Text('Sort by Nearest'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: implement nearest sorting
-            },
+      builder:
+          (_) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.near_me),
+                title: const Text('Sort by Nearest'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.timer),
+                title: const Text('Sort by Availability'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
-          ListTile(
-            leading: const Icon(Icons.timer),
-            title: const Text('Sort by Availability'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: implement availability sorting
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -268,26 +287,27 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                 children: [
                   const Text(
                     'Select Facilities',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  ...facilities.map((f) => CheckboxListTile(
-                        title: Text(f),
-                        value: tempSelected.contains(f),
-                        onChanged: (v) => setModalState(() {
-                          v == true
-                              ? tempSelected.add(f)
-                              : tempSelected.remove(f);
-                        }),
-                      )),
+                  ...facilities.map(
+                    (f) => CheckboxListTile(
+                      title: Text(f),
+                      value: tempSelected.contains(f),
+                      onChanged:
+                          (v) => setModalState(() {
+                            v == true
+                                ? tempSelected.add(f)
+                                : tempSelected.remove(f);
+                          }),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       setState(() => selectedFacilities = tempSelected);
                       Navigator.pop(context);
-                      // TODO: apply filtering logic to driver list
                     },
                     child: const Text('Apply Filter'),
-                  )
+                  ),
                 ],
               ),
             );
@@ -297,8 +317,6 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     );
   }
 }
-
-// ───────────── small helper widget for the Sort / Filter row ────────────────
 class _SortOrFilterTile extends StatelessWidget {
   final IconData icon;
   final String label;

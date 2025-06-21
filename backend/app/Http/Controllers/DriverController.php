@@ -65,6 +65,8 @@ class DriverController extends Controller
             'capacity' => $driver->driver_capacity,
             'license' => $driver->driver_license,
             'facilities' => $driver->facilities->pluck('facility')->toArray(),
+            'status'=>$driver->driver_status,
+            'location' => $driver->driver_location,
         ];
     });
 

@@ -91,7 +91,6 @@ Future<void> cancel(int id) async {
    cancellingIds.remove(id);          // rollback only on failure
     Get.snackbar('Error', 'Could not cancel booking');
   }
-  // ← no finally block
 }
 
 
