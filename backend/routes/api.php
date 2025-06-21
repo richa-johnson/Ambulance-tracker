@@ -53,3 +53,5 @@ Route::middleware(['auth:sanctum'])->get('/booking/{booking}/response',[BookingC
 Route::middleware(['auth:sanctum'])->get('/booking/expire',[BookingController::class,'expireOldBookings']);
 Route::middleware(['auth:sanctum'])->post('/bookings/{booking}/patients', [BookingController::class, 'storePatients']);
 Route::middleware('auth:sanctum')->get('/user/UserDetails', [DriverController::class, 'getSignedInUserDetails']);
+Route::middleware(['auth:sanctum'])->get('/booking/check-expiry', [BookingController::class, 'expireIfStillPending']);
+Route::middleware(['auth:sanctum'])->get('/booking/{booking}/status', [BookingController::class, 'getBookingStatus']);

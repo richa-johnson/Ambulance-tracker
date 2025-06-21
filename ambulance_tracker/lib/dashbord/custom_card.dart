@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:async';
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/models/driver_model.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
@@ -12,6 +12,7 @@ class CustomCard extends StatefulWidget {
   final int patientCount;
   final List<Map<String, dynamic>> patientList;
   final ValueNotifier<bool> bookingLocked;
+  final void Function(Map<String, dynamic> result)? onBookingResult;
 
   const CustomCard({
     Key? key,
@@ -20,6 +21,7 @@ class CustomCard extends StatefulWidget {
     required this.patientCount,
     required this.patientList,
     required this.bookingLocked,
+    this.onBookingResult,
   }) : super(key: key);
 
   @override
@@ -27,9 +29,138 @@ class CustomCard extends StatefulWidget {
 }
 
 class _CustomCardState extends State<CustomCard> {
+  Timer? countdownTimer;
+  Timer? statusCheckTimer;
+
+  int remainingSeconds = 120;
+  String bookingStatus = 'pending';
+
+  int? currentBookingId;
+
   bool isPressed = false; // this card’s button is now green/locked
   bool isSubmitting = false; // show spinner while waiting
   final ValueNotifier<bool> bookingLocked = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    countdownTimer?.cancel();
+    statusCheckTimer?.cancel();
+    super.dispose();
+  }
+
+  void startBookingTimer(int bookingId, int driverId) {
+    setState(() {
+      currentBookingId = bookingId;
+      remainingSeconds = 120;
+      bookingStatus = 'pending';
+    });
+
+    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (remainingSeconds > 0) {
+          remainingSeconds--;
+        } else {
+          timer.cancel();
+
+          expireBooking();
+        }
+      });
+    });
+
+    statusCheckTimer = Timer.periodic(Duration(seconds: 5), (_) async {
+      final token = await getToken(); // from shared_preferences
+      final url = Uri.parse('$baseURL/booking/$bookingId/status');
+
+      final res = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        String status = data['status'];
+
+        if (status != 'pending') {
+          countdownTimer?.cancel();
+          statusCheckTimer?.cancel();
+
+          setState(() {
+            bookingStatus = status;
+          });
+
+          if (status == 'confirmed') {
+            showDialog(
+              context: context,
+              builder:
+                  (_) => AlertDialog(
+                    title: Text('✅ Booking Confirmed'),
+                    content: Text('Driver has accepted your request.'),
+                  ),
+            );
+            // Call sendPatients() if needed
+          } else if (status == 'cancelled' || status == 'expired') {
+            showDialog(
+              context: context,
+              builder:
+                  (_) => AlertDialog(
+                    title: Text('❌ Booking $status'),
+                    content: Text(
+                      'Driver rejected or timed out. Please try another.',
+                    ),
+                  ),
+            );
+            if (widget.onBookingResult != null) {
+              widget.onBookingResult!({'driverId': driverId, 'expired': true});
+            }
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> expireBooking() async {
+    final token = await getToken();
+    final url = Uri.parse('$baseURL/booking/check-expiry');
+
+    final res = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      if (data['b_status'] == 'expired') {
+        print('✅ Booking expired on server.');
+
+        setState(() {
+          bookingStatus = 'expired';
+        });
+
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: const Text('⏱️ Booking Expired'),
+                content: const Text(
+                  'Driver did not respond in time. Please try another ambulance.',
+                ),
+              ),
+        );
+
+        Navigator.pop(context, {
+          'driverId': data['driver_id'],
+          'expired': true,
+        });
+      } else {
+        print('ℹ️ Booking is still active: ${data['b_status']}');
+      }
+    } else {
+      print('❌ Expire check failed: ${res.body}');
+    }
+  }
 
   Future<int> _createBooking(String token) async {
     final res = await http.post(
@@ -44,6 +175,17 @@ class _CustomCardState extends State<CustomCard> {
         'p_count': widget.patientCount,
       }),
     );
+    if (res.statusCode == 201) {
+      final data = jsonDecode(res.body);
+      int bookingId = data['booking_id'];
+
+      /// ✅ Start 2-minute timer and polling
+      startBookingTimer(bookingId, widget.driver.id);
+
+      print("🚑 Booking successful. Timer started.");
+    } else {
+      print("❌ Booking failed. Status: ${res.statusCode}");
+    }
     if (res.statusCode == 201) {
       return jsonDecode(res.body)['booking_id'] as int;
     }
@@ -124,41 +266,56 @@ class _CustomCardState extends State<CustomCard> {
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 const Spacer(),
-             ValueListenableBuilder<bool>(
-                valueListenable: widget.bookingLocked,
-                builder: (_, locked, __) {
-                  final disabled = isPressed || locked || isSubmitting;
+                ValueListenableBuilder<bool>(
+                  valueListenable: widget.bookingLocked,
+                  builder: (_, locked, __) {
+                    final disabled = isPressed || locked || isSubmitting;
 
-                  return ElevatedButton(
-                    onPressed: disabled ? null : _bookDriver,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isPressed ? Colors.green : Colors.white,
-                      minimumSize: const Size(100, 32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                    return ElevatedButton(
+                      onPressed: disabled ? null : _bookDriver,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isPressed ? Colors.green : Colors.white,
+                        minimumSize: const Size(100, 32),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
-                    ),
-                    child: isSubmitting
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(
-                            isPressed ? 'Request Sent' : 'Book Now',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isPressed
-                                  ? Colors.white
-                                  : const Color(0xFF9F0D37),
-                            ),
-                          ),
-                  );
-                },
-              ),   ],
+                      child:
+                          isSubmitting
+                              ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : Text(
+                                isPressed ? 'Request Sent' : 'Book Now',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color:
+                                      isPressed
+                                          ? Colors.white
+                                          : const Color(0xFF9F0D37),
+                                ),
+                              ),
+                    );
+                  },
+                ),
+              ],
             ),
+            if (currentBookingId != null && bookingStatus == 'pending') ...[
+              Text(
+                '⏳ Time left: ${remainingSeconds ~/ 60}:${(remainingSeconds % 60).toString().padLeft(2, '0')}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
 
             // ─── Divider ───────────────────────────────────────────────────
             const SizedBox(height: 8),

@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import '../models/driver_model.dart'; // adjust relative path
 import '../constant.dart';
 import 'custom_card.dart'; // put CustomCard in its own file or below
 
 class AvailableAmbulance extends StatefulWidget {
-
   final String pickupLocation;
   final int patientCount;
   final List<Map<String, dynamic>> patientList;
@@ -25,8 +23,15 @@ class AvailableAmbulance extends StatefulWidget {
 }
 
 class _AvailableAmbulanceState extends State<AvailableAmbulance> {
+  final ValueNotifier<bool> bookingLocked = ValueNotifier(
+    false,
+  ); // <‑‑ ONE shared instance
 
-  final ValueNotifier<bool> bookingLocked = ValueNotifier(false);   // <‑‑ ONE shared instance
+  @override
+  void initState() {
+    super.initState();
+    _driverFuture = fetchDrivers(); // ✅ assign the real future
+  }
 
   @override
   void dispose() {
@@ -34,28 +39,35 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     super.dispose();
   }
 
+  List<Driver> drivers = [];
   Map<String, dynamic>? userDetails;
   bool isLoadingUser = true;
+  late Future<List<Driver>> _driverFuture;
 
-
-  
+  Future<List<Driver>> loadDrivers() async {
+    final fetched = await fetchDrivers();
+    return fetched;
+  }
 
   Future<List<Driver>> fetchDrivers() async {
     final res = await http.get(Uri.parse(getAvailabledriversURL));
     if (res.statusCode == 200) {
-      print(res.body);
-      final List list = jsonDecode(
-        res.body,
-      ); // assume backend sends a JSON array
-      return list.map((e) => Driver.fromJson(e)).toList();
+      final List list = jsonDecode(res.body);
+      final List<Driver> fetchedDrivers =
+          list.map((e) => Driver.fromJson(e)).toList();
+      setState(() {
+        drivers = fetchedDrivers;
+      });
+      return fetchedDrivers;
+    } else {
+      throw Exception('Failed to load drivers');
     }
-    throw Exception('Failed to load drivers');
   }
 
   // ─────────────────────────── UI ────────────────────────────
-   List<String> selectedFacilities = []; 
-   
- @override
+  List<String> selectedFacilities = [];
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -97,8 +109,9 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
             color: Colors.white,
           ),
           child: SingleChildScrollView(
-            padding:
-                EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
             child: Column(
               children: [
                 // ─── pink header strip with back arrow ─────────────────────
@@ -117,12 +130,13 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.arrow_back, size: 30),
-                          onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const patientDetailsForm(),
-                            ),
-                          ),
+                          onPressed:
+                              () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const patientDetailsForm(),
+                                ),
+                              ),
                         ),
                       ],
                     ),
@@ -172,7 +186,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
 
                 // ─── Driver list (FutureBuilder inside) ───────────────────
                 FutureBuilder<List<Driver>>(
-                  future: fetchDrivers(),
+                  future: _driverFuture,
                   builder: (context, snap) {
                     if (snap.connectionState == ConnectionState.waiting) {
                       return const Padding(
@@ -196,17 +210,42 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                     }
 
                     return Column(
-                      children: drivers
-                          .map(
-                            (d) => CustomCard(
-                              driver: d,
-                              pickupLocation: widget.pickupLocation,
-                              patientCount: widget.patientCount,
-                              patientList: widget.patientList,
-                                bookingLocked: bookingLocked,
-                            ),
-                          )
-                          .toList(),
+                      children:
+                          drivers
+                              .map(
+                                (d) => CustomCard(
+                                  driver: d,
+                                  pickupLocation: widget.pickupLocation,
+                                  patientCount: widget.patientCount,
+                                  patientList: widget.patientList,
+                                  bookingLocked: bookingLocked,
+                                  onBookingResult: (result) {
+                                    if (result != null &&
+                                        result['expired'] == true) {
+                                      setState(() {
+                                        drivers.removeWhere(
+                                          (driver) =>
+                                              driver.id == result['driverId'],
+                                        );
+                                        bookingLocked.value = false;
+                                      });
+
+                                      loadDrivers();
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            '⏱️ Booking expired. Please choose another ambulance.',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              )
+                              .toList(),
                     );
                   },
                 ),
@@ -225,27 +264,28 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.near_me),
-            title: const Text('Sort by Nearest'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: implement nearest sorting
-            },
+      builder:
+          (_) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.near_me),
+                title: const Text('Sort by Nearest'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: implement nearest sorting
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.timer),
+                title: const Text('Sort by Availability'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: implement availability sorting
+                },
+              ),
+            ],
           ),
-          ListTile(
-            leading: const Icon(Icons.timer),
-            title: const Text('Sort by Availability'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: implement availability sorting
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -268,18 +308,20 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                 children: [
                   const Text(
                     'Select Facilities',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  ...facilities.map((f) => CheckboxListTile(
-                        title: Text(f),
-                        value: tempSelected.contains(f),
-                        onChanged: (v) => setModalState(() {
-                          v == true
-                              ? tempSelected.add(f)
-                              : tempSelected.remove(f);
-                        }),
-                      )),
+                  ...facilities.map(
+                    (f) => CheckboxListTile(
+                      title: Text(f),
+                      value: tempSelected.contains(f),
+                      onChanged:
+                          (v) => setModalState(() {
+                            v == true
+                                ? tempSelected.add(f)
+                                : tempSelected.remove(f);
+                          }),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       setState(() => selectedFacilities = tempSelected);
@@ -287,7 +329,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                       // TODO: apply filtering logic to driver list
                     },
                     child: const Text('Apply Filter'),
-                  )
+                  ),
                 ],
               ),
             );
