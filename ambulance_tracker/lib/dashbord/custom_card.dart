@@ -113,8 +113,6 @@ class _CustomCardState extends State<CustomCard> {
                 ),
               ],
             ),
-
-            // ─── Vehicle number + Book Now button row ──────────────────────
             const SizedBox(height: 8),
             Row(
               children: [
@@ -128,7 +126,6 @@ class _CustomCardState extends State<CustomCard> {
                 valueListenable: widget.bookingLocked,
                 builder: (_, locked, __) {
                   final disabled = isPressed || locked || isSubmitting;
-
                   return ElevatedButton(
                     onPressed: disabled ? null : _bookDriver,
                     style: ElevatedButton.styleFrom(
@@ -160,11 +157,8 @@ class _CustomCardState extends State<CustomCard> {
               ),   ],
             ),
 
-            // ─── Divider ───────────────────────────────────────────────────
             const SizedBox(height: 8),
             Container(height: 1, color: const Color(0xFFE7A4A4), width: 300),
-
-            // ─── View More button row ──────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -185,13 +179,13 @@ class _CustomCardState extends State<CustomCard> {
                           (_) => _DriverDetailsSheet(
                             name: d.name,
                             sector: d.sector,
-                            district: d.disrtict ?? '', // add field if needed
+                            district: d.disrtict ,
                             capacity: d.capacity,
                             facilities: d.facilities,
                           ),
                     );
                   },
-                  child: const Text('View More'),
+                  child: const Text('View More'),
                 ),
               ],
             ),
@@ -202,9 +196,6 @@ class _CustomCardState extends State<CustomCard> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Bottom‑sheet for driver details
-// ─────────────────────────────────────────────────────────────────────────────
 class _DriverDetailsSheet extends StatelessWidget {
   final String name;
   final String district;
