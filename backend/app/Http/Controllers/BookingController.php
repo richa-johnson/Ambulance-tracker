@@ -13,7 +13,9 @@ class BookingController extends Controller
 
 
     public function store(Request $r)
-    {
+    { 
+        \Log::info('🏁 before Booking::create');
+    
 
 
         $booking = Booking::create([
@@ -65,7 +67,7 @@ class BookingController extends Controller
             ->where('book_id', '!=', $id)
             ->update(['b_status' => 'cancelled']);
 
-        Driver::where('id', auth()->id())
+        ambulanceDriver::where('driver_id', auth()->id())
             ->update(['driver_status' => 'busy']);
 
         Log::info('Booking confirmed', ['id' => $id]);
