@@ -29,16 +29,16 @@ class BookingController extends Controller
 
     public function pending(Request $request)
     {
-        $driverId  = auth()->id();
+        $driverId = auth()->id();
 
         \Log::info("Driver ID: {$driverId}");
-         $bookings = Booking::with('user:user_id,user_name as name,user_phone as phone')
-        ->where('driver_id', $driverId)    // integer, not object
-        ->where('b_status', 'pending')       // use the real column name
-        ->orderByDesc('created_at')
-        ->get();
+        $bookings = Booking::with('user:user_id,user_name as name,user_phone as phone')
+            ->where('driver_id', $driverId)    // integer, not object
+            ->where('b_status', 'pending')       // use the real column name
+            ->orderByDesc('created_at')
+            ->get();
 
-            \Log::info('pending() rows found: ' . $bookings->count());
+        \Log::info('pending() rows found: ' . $bookings->count());
         return response()->json($bookings);
     }
 
@@ -48,7 +48,7 @@ class BookingController extends Controller
     // POST /booking/{id}/confirm
     public function confirm($id)
     {
-        
+
         $booking = Booking::where('driver_id', auth()->id())
             ->findOrFail($id);        // uses book_id under the hood
 
@@ -71,19 +71,24 @@ class BookingController extends Controller
     }
 
     // POST /booking/{id}/cancel
-    public function cancel($id)
-    {
-         $driverId  = auth()->id();
-              // <-- real driver row
-        $booking = Booking::where('driver_id', $driverId)
-            ->where('b_status', 'pending')
-            ->findOrFail($id);
+   public function cancel($id)
+{
+   $driver = ambulanceDriver::find(Auth::id());
 
-        $booking->update(['b_status' => 'cancelled']);
+    $booking = Booking::where('driver_id', $driver->driver_id)
+                      ->where('b_status', 'pending')
+                      ->where('book_id', $id)        // real PK
+                      ->firstOrFail();
 
-        Log::info('Booking cancelled', ['id' => $id]);
-        return response()->json(['message' => 'Booking cancelled']);
-    }
+    $booking->b_status = 'cancelled';   // ← explicit
+    $booking->save();                   // ← forces SQL UPDATE
+
+    Log::info('Booking cancelled', ['id' => $id]);
+
+    return response()->json(['message' => 'Booking cancelled']);
+}
+
+
     public function expireOldBookings()
     {
         $expired = Booking::where('status', 'pending')

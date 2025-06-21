@@ -6,6 +6,7 @@ import '../models/booking.dart';
 enum DriverStatus { available, unavailable, busy }
 
 class DriverBookingController extends GetxController {
+
 DriverBookingController() {
     print('🚀 DriverBookingController CREATED');
   }
@@ -85,8 +86,7 @@ Future<void> cancel(int id) async {
   cancellingIds.add(id); 
   try {
     await _service.cancel(id);    // 2️⃣ backend call
-    // don’t touch processingIds here
-    // card will disappear on the next _poll()
+    bookings.removeWhere((b) => b.id == id);
   } catch (e) {
    cancellingIds.remove(id);          // rollback only on failure
     Get.snackbar('Error', 'Could not cancel booking');

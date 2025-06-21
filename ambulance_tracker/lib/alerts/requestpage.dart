@@ -10,8 +10,7 @@ class RequestsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🔑 Put the controller once so it survives hot reloads
-    final ctrl = Get.put(DriverBookingController(), permanent: true);
+   final ctrl = Get.find<DriverBookingController>();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
