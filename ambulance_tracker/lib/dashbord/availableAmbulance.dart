@@ -177,21 +177,21 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
               ),
               Expanded(
                 child:
-                    filteredDrivers.isEmpty
-                        ? const Center(child: Text("No available ambulances"))
-                        : ListView.builder(
-                          itemCount: filteredDrivers.length,
-                          itemBuilder: (context, index) {
-                            final d = filteredDrivers[index];
-                            return CustomCard(
-                              driver: d,
-                              pickupLocation: widget.pickupLocation,
-                              patientCount: widget.patientCount,
-                              patientList: widget.patientList,
-                              bookingLocked: bookingLocked,
-                            );
-                          },
-                        ),
+                filteredDrivers.isEmpty
+                ? const Center(child: Text("No available ambulances"))
+                : ListView.builder(
+                  itemCount: filteredDrivers.length,
+                  itemBuilder: (context, index) {
+                    final d = filteredDrivers[index];
+                    return CustomCard(
+                      driver: d,
+                      pickupLocation: widget.pickupLocation,
+                      patientCount: widget.patientCount,
+                      patientList: widget.patientList,
+                      bookingLocked: bookingLocked,
+                    );
+                  },
+                ),
               ),
             ],
           ),

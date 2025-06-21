@@ -10,13 +10,8 @@ class BookingController extends Controller
 
 
     public function store(Request $r)
-    {
-        
-
-
+    { 
         \Log::info('🏁 before Booking::create');
-       
-
         $booking = Booking::create([
             'driver_id' => $r->driver_id,
             'user_id' => auth()->id(),
