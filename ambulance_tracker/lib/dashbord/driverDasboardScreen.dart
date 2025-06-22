@@ -35,7 +35,7 @@ class _driverDashboardState extends State<driverDashboard> {
 
   bool onRun = false;
   bool isAvailable = false;
-final DriverBookingController bookingCtrl = Get.find();
+  final DriverBookingController bookingCtrl = Get.find();
   final LocationController locationController = Get.put(LocationController());
 
   String drname = "driver name";
@@ -56,7 +56,12 @@ final DriverBookingController bookingCtrl = Get.find();
     if (response.statusCode == 200) {
       await prefs.remove('token');
       await prefs.remove('userId');
-     
+      if (Get.isRegistered<DriverBookingController>()) {
+        final ctrl = Get.find<DriverBookingController>();
+        ctrl.stopPolling(); // Stop background task
+        Get.delete<DriverBookingController>(force: true);
+      }
+
       return true;
     } else {
       if (!mounted) return false;
@@ -99,9 +104,11 @@ final DriverBookingController bookingCtrl = Get.find();
   @override
   void initState() {
     super.initState();
-   WidgetsBinding.instance.addPostFrameCallback(
-      (_) => LocationService.instance
-          .startTracking(controller: locationController, context: context),
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => LocationService.instance.startTracking(
+        controller: locationController,
+        context: context,
+      ),
     );
   }
 
@@ -133,6 +140,7 @@ final DriverBookingController bookingCtrl = Get.find();
             ],
           ),
         ),
+        child:SingleChildScrollView(
         padding: EdgeInsets.only(
           top: MediaQuery.of(context).padding.top + kToolbarHeight,
           left: 10.0,
@@ -201,8 +209,13 @@ final DriverBookingController bookingCtrl = Get.find();
                                 (route) => false,
                               );
                             }
-                          } else if (value == 'requestPage'){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsPage()));
+                          } else if (value == 'requestPage') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RequestsPage(),
+                              ),
+                            );
                           }
                         },
                         itemBuilder:
@@ -244,7 +257,7 @@ final DriverBookingController bookingCtrl = Get.find();
                                       'User Requests',
                                       style: TextStyle(
                                         color: Color.fromRGBO(87, 24, 44, 1.0),
-                                        fontSize: 16,                      
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -263,7 +276,7 @@ final DriverBookingController bookingCtrl = Get.find();
                                   endIndent: 10,
                                 ),
                               ),
-                              
+
                               PopupMenuItem<String>(
                                 value: 'logout',
                                 child: Row(
@@ -812,6 +825,7 @@ final DriverBookingController bookingCtrl = Get.find();
           ),
         ),
       ),
+      )
     );
   }
 }

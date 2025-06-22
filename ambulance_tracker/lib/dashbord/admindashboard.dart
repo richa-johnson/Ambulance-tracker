@@ -75,6 +75,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ],
           ),
         ),
+        child:SingleChildScrollView(
         padding: EdgeInsets.only(
           top: MediaQuery.of(context).padding.top + kToolbarHeight,
           left: 10.0,
@@ -346,6 +347,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ),
         ),
       ),
+      )
     );
   }
 }
