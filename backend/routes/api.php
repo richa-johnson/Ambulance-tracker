@@ -16,6 +16,7 @@ Route::post('/auth/adminregister',[AuthManager::class,'adminregister']);
 Route::post('/auth/login', [AuthManager::class, "login"]);
     
 Route::post('/auth/driverregister',[AuthManager::class,'driverregister']);
+Route::get('/booking/activity-history', [BookingController::class, 'allActivityHistory']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
