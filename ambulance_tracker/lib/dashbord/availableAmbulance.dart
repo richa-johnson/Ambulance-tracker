@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../models/driver_model.dart';
+import '../models/driver_model.dart'; // adjust relative path
 import '../constant.dart';
 import 'custom_card.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
@@ -24,7 +24,21 @@ class AvailableAmbulance extends StatefulWidget {
 }
 
 class _AvailableAmbulanceState extends State<AvailableAmbulance> {
-  final ValueNotifier<bool> bookingLocked = ValueNotifier(false);
+  final ValueNotifier<bool> bookingLocked = ValueNotifier(
+    false,
+  ); // <‑‑ ONE shared instance
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDrivers().then((drivers) {
+      setState(() {
+        allDrivers = drivers;
+        filteredDrivers = drivers;
+      });
+    });
+    _driverFuture = fetchDrivers(); // ✅ assign the real future
+  }
 
   List<Driver> allDrivers = [];
   List<Driver> filteredDrivers = [];
@@ -38,15 +52,14 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchDrivers().then((drivers) {
-      setState(() {
-        allDrivers = drivers;
-        filteredDrivers = drivers;
-      });
-    });
+  List<Driver> drivers = [];
+  Map<String, dynamic>? userDetails;
+  bool isLoadingUser = true;
+  late Future<List<Driver>> _driverFuture;
+
+  Future<List<Driver>> loadDrivers() async {
+    final fetched = await fetchDrivers();
+    return fetched;
   }
 
   Future<List<Driver>> fetchDrivers() async {
@@ -69,7 +82,12 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
         final distB = calculateDistance(pickupLat, pickupLng, bLat, bLng);
         return distA.compareTo(distB);
       });
-      return availableDrivers.map((e) => Driver.fromJson(e)).toList();
+      final List<Driver> fetchedDrivers =
+          availableDrivers.map((e) => Driver.fromJson(e)).toList();
+      setState(() {
+        drivers = fetchedDrivers;
+      });
+      return fetchedDrivers;
     }
     throw Exception('Failed to load drivers');
   }
@@ -141,59 +159,121 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
-          child: Column(
-            children: [
-              Container(
-                height: 76,
-                decoration: const BoxDecoration(
-                  color: Color.fromRGBO(227, 185, 197, 1),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                ),
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, size: 30),
-                        onPressed:
-                            () => Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const patientDetailsForm(),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Column(
+              children: [
+                // ─── pink header strip with back arrow ─────────────────────
+                Container(
+                  height: 76,
+                  decoration: const BoxDecoration(
+                    color: Color.fromRGBO(227, 185, 197, 1),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(10),
+                    ),
+                  ),
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, size: 30),
+                          onPressed:
+                              () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const patientDetailsForm(),
+                                ),
                               ),
-                            ),
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTapDown: (TapDownDetails details) {
-                          _showFilterPopup(details.globalPosition);
-                        },
-                        child: const Icon(Icons.filter_list, color: Colors.black),
-                      ),
-                    ],
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTapDown: (TapDownDetails details) {
+                            _showFilterPopup(details.globalPosition);
+                          },
+                          child: const Icon(
+                            Icons.filter_list,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child:
-                filteredDrivers.isEmpty
-                ? const Center(child: Text("No available ambulances"))
-                : ListView.builder(
-                  itemCount: filteredDrivers.length,
-                  itemBuilder: (context, index) {
-                    final d = filteredDrivers[index];
-                    return CustomCard(
-                      driver: d,
-                      pickupLocation: widget.pickupLocation,
-                      patientCount: widget.patientCount,
-                      patientList: widget.patientList,
-                      bookingLocked: bookingLocked,
+
+                FutureBuilder<List<Driver>>(
+                  future: _driverFuture,
+                  builder: (context, snap) {
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snap.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text('Error: ${snap.error}'),
+                      );
+                    }
+
+                    final drivers = snap.data ?? [];
+                    final showDrivers =
+                        filteredDrivers.isNotEmpty ? filteredDrivers : drivers;
+
+                    if (showDrivers.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Text('No available ambulances'),
+                      );
+                    }
+
+                    return Column(
+                      children:
+                          showDrivers
+                              .map(
+                                (d) => CustomCard(
+                                  key: ValueKey(d.id),
+                                  driver: d,
+                                  pickupLocation: widget.pickupLocation,
+                                  patientCount: widget.patientCount,
+                                  patientList: widget.patientList,
+                                  bookingLocked: bookingLocked,
+                                  onBookingResult: (result) {
+                                    if (result != null &&
+                                        result['expired'] == true) {
+                                      setState(() {
+                                        drivers.removeWhere(
+                                          (driver) =>
+                                              driver.id == result['driverId'],
+                                        );
+                                        bookingLocked.value = false;
+                                      });
+
+                                      loadDrivers();
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            '⏱️ Booking expired. Please choose another ambulance.',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              )
+                              .toList(),
                     );
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

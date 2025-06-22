@@ -10,13 +10,13 @@ class Booking extends Model
     protected $primaryKey = 'book_id';
         public    $incrementing = true;      // if it’s auto‑increment
     protected $keyType    = 'int';
-public $timestamps = false;
+    public $timestamps = false;
     protected $fillable = [
         'driver_id',
         'user_id',
         'p_location',
         'p_count',
-        'status',
+        'b_status',
         'created_at',
         'end_time',
     ];
@@ -26,4 +26,14 @@ public $timestamps = false;
 {
     return $this->belongsTo(User::class, 'user_id', 'user_id');
 }
+    public function patients()
+{
+    return $this->hasMany(Patient::class, 'book_id', 'book_id');
+}
+public function driver()
+{
+    return $this->belongsTo(ambulanceDriver::class, 'driver_id', 'driver_id');
+}
+
+
 }

@@ -20,7 +20,6 @@ Route::post('/auth/driverregister',[AuthManager::class,'driverregister']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
- 
     Route::post('/auth/logout',[AuthManager::class,'logout']);
     Route::get('/auth/user',[AuthManager::class,'user']);
     Route::put('/driver/status',[DriverStatus::class,'updateDriverStatus']);
@@ -34,19 +33,20 @@ Route::middleware('auth:sanctum')
       ->post('/driver/location', [DriverController::class, 'updateLocation']);
 Route::get('/admin/trackAmbulance/driver/{query}',[DriverController::class, 'getDriverLocation']);
 
-
 Route::middleware(['auth:sanctum'])->post('/booking/store',[BookingController::class,'store']);
 Route::middleware(['auth:sanctum'])->get('/booking/{booking}/response',[BookingController::class,'respond']);
-Route::middleware(['auth:sanctum'])->get('/booking/expire',[BookingController::class,'expireOldBookings']);
-Route::middleware(['auth:sanctum'])->post('/bookings/{booking}/patients', [BookingController::class, 'storePatients']);
 Route::middleware('auth:sanctum')->get('/user/UserDetails', [DriverController::class, 'getSignedInUserDetails']);
+Route::middleware(['auth:sanctum'])->get('/booking/check-expiry', [BookingController::class, 'expireIfStillPending']);
+Route::middleware(['auth:sanctum'])->get('/booking/{booking}/status', [BookingController::class, 'getBookingStatus']);
 
 Route::middleware('auth:sanctum')->get('/driver/pending-bookings', [BookingController::class, 'pending']);
 
 Route::middleware('auth:sanctum')->post('/booking/{id}/confirm', [BookingController::class, 'confirm']);
 Route::middleware('auth:sanctum')->post('/booking/{id}/cancel', [BookingController::class, 'cancel']);
 Route::middleware('auth:sanctum')->post('/booking/{id}/complete', [BookingController::class, 'complete']);
+Route::post('/booking/{id}/patients', [BookingController::class, 'storePatients']);
 
+<<<<<<< HEAD
 
 Route::middleware('auth:sanctum')->get('/driver/status', [DriverController::class, 'status']);
 
@@ -54,3 +54,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile',  [ProfileController::class, 'show']);   // GET current data
     Route::put('/profile',  [ProfileController::class, 'update']); // PUT/PATCH update
 });
+=======
+Route::middleware('auth:sanctum')->get('/driver/status', [DriverController::class, 'status']);
+>>>>>>> 6274676ee307359c532939ac2a1adcc40c48ec1b
