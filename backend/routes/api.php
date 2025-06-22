@@ -34,8 +34,9 @@ Route::get('/admin/trackAmbulance/driver/{query}',[DriverController::class, 'get
 
 Route::middleware(['auth:sanctum'])->post('/booking/store',[BookingController::class,'store']);
 Route::middleware(['auth:sanctum'])->get('/booking/{booking}/response',[BookingController::class,'respond']);
-Route::middleware(['auth:sanctum'])->get('/booking/expire',[BookingController::class,'expireOldBookings']);
 Route::middleware('auth:sanctum')->get('/user/UserDetails', [DriverController::class, 'getSignedInUserDetails']);
+Route::middleware(['auth:sanctum'])->get('/booking/check-expiry', [BookingController::class, 'expireIfStillPending']);
+Route::middleware(['auth:sanctum'])->get('/booking/{booking}/status', [BookingController::class, 'getBookingStatus']);
 
 Route::middleware('auth:sanctum')->get('/driver/pending-bookings', [BookingController::class, 'pending']);
 

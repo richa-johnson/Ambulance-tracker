@@ -15,7 +15,8 @@
     <application
         android:label="ambulance_tracker"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
         <service android:name="com.lyokone.location.FlutterLocationService" android:foregroundServiceType="location" />
 

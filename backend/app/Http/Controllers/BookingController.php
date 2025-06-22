@@ -23,7 +23,8 @@ class BookingController extends Controller
             'user_id' => auth()->id(),
             'p_location' => $r->p_location,
             'p_count' => $r->p_count,
-            'created_at' => now(),
+            'b_status' => 'pending',
+            'created_at' => now(), 
         ]);
 
 
@@ -75,7 +76,6 @@ class BookingController extends Controller
         return response()->json(['message' => 'Booking confirmed']);
     }
 
-    // POST /booking/{id}/cancel
     public function cancel($id)
     {
         $driver = ambulanceDriver::find(Auth::id());
@@ -94,21 +94,50 @@ class BookingController extends Controller
     }
 
 
-    public function expireOldBookings()
-    {
-        $expired = Booking::where('status', 'pending')
-            ->where('created_at', '<', now()->subMinutes(3))
-            ->get();
 
-        foreach ($expired as $booking) {
-            $booking->status = 'expired';
-            $booking->save();
-            // You can also fire an event/notification here if needed
-        }
+    public function expireIfStillPending(Request $request)
+{
+    $userId = auth()->id();
 
+    $booking = Booking::where('user_id', $userId)
+        ->where('b_status', 'pending')
+        ->where('created_at', '<', now()->subMinutes(2))
+        ->latest('created_at')
+        ->first();
 
-        return response()->json(['expired_count' => count($expired)]);
+    if ($booking) {
+        $booking->b_status = 'expired';
+        $booking->save();
+
+        return response()->json([
+            'message' => 'Booking expired successfully.',
+            'booking_id' => $booking->book_id,
+            'driver_id' => $booking->driver_id,
+            'b_status' => 'expired',
+        ]);
     }
+
+    return response()->json([
+        'message' => 'No expired bookings',
+        'b_status' => 'active', 
+    ]);
+}
+
+public function getBookingStatus(Request $request, $bookingId)
+{
+    $booking = Booking::find($bookingId);
+
+    if (!$booking || $booking->user_id !== auth()->id()) {
+        return response()->json(['message' => 'Booking not found'], 404);
+    }
+
+    return response()->json([
+        'status' => $booking->b_status,
+        'driver_id' => $booking->driver_id,
+        'booking_id' => $booking->book_id,
+    ]);
+}
+
 
 
     public function complete($id)
@@ -123,7 +152,7 @@ class BookingController extends Controller
         $booking->save();
 
         // 2) Free the driver
-        Driver::where('id', auth()->id())
+        ambulanceDriver::where('id', auth()->id())
             ->update(['driver_status' => 'available']);
 
         Log::info('Ride completed', ['id' => $id]);

@@ -6,11 +6,10 @@ import 'package:get/get.dart';
 
 class RequestsPage extends StatelessWidget {
   const RequestsPage({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
-   final ctrl = Get.find<DriverBookingController>();
+    final ctrl = Get.find<DriverBookingController>();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -58,14 +57,46 @@ class RequestsPage extends StatelessWidget {
           ),
           child: Obx(() {
             // Reactive part – updates every 10 s via the controller
-      
 
             if (ctrl.bookings.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No pending bookings',
-                  style: TextStyle(fontSize: 18),
-                ),
+              print(ctrl.bookings.length);
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // ✅ Confirmation Banner
+                  if (ctrl.showConfirmation.value)
+                    Card(
+                      color: Colors.green[50],
+                      margin: const EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check_circle, color: Colors.green),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Request confirmed!\nYou can now track the user from the dashboard.',
+                                style: TextStyle(
+                                  color: Colors.green[900],
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  const SizedBox(height: 12),
+                  const Text(
+                    'No pending bookings',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
               );
             }
 
