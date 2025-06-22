@@ -133,7 +133,7 @@ class BookingController extends Controller
 
     public function driverStatus()
     {
-        $status = Driver::findOrFail(auth()->id())->driver_status;
+        $status = ambulanceDriver::findOrFail(auth()->id())->driver_status;
 
         return response()->json(['status' => $status]);
     }

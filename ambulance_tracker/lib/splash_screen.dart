@@ -23,6 +23,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _isDriver = false;
   @override
   void initState() {
     super.initState();
@@ -50,7 +51,6 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (response.error == null && response.data != null) {
-      
       final map = response.data as Map<String, dynamic>;
       String role = map['role'] as String? ?? 'unknown';
 
@@ -67,11 +67,19 @@ class _SplashScreenState extends State<SplashScreen> {
           );
           break;
         case 'driver':
-        
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (Context) => driverDashboard()),
-            (route) => false,
-          );
+          _isDriver = true;
+          if (_isDriver) {
+        // delete the false instance if it was somehow registered earlier
+        if (Get.isRegistered<DriverBookingController>()) {
+          Get.delete<DriverBookingController>();
+        }
+
+        Get.put(DriverBookingController(true));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const driverDashboard()),
+          (route) => false,
+        );
+      }
           break;
         case 'admin':
           Navigator.of(context).pushAndRemoveUntil(

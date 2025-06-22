@@ -20,5 +20,14 @@ class User {
         district: json['user_district'],
       
     );
+
+    
   }
+  Map<String, dynamic> toJson() => {
+        'name'     : name,
+        'phone'    : phone,
+        'district' : district,
+      };
+
+
 }

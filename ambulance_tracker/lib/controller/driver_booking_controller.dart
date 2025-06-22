@@ -6,9 +6,10 @@ import '../models/booking.dart';
 enum DriverStatus { available, unavailable, busy }
 
 class DriverBookingController extends GetxController {
-  DriverBookingController() {
-    print('🚀 DriverBookingController CREATED');
-  }
+   final bool _isDriver;
+
+  DriverBookingController(this._isDriver);
+
   final showConfirmation = false.obs;
   final bookings = <Booking>[].obs;
   final _service = BookingService();
@@ -21,10 +22,11 @@ class DriverBookingController extends GetxController {
   final isBusy = false.obs;
 
   @override
-  void onInit() {
-    super.onInit();
-    print('🟢 onInit called');
-    _checkAvailabilityFromServer();
+   void onReady() {        // ← runs after the first frame of *any* widget
+    super.onReady(); 
+     if (_isDriver) {
+      _checkAvailabilityFromServer();  // only drivers will start polling
+    }
   }
 
   void _checkAvailabilityFromServer() async {
@@ -39,6 +41,7 @@ class DriverBookingController extends GetxController {
 
   void startPolling() {
     if (_timer != null) return; // already polling
+     if (!_isDriver) return;
     _poll(); // immediate fetch
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
   }
@@ -49,6 +52,7 @@ class DriverBookingController extends GetxController {
   }
 
   Future<void> _poll() async {
+     if (!_isDriver) return; 
     print('🕐 poll tick — status = ${status.value}');
 
     if (status.value != DriverStatus.available) {
@@ -112,7 +116,9 @@ class DriverBookingController extends GetxController {
 
   @override
   void onClose() {
+     print('🔥 DriverBookingController disposed');
     _timer?.cancel();
+     _timer = null;
     super.onClose();
   }
 }
