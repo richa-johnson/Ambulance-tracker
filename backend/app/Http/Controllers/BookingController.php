@@ -6,20 +6,18 @@ use App\Models\ambulanceDriver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
 class BookingController extends Controller
 {
     public $timestamps = false;
 
 
     public function store(Request $r)
-<<<<<<< HEAD
     { 
         \Log::info('🏁 before Booking::create');
-=======
-    {
+    
 
 
->>>>>>> ebd51490ac158f0982b14382673fedab6d41a6ca
         $booking = Booking::create([
             'driver_id' => $r->driver_id,
             'user_id' => auth()->id(),
@@ -50,10 +48,12 @@ class BookingController extends Controller
 
 
 
-    // POST /booking/{id}/confirm
+
     public function confirm($id)
     {
 
+          $driver = Auth::user()->driver;
+          
         $booking = Booking::where('driver_id', auth()->id())
             ->findOrFail($id);        // uses book_id under the hood
 
@@ -64,10 +64,10 @@ class BookingController extends Controller
 
         Booking::where('driver_id', auth()->id())
             ->where('b_status', 'pending')
-            ->where('id', '!=', $id)
+            ->where('book_id', '!=', $id)
             ->update(['b_status' => 'cancelled']);
 
-        Driver::where('id', auth()->id())
+        ambulanceDriver::where('driver_id', auth()->id())
             ->update(['driver_status' => 'busy']);
 
         Log::info('Booking confirmed', ['id' => $id]);
@@ -76,22 +76,22 @@ class BookingController extends Controller
     }
 
     // POST /booking/{id}/cancel
-   public function cancel($id)
-{
-   $driver = ambulanceDriver::find(Auth::id());
+    public function cancel($id)
+    {
+        $driver = ambulanceDriver::find(Auth::id());
 
-    $booking = Booking::where('driver_id', $driver->driver_id)
-                      ->where('b_status', 'pending')
-                      ->where('book_id', $id)        // real PK
-                      ->firstOrFail();
+        $booking = Booking::where('driver_id', $driver->driver_id)
+            ->where('b_status', 'pending')
+            ->where('book_id', $id)        // real PK
+            ->firstOrFail();
 
-    $booking->b_status = 'cancelled';   // ← explicit
-    $booking->save();                   // ← forces SQL UPDATE
+        $booking->b_status = 'cancelled';   // ← explicit
+        $booking->save();                   // ← forces SQL UPDATE
 
-    Log::info('Booking cancelled', ['id' => $id]);
+        Log::info('Booking cancelled', ['id' => $id]);
 
-    return response()->json(['message' => 'Booking cancelled']);
-}
+        return response()->json(['message' => 'Booking cancelled']);
+    }
 
 
     public function expireOldBookings()
@@ -131,9 +131,29 @@ class BookingController extends Controller
         return response()->json(['message' => 'Ride completed']);
     }
 
+    public function storePatients(Request $request, $id)
+{
+    if (!$request->has('patients') || !is_array($request->patients)) {
+        return response()->json(['message' => 'No patient data sent'], 200);
+    }
+
+    foreach ($request->patients as $patient) {
+        \App\Models\Patient::create([
+            'book_id' => $id,
+            'p_name' => $patient['p_name'] ?? null,
+            'p_blood' => $patient['p_blood'] ?? null,
+            'p_age' => $patient['p_age'] ?? null,
+        ]);
+    }
+
+    return response()->json(['message' => 'Patient data stored'], 204);
+}
+
+
+
     public function driverStatus()
     {
-        $status = Driver::findOrFail(auth()->id())->driver_status;
+        $status = ambulanceDriver::findOrFail(auth()->id())->driver_status;
 
         return response()->json(['status' => $status]);
     }

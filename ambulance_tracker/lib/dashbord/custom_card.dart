@@ -59,9 +59,13 @@ class _CustomCardState extends State<CustomCard> {
       },
       body: jsonEncode({'patients': widget.patientList}),
     );
-    if (res.statusCode != 204) {
-      throw Exception('Patient upload failed: ${res.body}');
-    }
+    if (res.statusCode != 200 &&
+    res.statusCode != 201 &&
+    res.statusCode != 204) {
+  throw Exception('Patient upload failed: ${res.body}');
+}
+
+
   }
 
   Future<void> _bookDriver() async {
@@ -69,10 +73,14 @@ class _CustomCardState extends State<CustomCard> {
 
     try {
       final token = await getToken();
-      final bookingId = await _createBooking(token); // your existing API call
+      final bookingId = await _createBooking(token);
+      await _sendPatients(token, bookingId);
       if (bookingId != null) {
         setState(() => isPressed = true);
         widget.bookingLocked.value = true; // lock every card
+        ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Booking successful!")),
+    );
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -144,7 +152,7 @@ class _CustomCardState extends State<CustomCard> {
                                 CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Text(
-                            isPressed ? 'Request Sent' : 'Book Now',
+                            isPressed ? 'Request Sent' : 'Book Now',
                             style: TextStyle(
                               fontSize: 12,
                               color: isPressed

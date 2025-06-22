@@ -48,5 +48,10 @@ class ambulanceDriver extends Authenticatable{
 
     return $this->hasMany(Facility::class, 'driver_id', 'driver_id');
     }
+    public function bookings()
+{
+    return $this->hasMany(Booking::class, 'driver_id', 'driver_id');
+}
 
+   
 }
