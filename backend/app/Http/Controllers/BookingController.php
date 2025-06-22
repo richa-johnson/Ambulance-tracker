@@ -93,23 +93,6 @@ class BookingController extends Controller
 
         return response()->json(['message' => 'Booking cancelled']);
     }
-
-
-    public function expireOldBookings()
-    {
-        $expired = \App\Models\Booking::where('b_status', 'pending')
-            ->where('created_at', '<', now()->subMinutes(3))
-            ->get();
-
-        foreach ($expired as $booking) {
-            $booking->b_status = 'expired';
-            $booking->save();
-            // You can also fire an event/notification here if needed
-        }
-
-
-        return response()->json(['expired_count' => count($expired)]);
-    }
     public function expireIfStillPending(Request $request)
 {
     $userId = auth()->id();

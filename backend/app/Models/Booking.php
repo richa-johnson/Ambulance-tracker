@@ -16,7 +16,7 @@ public $timestamps = false;
         'user_id',
         'p_location',
         'p_count',
-        'status',
+        'b_status',
         'created_at',
         'end_time',
     ];

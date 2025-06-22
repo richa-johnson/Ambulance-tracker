@@ -73,7 +73,11 @@ class _CustomCardState extends State<CustomCard> {
           remainingSeconds--;
         } else {
           timer.cancel();
-          expireBooking();
+          if (!bookingExpiredHandled.value) {
+            bookingExpiredHandled.value = true; // prevent double triggering
+            expireBooking(); // Expire logic
+            checkBookingStatus(); // <- ADD this
+          }
         }
       });
     });
@@ -176,6 +180,9 @@ class _CustomCardState extends State<CustomCard> {
                       actions: [
                         TextButton(
                           onPressed: () {
+                            setState(() {
+                              bookingStatus = 'cancelled';
+                            });
                             Navigator.pop(context);
                             if (widget.onBookingResult != null) {
                               widget.onBookingResult!({'refresh': true});
@@ -191,6 +198,95 @@ class _CustomCardState extends State<CustomCard> {
         }
       }
     });
+  }
+
+  Future<void> checkBookingStatus() async {
+    final token = await getToken();
+    final url = Uri.parse('$baseURL/booking/${currentBookingId}/status');
+
+    final res = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      final status = data['status'];
+
+      if (status == 'confirmed') {
+        countdownTimer?.cancel();
+        statusCheckTimer?.cancel();
+        if (!mounted) return;
+        setState(() {
+          bookingStatus = status;
+        });
+
+        Future.microtask(() {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder:
+                (_) => AlertDialog(
+                  title: const Text('✅ Booking Confirmed'),
+                  content: const Text('Driver has accepted your request.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        if (!mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => userdashboard()),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text('OK'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        if (mounted) Navigator.of(context).pop();
+                        // TODO: Track driver logic
+                      },
+                      child: const Text('Track Driver'),
+                    ),
+                  ],
+                ),
+          );
+        });
+      } else if (status == 'cancelled') {
+        countdownTimer?.cancel();
+        statusCheckTimer?.cancel();
+        if (!mounted) return;
+        setState(() {
+          bookingStatus = status;
+        });
+
+        Future.microtask(() {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder:
+                (_) => AlertDialog(
+                  title: const Text('❌ Booking Cancelled'),
+                  content: const Text(
+                    'Driver rejected the request. Please try another.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (widget.onBookingResult != null) {
+                          widget.onBookingResult!({'refresh': true});
+                        }
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+          );
+        });
+      }
+    }
   }
 
   Future<void> expireBooking() async {
@@ -238,6 +334,9 @@ class _CustomCardState extends State<CustomCard> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        setState(() {
+                          bookingStatus = 'expired';
+                        });
                         Navigator.pop(context);
                       },
                       child: const Text('OK'),
@@ -337,7 +436,13 @@ class _CustomCardState extends State<CustomCard> {
                 ValueListenableBuilder<bool>(
                   valueListenable: widget.bookingLocked,
                   builder: (_, locked, __) {
-                    final disabled = isPressed || locked || isSubmitting;
+                    final disabled =
+                        isPressed ||
+                        locked ||
+                        isSubmitting ||
+                        bookingStatus == 'expired' ||
+                        bookingStatus == 'cancelled';
+
                     return ElevatedButton(
                       onPressed: disabled ? null : _bookDriver,
                       style: ElevatedButton.styleFrom(
@@ -358,11 +463,19 @@ class _CustomCardState extends State<CustomCard> {
                                 ),
                               )
                               : Text(
-                                isPressed ? 'Request Sent' : 'Book Now',
+                                bookingStatus == 'expired'
+                                    ? 'Expired'
+                                    : bookingStatus == 'cancelled'
+                                    ? 'Cancelled'
+                                    : isPressed
+                                    ? 'Request Sent'
+                                    : 'Book Now',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color:
-                                      isPressed
+                                      isPressed ||
+                                              bookingStatus == 'expired' ||
+                                              bookingStatus == 'cancelled'
                                           ? Colors.white
                                           : const Color(0xFF9F0D37),
                                 ),
