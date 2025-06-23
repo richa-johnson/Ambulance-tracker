@@ -65,6 +65,7 @@ class TrackpatientState extends State<Trackpatient> {
         double.parse(driverCoords[1]),
       );
 
+      if (!mounted) return;
       setState(() {
         CurrentLocation = driverLatLng;
         destinationLocation = pickupLatLng;
@@ -120,6 +121,8 @@ class TrackpatientState extends State<Trackpatient> {
         double.parse(driverCoords[1]),
       );
 
+      if (!mounted) return; // prevent setState if widget is not in tree
+
       setState(() {
         CurrentLocation = driverLatLng;
       });
@@ -148,6 +151,7 @@ class TrackpatientState extends State<Trackpatient> {
       List<LatLng> points =
           geometry.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
 
+      if (!mounted) return;
       setState(() {
         routePoints = points;
         destinationLocation = end;

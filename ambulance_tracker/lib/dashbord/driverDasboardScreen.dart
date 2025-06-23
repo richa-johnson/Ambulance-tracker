@@ -5,7 +5,6 @@ import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
-import 'package:ambulance_tracker/dashbord/userEdit.dart';
 import 'package:ambulance_tracker/location/Trackpatient.dart';
 import 'package:ambulance_tracker/registration/login.dart';
 import 'package:ambulance_tracker/services/location_service.dart';

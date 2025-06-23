@@ -1,7 +1,11 @@
 import 'package:ambulance_tracker/services/driver_profile_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+<<<<<<< HEAD
 import '../models/drivermodel.dart';
+=======
+import '../models/driver_model.dart';
+>>>>>>> b95c6dd3bf4b25f66114f6900232d8642c6c24cb
 
 class DriverEditController extends GetxController {
   // ── reactive state ──
@@ -19,7 +23,11 @@ class DriverEditController extends GetxController {
   final sector = RxnString();
   final facilities = <String>[].obs;
   // keep ID so we can send it back
+<<<<<<< HEAD
   late int driverId;
+=======
+  int? driverId;
+>>>>>>> b95c6dd3bf4b25f66114f6900232d8642c6c24cb
 
   final _srv = DriverProfileService();
 
@@ -58,7 +66,11 @@ class DriverEditController extends GetxController {
     try {
       await _srv.update(
         Driver(
+<<<<<<< HEAD
          id: driverId,
+=======
+          id: driverId,
+>>>>>>> b95c6dd3bf4b25f66114f6900232d8642c6c24cb
           name: nameCtrl.text.trim(),
           phoneno: phoneCtrl.text.trim(),
           vehicleno: vehNoCtrl.text.trim(),
@@ -92,4 +104,8 @@ class DriverEditController extends GetxController {
     facilitiesCtrl.dispose();
     super.onClose();
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b95c6dd3bf4b25f66114f6900232d8642c6c24cb
