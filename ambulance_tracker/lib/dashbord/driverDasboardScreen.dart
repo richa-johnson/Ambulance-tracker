@@ -1,7 +1,4 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:convert';
-
 import 'package:ambulance_tracker/alerts/requestpage.dart';
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
@@ -72,7 +69,7 @@ class _driverDashboardState extends State<driverDashboard> {
       return false;
     }
   }
-
+  
   Future<void> updateDriverStatus(String status) async {
     final prefs = await SharedPreferences.getInstance();
     final String? token = prefs.getString('token');
@@ -157,7 +154,6 @@ class _driverDashboardState extends State<driverDashboard> {
             children: [
               Container(
                 width: double.infinity,
-                height: 76,
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(227, 185, 197, 1),
                   borderRadius: BorderRadius.vertical(
@@ -198,7 +194,7 @@ class _driverDashboardState extends State<driverDashboard> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => driverEdit(),
+                                builder: (context) => DriverEdit(),
                               ),
                             );
                           } else if (value == 'logout') {
@@ -217,6 +213,8 @@ class _driverDashboardState extends State<driverDashboard> {
                                 builder: (context) => RequestsPage(),
                               ),
                             );
+                          } else if ( value == 'driveractivity') {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> DriverHistory()));
                           }
                         },
                         itemBuilder:
@@ -279,6 +277,35 @@ class _driverDashboardState extends State<driverDashboard> {
                               ),
 
                               PopupMenuItem<String>(
+                                value: 'driveractivity',
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Activity History',
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(87, 24, 44, 1.0),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                enabled: false,
+                                height: 0,
+                                padding: EdgeInsets.zero,
+                                child: Divider(
+                                  thickness: 1.5,
+                                  height: 0,
+                                  color: Color.fromRGBO(189, 83, 114, 1.0),
+                                  indent: 10,
+                                  endIndent: 10,
+                                ),
+                              ),
+
+                              PopupMenuItem<String>(
                                 value: 'logout',
                                 child: Row(
                                   children: [
@@ -306,7 +333,6 @@ class _driverDashboardState extends State<driverDashboard> {
               ),
               SizedBox(
                 width: 381,
-                // height: 764,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -499,7 +525,6 @@ class _driverDashboardState extends State<driverDashboard> {
                                         ),
                                       ),
                                     ),
-
                                     Expanded(
                                       child: GestureDetector(
                                         onTap:
@@ -758,11 +783,9 @@ class _driverDashboardState extends State<driverDashboard> {
                                           ),
                                           SizedBox(
                                             height: 53,
-                                          ), // reserve space for bottom container
+                                          ),
                                         ],
                                       ),
-
-                                      // Align the bottom container to the bottom
                                       Positioned(
                                         bottom: 0,
                                         left: 0,

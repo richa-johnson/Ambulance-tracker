@@ -1,18 +1,18 @@
-
-import 'package:ambulance_tracker/dashbord/driverDasboardScreen.dart';
-import 'package:ambulance_tracker/registration/facilities_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controller/driver_edit_controller.dart';
+import '../dashbord/driverDasboardScreen.dart';
+import '../registration/facilities_screen.dart';
 
-class driverEdit extends StatefulWidget {
-  const driverEdit({super.key});
-
+class DriverEdit extends StatefulWidget {
+  const DriverEdit({super.key});
   @override
-  State<driverEdit> createState() => driverEditState();
+  State<DriverEdit> createState() => _DriverEditState();
 }
 
-class driverEditState extends State<driverEdit> {
-  String? selectedValue,selectedSector;
-  List<String> districts = [
+class _DriverEditState extends State<DriverEdit> {
+  final ctrl = Get.put(DriverEditController());
+  final List<String> districts = [
     'Thiruvananthapuram',
     'Kollam',
     'Pathanamthitta',
@@ -28,19 +28,20 @@ class driverEditState extends State<driverEdit> {
     'Kannur',
     'Kasaragod',
   ];
-  List<String> sector=[
-     "Emergency Medical Services (EMS)",
-    "Non-Emergency Transport",
-    "Private Ambulance Services",
-    "Military Ambulance Services",
-    "Disaster Response and Relief",
-    "Air Ambulance Services",
-    "Water Ambulance Services",
-    "Fire Department Ambulance",
-    "Hospital-Based Ambulance",
-    "Event Medical Coverage",
-    "Industrial/Occupational Health Ambulance"
+  final List<String> sector = [
+    'Emergency Medical Services (EMS)',
+    'Non-Emergency Transport',
+    'Private Ambulance Services',
+    'Military Ambulance Services',
+    'Disaster Response and Relief',
+    'Air Ambulance Services',
+    'Water Ambulance Services',
+    'Fire Department Ambulance',
+    'Hospital-Based Ambulance',
+    'Event Medical Coverage',
+    'Industrial/Occupational Health Ambulance',
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,308 +51,203 @@ class driverEditState extends State<driverEdit> {
           alignment: Alignment.topLeft,
           child: Image.asset(
             'assets/title.png',
-            fit: BoxFit.contain,
             height: 180,
+            fit: BoxFit.contain,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      body: Obx(
+        () =>
+            ctrl.loading.value
+                ? const Center(child: CircularProgressIndicator())
+                : _buildForm(context),
+      ),
+    );
+  }
 
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.fromRGBO(159, 13, 55, 1.0),
-              Color.fromRGBO(189, 83, 114, 1.0),
-            ],
-          ),
+  Widget _buildForm(BuildContext context) => Container(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF9F0D37), Color(0xFFBD5372)],
+      ),
+    ),
+    padding: EdgeInsets.only(
+      top: MediaQuery.of(context).padding.top + kToolbarHeight,
+      left: 10,
+      right: 10,
+      bottom: 10,
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+      ),
+      padding: const EdgeInsets.only(top: 10),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 10),
+            const Text(
+              'EDIT YOUR PROFILE',
+              style: TextStyle(
+                fontSize: 32,
+                fontFamily: 'Roboto',
+                color: Color(0xFF57182C),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _label('NAME:'),
+            _text(ctrl.nameCtrl, 'NAME'),
+            _gap(),
+            _label('PHONE NO:'),
+            _text(ctrl.phoneCtrl, 'PHONE NO', TextInputType.phone),
+            _gap(),
+            _label('DISTRICT:'),
+            _dropdown(districts, ctrl.district, 'DISTRICT'),
+            _gap(),
+            _label('VEHICLE NO:'),
+            _text(ctrl.vehNoCtrl, 'VEHICLE NO'),
+            _gap(),
+            _label('CAPACITY:'),
+            _text(ctrl.capacityCtrl, 'CAPACITY'),
+            _gap(),
+            _label('SECTOR:'),
+            _dropdown(sector, ctrl.sector, 'SECTOR'),
+            _gap(),
+            _label('FACILITIES:'),
+            _facilityField(context),
+            const SizedBox(height: 20),
+            _updateBtn(),
+          ],
         ),
-        padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top + kToolbarHeight,
-          left: 10.0,
-          right: 10.0,
-          bottom: 10.0,
-        ),
+      ),
+    ),
+  );
+
+  Widget _label(String t) => Align(
+    alignment: Alignment.centerLeft,
+    child: Padding(padding: const EdgeInsets.only(left: 40), child: Text(t)),
+  );
+
+  Widget _gap() => const SizedBox(height: 10);
+
+  Widget _text(TextEditingController c, String hint, [TextInputType? k]) =>
+      SizedBox(
+        width: 325,
+        height: 55,
         child: Container(
-          width: double.infinity,
-          height: double.infinity,
           decoration: BoxDecoration(
+            color: const Color(0xFFE3B9C5),
             borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
           ),
-          padding: EdgeInsets.only(top: 10.0),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
+          child: TextField(
+            controller: c,
+            keyboardType: k,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: hint,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SelectionContainer.disabled(
-                  child: Text(
-                    "EDIT YOUR PROFILE",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontFamily: 'Roboto',
-                      color: Color.fromRGBO(87, 24, 44, 1.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "NAME: ",
-                    ),
-                  ),
-                ),
-                CustomTextField(hint: 'NAME'),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "PHONE NO: ",
-                    ),
-                  ),
-                ),
-                CustomTextField(hint: 'PHONE NO'),
-                SizedBox(height: 10),
-              
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "DISTRICT: ",
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 325,
-                  height: 55,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(227, 185, 197, 1.0),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedValue,
-                        hint: Text(
-                          'DISTRICT',
-                          style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 42),
-                            fontSize: 16,
-                          ),
-                        ),
-                        isExpanded: true,
-                        dropdownColor: Color.fromRGBO(227, 185, 197, 1.0),
-                        borderRadius: BorderRadius.circular(10),
-                        items:
-                            districts.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              );
-                            }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedValue = newValue!;
-                          });
-                        },
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.black.withAlpha(107),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "VEHICLE NO: ",
-                    ),
-                  ),
-                ),
-                CustomTextField(hint: 'VEHICLE NO'),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "CAPACITY: ",
-                    ),
-                  ),
-                ),
-                CustomTextField(hint: 'CAPACITY'),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "SECTOR: ",
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 325,
-                  height: 55,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(227, 185, 197, 1.0),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedSector,
-                        hint: Text(
-                          'SECTOR',
-                          style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 42),
-                            fontSize: 16,
-                          ),
-                        ),
-                        isExpanded: true,
-                        dropdownColor: Color.fromRGBO(227, 185, 197, 1.0),
-                        borderRadius: BorderRadius.circular(10),
-                        items:
-                            sector.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              );
-                            }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedValue = newValue!;
-                          });
-                        },
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.black.withAlpha(107),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "FACILITIES: ",
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 325,
-                  height: 55,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(227, 185, 197, 1.0),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'FACILITIES',
-                        hintStyle: TextStyle(
-                          color: Color.fromRGBO(0, 0, 0, 42), // opacity ~ 42%
-                          fontSize: 16,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.add),
-                          color: Colors.black.withAlpha(107),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> FacilitiesScreen()));
-                          },
-                        )
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 265,
-                  height: 55,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromRGBO(159, 13, 55, 1.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => driverDashboard()),
-                      );
-                    },
-                    child: Text(
-                      'UPDATE',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'Roboto',
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          ),
+        ),
+      );
+
+  Widget _dropdown(List<String> items, RxnString sel, String hint) => SizedBox(
+    width: 325,
+    height: 55,
+    child: Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFE3B9C5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Obx(
+        () => DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: sel.value,
+            hint: Text(
+              hint,
+              style: const TextStyle(
+                color: Color.fromRGBO(0, 0, 0, 42),
+                fontSize: 16,
+              ),
             ),
+            isExpanded: true,
+            items:
+                items
+                    .map((v) => DropdownMenuItem(value: v, child: Text(v)))
+                    .toList(),
+            onChanged: (v) => sel.value = v,
           ),
         ),
       ),
-    );
-  }
-}
+    ),
+  );
 
-class CustomTextField extends StatelessWidget {
-  final String hint;
-
-  const CustomTextField({required this.hint, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 325,
-      height: 55,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(227, 185, 197, 1.0),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: TextField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: Color.fromRGBO(0, 0, 0, 42),
-              fontSize: 16,
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+  Widget _facilityField(BuildContext context) => SizedBox(
+    width: 325,
+    height: 55,
+    child: Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFE3B9C5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextField(
+        controller: ctrl.facilitiesCtrl,
+        readOnly: true,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: 'FACILITIES',
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              final selected = await Navigator.push<List<String>>(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => FacilitiesScreen(
+                        previouslySelected: ctrl.facilities.toList(),
+                      ),
+                ),
+              );
+              if (selected != null) {
+                ctrl.facilities
+                  ..clear()
+                  ..addAll(selected);
+                ctrl.facilitiesCtrl.text = selected.join(', ');
+              }
+            },
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+
+  Widget _updateBtn() => SizedBox(
+    width: 265,
+    height: 55,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF9F0D37),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      onPressed: ctrl.save,
+      child: const Text(
+        'UPDATE',
+        style: TextStyle(fontSize: 24, color: Colors.white),
+      ),
+    ),
+  );
 }

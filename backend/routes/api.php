@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthManager;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DriverProfileController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Booking;
 use Illuminate\Http\Request;
@@ -54,10 +55,16 @@ Route::middleware('auth:sanctum')->get('/user/UserDetails', [DriverController::c
 Route::middleware('auth:sanctum')->get('/driver/pending-bookings', [BookingController::class, 'pending']);
 
 
+Route::middleware('auth:sanctum')->get('/booking/driver-history', [BookingController::class, 'getdriverHistory']);
 
-Route::middleware('auth:sanctum')->get('/driver/status', [DriverController::class, 'status']);
+Route::middleware('auth:sanctum')->get('/booking/user-history', [BookingController::class, 'getUserHistory']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile',  [ProfileController::class, 'show']);   // GET current data
     Route::put('/profile',  [ProfileController::class, 'update']); // PUT/PATCH update
+});
+Route::middleware('auth:sanctum')->get('/driver/status', [DriverController::class, 'status']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get ('/driver/profile',  [DriverProfileController::class, 'show']);
+    Route::put ('/driver/profile',  [DriverProfileController::class, 'update']);
 });

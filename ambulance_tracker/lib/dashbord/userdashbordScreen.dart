@@ -144,6 +144,8 @@ class _userdashboardState extends State<userdashboard> {
                                   (route) => false,
                                 );
                               }
+                            }else if(value == 'useractivity'){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>UserHistory()));
                             }
                           },
                           itemBuilder:
@@ -161,6 +163,43 @@ class _userdashboardState extends State<userdashboard> {
                                       SizedBox(width: 10),
                                       Text(
                                         'Edit Profile',
+                                        style: TextStyle(
+                                          color: Color.fromRGBO(
+                                            87,
+                                            24,
+                                            44,
+                                            1.0,
+                                          ),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  enabled: false,
+                                  height: 0,
+                                  padding: EdgeInsets.zero,
+                                  child: Divider(
+                                    thickness: 1.5,
+                                    height: 0,
+                                    color: Color.fromRGBO(189, 83, 114, 1.0),
+                                    indent: 10,
+                                    endIndent: 10,
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'useractivity',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.logout,
+                                        color: Color.fromRGBO(87, 24, 44, 1.0),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        'Booking History',
                                         style: TextStyle(
                                           color: Color.fromRGBO(
                                             87,
