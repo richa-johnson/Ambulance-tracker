@@ -245,5 +245,52 @@ public function getBookingStatus(Request $request, $bookingId)
         return response()->json(['status' => $status]);
     }
 
+    public function getConfirmedBooking()
+{
+    $userId = auth()->id();
+
+    $booking = Booking::where('user_id', $userId)
+        ->where('b_status', 'confirmed')
+        ->latest('created_at')
+        ->first();
+
+    if (!$booking) {
+        return response()->json(['message' => 'No confirmed bookings'], 404);
+    }
+
+    $driver = $booking->driver;
+
+    return response()->json([
+        'booking_id' => $booking->book_id,
+        'pickup_location' => $booking->p_location, // e.g. "10.304,76.249"
+        'driver_location' => $driver->driver_location, // e.g. "10.325,76.255"
+        'driver_id' => $driver->driver_id,
+        'driver_name' => $driver->driver_name,
+    ]);
+}
+
+public function getDriverConfirmedBooking()
+{
+    $driverId = auth()->id(); // driver is authenticated here
+
+    $booking = Booking::where('driver_id', $driverId)
+        ->where('b_status', 'confirmed')
+        ->latest('created_at')
+        ->first();
+
+    if (!$booking) {
+        return response()->json(['message' => 'No confirmed bookings'], 404);
+    }
+
+    return response()->json([
+        'booking_id' => $booking->book_id,
+        'pickup_location' => $booking->p_location,
+        'driver_location' => $booking->driver->driver_location,
+        'driver_id' => $booking->driver->driver_id,
+        'driver_name' => $booking->driver->driver_name,
+    ]);
+}
+
+
 
 }

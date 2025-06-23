@@ -2,6 +2,7 @@ import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/patientDetailsForm.dart';
 import 'package:ambulance_tracker/dashbord/userEdit.dart';
 import 'package:ambulance_tracker/dashbord/userHistory.dart';
+import 'package:ambulance_tracker/location/Trackambulance.dart';
 import 'package:ambulance_tracker/registration/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -850,7 +851,7 @@ class _userdashboardState extends State<userdashboard> {
                                         horizontal: 10,
                                       ),
                                       child: Text(
-                                        'STrack Driver',
+                                        'Track Ambulance',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 19,
@@ -862,7 +863,9 @@ class _userdashboardState extends State<userdashboard> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => UserHistory(),
+                                            builder:
+                                                (context) =>
+                                                    Trackambulance(), // ← changed here
                                           ),
                                         );
                                       },

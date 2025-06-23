@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
+import 'package:ambulance_tracker/location/Trackambulance.dart';
+import 'package:ambulance_tracker/location/location.dart';
 import 'package:ambulance_tracker/models/driver_model.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +43,7 @@ class _CustomCardState extends State<CustomCard> {
   bool isPressed = false; // this card’s button is now green/locked
   bool isSubmitting = false; // show spinner while waiting
   final ValueNotifier<bool> bookingExpiredHandled = ValueNotifier(false);
+  bool _hasShownStatusDialog = false;
 
   @override
   void dispose() {
@@ -73,7 +76,11 @@ class _CustomCardState extends State<CustomCard> {
           remainingSeconds--;
         } else {
           timer.cancel();
-          expireBooking();
+          if (!bookingExpiredHandled.value) {
+            bookingExpiredHandled.value = true; // prevent double triggering
+            expireBooking(); // Expire logic
+            checkBookingStatus(); // <- ADD this
+          }
         }
       });
     });
@@ -96,7 +103,8 @@ class _CustomCardState extends State<CustomCard> {
         final data = jsonDecode(res.body);
         String status = data['status'];
 
-        if (status != 'pending') {
+        if (status != 'pending' && !_hasShownStatusDialog) {
+          _hasShownStatusDialog = true; // Prevent repeated dialogs
           countdownTimer?.cancel();
           statusCheckTimer?.cancel();
 
@@ -111,53 +119,59 @@ class _CustomCardState extends State<CustomCard> {
             countdownTimer?.cancel();
             statusCheckTimer?.cancel();
             if (!mounted) return;
+
             setState(() {
               bookingStatus = status;
-              bookingExpiredHandled.value = true;
+              // DO NOT SET THIS YET
             });
 
             Future.microtask(() {
               if (!mounted) return;
+              print("⏱️ Status check response: $status");
               showDialog(
                 context: context,
                 barrierDismissible: false,
                 builder:
                     (_) => AlertDialog(
-                      title: Text('✅ Booking Confirmed'),
-                      content: Text('Driver has accepted your request.'),
+                      title: const Text('✅ Booking Confirmed'),
+                      content: const Text('Driver has accepted your request.'),
                       actions: [
                         TextButton(
                           onPressed: () {
                             if (!mounted) return;
                             Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                builder: (_) => userdashboard(),
+                                builder: (_) => const userdashboard(),
                               ),
                               (route) => false,
                             );
                           },
-                          child: Text('OK'),
+                          child: const Text('OK'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            if (mounted) Navigator.of(context).pop();
-                            // TODO: Track driver logic
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await Future.delayed(Duration(milliseconds: 300));
+                            if (mounted) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const Trackambulance(),
+                                ),
+                              );
+                            }
                           },
-                          child: Text('Track Driver'),
+                          child: const Text('Track Driver'),
                         ),
                       ],
                     ),
-              );
+              ).then((_) {
+                // ✅ Now set the flag after dialog is closed
+                bookingExpiredHandled.value = true;
+              });
             });
           } else if (status == 'cancelled') {
-            countdownTimer?.cancel();
-            statusCheckTimer?.cancel();
-            if (!mounted) return;
-            setState(() {
-              bookingStatus = status;
-              bookingExpiredHandled.value = true;
-            });
-
+            if (_hasShownStatusDialog) return;
+            _hasShownStatusDialog = true;
             if (widget.onBookingResult != null) {
               widget.onBookingResult!({'driverId': driverId, 'expired': true});
             }
@@ -176,6 +190,9 @@ class _CustomCardState extends State<CustomCard> {
                       actions: [
                         TextButton(
                           onPressed: () {
+                            setState(() {
+                              bookingStatus = 'cancelled';
+                            });
                             Navigator.pop(context);
                             if (widget.onBookingResult != null) {
                               widget.onBookingResult!({'refresh': true});
@@ -193,6 +210,102 @@ class _CustomCardState extends State<CustomCard> {
     });
   }
 
+  Future<void> checkBookingStatus() async {
+    final token = await getToken();
+    final url = Uri.parse('$baseURL/booking/${currentBookingId}/status');
+
+    final res = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      final status = data['status'];
+
+      if (status == 'confirmed') {
+        countdownTimer?.cancel();
+        statusCheckTimer?.cancel();
+        if (!mounted) return;
+        setState(() {
+          bookingStatus = status;
+        });
+
+        Future.microtask(() {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder:
+                (_) => AlertDialog(
+                  title: const Text('✅ Booking Confirmed'),
+                  content: const Text('Driver has accepted your request.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        if (!mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => userdashboard()),
+                          (route) => false,
+                        );
+                      },
+                      child: const Text('OK'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        if (mounted) {
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the alert dialog first
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const RoutingPage(),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Track Driver'),
+                    ),
+                  ],
+                ),
+          );
+        });
+      } else if (status == 'cancelled') {
+        countdownTimer?.cancel();
+        statusCheckTimer?.cancel();
+        if (!mounted) return;
+        setState(() {
+          bookingStatus = status;
+        });
+
+        Future.microtask(() {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder:
+                (_) => AlertDialog(
+                  title: const Text('❌ Booking Cancelled'),
+                  content: const Text(
+                    'Driver rejected the request. Please try another.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (widget.onBookingResult != null) {
+                          widget.onBookingResult!({'refresh': true});
+                        }
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+          );
+        });
+      }
+    }
+  }
 
   Future<void> expireBooking() async {
     final token = await getToken();
@@ -239,6 +352,9 @@ class _CustomCardState extends State<CustomCard> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        setState(() {
+                          bookingStatus = 'expired';
+                        });
                         Navigator.pop(context);
                       },
                       child: const Text('OK'),
@@ -271,7 +387,7 @@ class _CustomCardState extends State<CustomCard> {
     if (res.statusCode == 201) {
       final data = jsonDecode(res.body);
       int bookingId = data['booking_id'];
-      startBookingTimer(bookingId, widget.driver.id);
+      startBookingTimer(bookingId, widget.driver.id!);
       return bookingId;
     }else{
       throw Exception("Booking failed: ${res.body}");
@@ -336,7 +452,7 @@ class _CustomCardState extends State<CustomCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              d.name,
+              d.name!,
               style: const TextStyle(fontSize: 24, color: Colors.white),
             ),
             const SizedBox(height: 8),
@@ -345,7 +461,7 @@ class _CustomCardState extends State<CustomCard> {
                 const Icon(Icons.phone, color: Colors.white, size: 18),
                 const SizedBox(width: 5),
                 Text(
-                  d.phoneno,
+                  d.phoneno!,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
@@ -355,14 +471,20 @@ class _CustomCardState extends State<CustomCard> {
               children: [
                 const SizedBox(width: 25),
                 Text(
-                  d.vehicleno,
+                  d.vehicleno!,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 const Spacer(),
                 ValueListenableBuilder<bool>(
                   valueListenable: widget.bookingLocked,
                   builder: (_, locked, __) {
-                    final disabled = isPressed || locked || isSubmitting;
+                    final disabled =
+                        isPressed ||
+                        locked ||
+                        isSubmitting ||
+                        bookingStatus == 'expired' ||
+                        bookingStatus == 'cancelled';
+
                     return ElevatedButton(
                       onPressed: disabled ? null : _bookDriver,
                       style: ElevatedButton.styleFrom(
@@ -383,11 +505,19 @@ class _CustomCardState extends State<CustomCard> {
                                 ),
                               )
                               : Text(
-                                isPressed ? 'Request Sent' : 'Book Now',
+                                bookingStatus == 'expired'
+                                    ? 'Expired'
+                                    : bookingStatus == 'cancelled'
+                                    ? 'Cancelled'
+                                    : isPressed
+                                    ? 'Request Sent'
+                                    : 'Book Now',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color:
-                                      isPressed
+                                      isPressed ||
+                                              bookingStatus == 'expired' ||
+                                              bookingStatus == 'cancelled'
                                           ? Colors.white
                                           : const Color(0xFF9F0D37),
                                 ),
@@ -428,11 +558,11 @@ class _CustomCardState extends State<CustomCard> {
                       ),
                       builder:
                           (_) => _DriverDetailsSheet(
-                            name: d.name,
-                            sector: d.sector,
-                            district: d.disrtict ?? '',
-                            capacity: d.capacity,
-                            facilities: d.facilities,
+                            name: d.name!,
+                            sector: d.sector!,
+                            district: d.district ?? '',
+                            capacity: d.capacity!,
+                            facilities: d.facilities!,
                           ),
                     );
                   },
