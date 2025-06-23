@@ -46,7 +46,8 @@ class _CustomCardState extends State<CustomCard> {
   bool _hasShownStatusDialog = false;
 
   @override
-  void dispose() {
+  void 
+    pose() {
     countdownTimer?.cancel();
     statusCheckTimer?.cancel();
     super.dispose();
@@ -560,7 +561,7 @@ class _CustomCardState extends State<CustomCard> {
                           (_) => _DriverDetailsSheet(
                             name: d.name,
                             sector: d.sector,
-                            district: d.disrtict ?? '',
+                            district: d.district ?? '',
                             capacity: d.capacity,
                             facilities: d.facilities,
                           ),
