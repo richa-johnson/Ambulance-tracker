@@ -78,7 +78,7 @@ class BookingController extends Controller
           $driver = Auth::user()->driver;
           
         $booking = Booking::where('driver_id', auth()->id())
-            ->findOrFail($id);        // uses book_id under the hood
+            ->findOrFail($id);       
 
 
         $booking->b_status = 'confirmed';
@@ -201,7 +201,46 @@ public function getBookingStatus(Request $request, $bookingId)
 
     return response()->json(['message' => 'Patient data stored'], 204);
 }
+    public function getdriverHistory(Request $request)
+{
+    $driver = Auth::user(); // Gets the authenticated driver
+    $driverId = $driver->driver_id;
 
+    $bookings = Booking::with(['user']) // eager load user info
+        ->where('driver_id', $driverId)
+        ->get()
+        ->map(function ($booking) {
+            return [
+                'uname'     => $booking->user->user_name,
+                'phoneno'   => $booking->user->user_phone,
+                'pcount'    => $booking->p_count,
+                'location'  => $booking->p_location,
+                'timestamp' => $booking->created_at,
+            ];
+        });
+
+    return response()->json($bookings);
+}
+    public function getUserHistory(Request $request)
+{
+    $userId = auth()->id(); // Get authenticated user_id
+
+    $bookings = Booking::with('driver') // eager load driver info
+        ->where('user_id', $userId)
+        ->orderByDesc('created_at') // sort latest first
+        ->get()
+        ->map(function ($booking) {
+            return [
+                'dname'     => optional($booking->driver)->driver_name ?? 'N/A',
+                'phoneno'   => optional($booking->driver)->driver_phone ?? 'N/A',
+                'vehicleNo' => optional($booking->driver)->driver_vehno ?? 'N/A',
+                'location'  => $booking->p_location ?? 'N/A',
+                'timestamp' => $booking->created_at,
+            ];
+        });
+
+    return response()->json($bookings);
+}
 
 
     public function driverStatus()

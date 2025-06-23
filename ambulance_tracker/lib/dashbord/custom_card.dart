@@ -376,6 +376,7 @@ class _CustomCardState extends State<CustomCard> {
       Uri.parse('$baseURL/booking/store'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
@@ -410,9 +411,6 @@ class _CustomCardState extends State<CustomCard> {
 }
 
  }
-
-
-  
 
   Future<void> _bookDriver() async {
     setState(() => isSubmitting = true);

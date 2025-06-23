@@ -1,7 +1,7 @@
 import 'package:ambulance_tracker/services/driver_profile_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/driver_model.dart';
+import '../models/drivermodel.dart';
 
 class DriverEditController extends GetxController {
   // ── reactive state ──

@@ -22,39 +22,26 @@ class Driver {
   });
 
   factory Driver.fromJson(Map<String, dynamic> json) {
-   
     final rawFacilities = json['facilities'];
-    List<String> fac = [];
+
+    List<String> parsedFacilities;
     if (rawFacilities is List) {
-      fac =
-          rawFacilities.map<String>((e) {
-            if (e is Map && e.containsKey('facility')) {
-              return e['facility'].toString().trim();
-            }
-            return e.toString().trim();
-          }).toList();
+      parsedFacilities = rawFacilities.map((e) => e.toString().trim()).toList();
+    } else if (rawFacilities is String) {
+      parsedFacilities = rawFacilities.split(',').map((e) => e.trim()).toList();
+    } else {
+      parsedFacilities = [];
     }
 
     return Driver(
-      id: json['driver_id'],
-      name: json['driver_name'],
-      phoneno: json['driver_phone'],
-      vehicleno: json['driver_vehno'],
-      sector: json['driver_sector'],
-      capacity: json['driver_capacity'].toString(),
-      district: json['driver_district'],
-      facilities: fac,
+      id: int.parse(json['slno'].toString()),
+      name: json['name'],
+      phoneno: json['phoneno'],
+      vehicleno: json['vehicleno'],
+      district: json['district'],
+      sector: json['sector'],
+      capacity: json['capacity']?.toString() ?? '',
+      facilities: parsedFacilities,
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    'driver_id': id,
-    'name': name,
-    'phone': phoneno,
-    'vehno': vehicleno,
-    'sector': sector,
-    'capacity': capacity,
-    'district': district,
-    'facilities': facilities,
-  }..removeWhere((_, v) => v == null);
 }
