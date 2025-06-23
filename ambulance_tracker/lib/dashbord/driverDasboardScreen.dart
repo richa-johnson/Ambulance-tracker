@@ -8,6 +8,7 @@ import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:ambulance_tracker/controller/location_controller.dart';
 import 'package:ambulance_tracker/dashbord/driverEdit.dart';
 import 'package:ambulance_tracker/dashbord/driverHistory.dart';
+import 'package:ambulance_tracker/location/Trackpatient.dart';
 import 'package:ambulance_tracker/registration/login.dart';
 import 'package:ambulance_tracker/services/location_service.dart';
 import 'package:flutter/material.dart';
@@ -788,7 +789,7 @@ class _driverDashboardState extends State<driverDashboard> {
                                                   horizontal: 10,
                                                 ),
                                                 child: Text(
-                                                  'Activity history',
+                                                  'Track Patient',
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 19,
@@ -802,7 +803,7 @@ class _driverDashboardState extends State<driverDashboard> {
                                                     MaterialPageRoute(
                                                       builder:
                                                           (context) =>
-                                                              DriverHistory(),
+                                                              Trackpatient(),
                                                     ),
                                                   );
                                                 },

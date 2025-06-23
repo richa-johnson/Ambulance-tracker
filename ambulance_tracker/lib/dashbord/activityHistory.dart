@@ -1,4 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:ambulance_tracker/constant.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart'; // Adjust path if needed
 
 class ActivityHistory extends StatefulWidget {
   const ActivityHistory({super.key});
@@ -8,8 +11,40 @@ class ActivityHistory extends StatefulWidget {
 }
 
 class _ActivityHistoryState extends State<ActivityHistory> {
-  String slno="1   ",uname="dIYA  ",uphoneno="78987968  ",dname="djfkhsjf",dphoneno="9408780909",vehicleno="238924",pcount="3",pname="gobewrmfscnt",location="jklsadfhaskjam",date="sdfhlkajsvnssmc",time="78:89:90";
-  int i=0;
+  List<ActivityRecord> records = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchActivityHistory();
+  }
+
+  Future<void> fetchActivityHistory() async {
+    final url = Uri.parse('$baseURL/booking/activity-history');
+
+    try {
+  final response = await http.get(url);
+
+  print("Status Code: ${response.statusCode}");
+  print("Response Body: ${response.body}");
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    setState(() {
+      records = data.map((e) => ActivityRecord.fromJson(e)).toList();
+      isLoading = false;
+    });
+  } else {
+    throw Exception("Failed to load history");
+  }
+} catch (e) {
+  print("Error: $e");
+  setState(() => isLoading = false);
+}
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,43 +87,70 @@ class _ActivityHistoryState extends State<ActivityHistory> {
             color: Colors.white,
           ),
           child: Column(
-              children: [
-                SizedBox(height: 20),
-                Text("ACTIVITY HISTORY", textAlign: TextAlign.center,style: TextStyle(color: Color.fromRGBO(87, 24, 44,1), fontWeight: FontWeight.bold,fontSize: 32),),
-                SizedBox(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Table(
-                            defaultColumnWidth: IntrinsicColumnWidth(),
-                            border: TableBorder.all(
-                              color: Color.fromRGBO(0, 0, 0, 1),
-                              width: 1.0,
-                              style: BorderStyle.solid
-                            ),
-                            children: [
-                              ActivityHistoryTable(slno: "Sl No", uname: "User Name", uphoneno: "User Phone No", dname: "Driver Name", dphoneno: "Driver Phone No", vehicleno: "Vehicle No", pcount: "Patient count", pname: "Patient Name", location: "Location", date: "Date", time: "Time").build(),
-                              for (int i=0;i<10;i++)
-                                ActivityHistoryTable(slno: slno, uname: uname, uphoneno: uphoneno, dname: dname, dphoneno: dphoneno, vehicleno: vehicleno, pcount: pcount, pname: pname, location: location, date: date, time: time).build(),
-                            ],
-                          ),
-                        ),
-                      ),
+            children: [
+              SizedBox(height: 20),
+              Text(
+                "ACTIVITY HISTORY",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color.fromRGBO(87, 24, 44, 1),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child:
+                          isLoading
+                              ? Center(child: CircularProgressIndicator())
+                              : Table(
+                                defaultColumnWidth: IntrinsicColumnWidth(),
+                                border: TableBorder.all(color: Colors.black),
+                                children: [
+                                  ActivityHistoryTable(
+                                    slno: "Sl No",
+                                    uname: "User Name",
+                                    uphoneno: "User Phone No",
+                                    dname: "Driver Name",
+                                    dphoneno: "Driver Phone No",
+                                    vehicleno: "Vehicle No",
+                                    pcount: "Patient count",
+                                    location: "Location",
+                                    timestamp: "Timestamp",
+                                  ).build(),
+                                  for (var record in records)
+                                    ActivityHistoryTable(
+                                      slno: record.slno,
+                                      uname: record.uname,
+                                      uphoneno: record.uphoneno,
+                                      dname: record.dname,
+                                      dphoneno: record.dphoneno,
+                                      vehicleno: record.vehicleno,
+                                      pcount: record.pcount,
+                                      location: record.location,
+                                      timestamp: record.timestamp,
+                                    ).build(),
+                                ],
+                              ),
                     ),
                   ),
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
-class ActivityHistoryTable{
+class ActivityHistoryTable {
   final String slno;
   final String uname;
   final String uphoneno;
@@ -96,19 +158,27 @@ class ActivityHistoryTable{
   final String dphoneno;
   final String vehicleno;
   final String pcount;
-  final String pname;
   final String location;
-  final String date;
-  final String time;
- 
-  ActivityHistoryTable({required this.slno,required this.uname,required this.uphoneno,required this.dname,required this.dphoneno,required this.vehicleno,required this.pcount,required this.pname,required this.location,required this.date,required this.time});
+  final String timestamp;
+
+  ActivityHistoryTable({
+    required this.slno,
+    required this.uname,
+    required this.uphoneno,
+    required this.dname,
+    required this.dphoneno,
+    required this.vehicleno,
+    required this.pcount,
+    required this.location,
+    required this.timestamp,
+  });
 
   TableRow build() {
-  TextStyle textStyle = TextStyle(
-    color: Colors.black,
-    fontWeight: FontWeight.w900,
-    fontSize: 17,
-  );
+    TextStyle textStyle = TextStyle(
+      color: Colors.black,
+      fontWeight: FontWeight.w900,
+      fontSize: 17,
+    );
 
     return TableRow(
       children: [
@@ -119,10 +189,8 @@ class ActivityHistoryTable{
         tableCell(dphoneno, textStyle),
         tableCell(vehicleno, textStyle),
         tableCell(pcount, textStyle),
-        tableCell(pname, textStyle),
         tableCell(location, textStyle),
-        tableCell(date, textStyle),
-        tableCell(time, textStyle),
+        tableCell(timestamp, textStyle),
       ],
     );
   }
@@ -140,3 +208,40 @@ class ActivityHistoryTable{
   }
 }
 
+class ActivityRecord {
+  final String slno;
+  final String uname;
+  final String uphoneno;
+  final String dname;
+  final String dphoneno;
+  final String vehicleno;
+  final String pcount;
+  final String location;
+  final String timestamp;
+
+  ActivityRecord({
+    required this.slno,
+    required this.uname,
+    required this.uphoneno,
+    required this.dname,
+    required this.dphoneno,
+    required this.vehicleno,
+    required this.pcount,
+    required this.location,
+    required this.timestamp,
+  });
+
+  factory ActivityRecord.fromJson(Map<String, dynamic> json) {
+    return ActivityRecord(
+      slno: json['slno'].toString(),
+      uname: json['uname'],
+      uphoneno: json['uphoneno'],
+      dname: json['dname'],
+      dphoneno: json['dphoneno'],
+      vehicleno: json['vehicleno'],
+      pcount: json['pcount'].toString(),
+      location: json['location'],
+      timestamp: json['timestamp'],
+    );
+  }
+}

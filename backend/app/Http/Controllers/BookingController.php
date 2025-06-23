@@ -15,9 +15,6 @@ class BookingController extends Controller
     public function store(Request $r)
     { 
         \Log::info('🏁 before Booking::create');
-    
-
-
         $booking = Booking::create([
             'driver_id' => $r->driver_id,
             'user_id' => auth()->id(),
@@ -30,6 +27,7 @@ class BookingController extends Controller
 
         return response()->json(['booking_id' => $booking->book_id], 201);
     }
+    
 
     public function pending(Request $request)
     {
@@ -45,8 +43,32 @@ class BookingController extends Controller
         \Log::info('pending() rows found: ' . $bookings->count());
         return response()->json($bookings);
     }
+    public function allActivityHistory()
+{
+    \Log::info('🟡 Fetching bookings...');
+    $bookings = Booking::with(['user', 'driver', 'patients'])->get();
+    \Log::info('✅ Bookings fetched: ' . $bookings->count());
 
+    $result = $bookings->map(function ($booking, $index) {
+        \Log::info("🔍 Mapping booking ID: {$booking->book_id}");
 
+        return [
+            'slno' => $index + 1,
+            'uname' => optional($booking->user)->user_name ?? 'N/A',
+            'uphoneno' => optional($booking->user)->user_phone ?? 'N/A',
+            'dname' => optional($booking->driver)->driver_name ?? 'N/A',
+            'dphoneno' => optional($booking->driver)->driver_phone ?? 'N/A',
+            'vehicleno' => optional($booking->driver)->driver_vehno ?? 'N/A',
+            'pcount' => $booking->p_count ?? 0,
+            'location' => $booking->p_location ?? 'N/A',
+            'timestamp' => $booking->created_at ?? now(),
+        ];
+    });
+
+    \Log::info('✅ Mapping completed.');
+
+    return response()->json($result);
+}
 
 
 
@@ -92,9 +114,6 @@ class BookingController extends Controller
 
         return response()->json(['message' => 'Booking cancelled']);
     }
-
-
-
     public function expireIfStillPending(Request $request)
 {
     $userId = auth()->id();
@@ -186,6 +205,53 @@ public function getBookingStatus(Request $request, $bookingId)
 
         return response()->json(['status' => $status]);
     }
+
+    public function getConfirmedBooking()
+{
+    $userId = auth()->id();
+
+    $booking = Booking::where('user_id', $userId)
+        ->where('b_status', 'confirmed')
+        ->latest('created_at')
+        ->first();
+
+    if (!$booking) {
+        return response()->json(['message' => 'No confirmed bookings'], 404);
+    }
+
+    $driver = $booking->driver;
+
+    return response()->json([
+        'booking_id' => $booking->book_id,
+        'pickup_location' => $booking->p_location, // e.g. "10.304,76.249"
+        'driver_location' => $driver->driver_location, // e.g. "10.325,76.255"
+        'driver_id' => $driver->driver_id,
+        'driver_name' => $driver->driver_name,
+    ]);
+}
+
+public function getDriverConfirmedBooking()
+{
+    $driverId = auth()->id(); // driver is authenticated here
+
+    $booking = Booking::where('driver_id', $driverId)
+        ->where('b_status', 'confirmed')
+        ->latest('created_at')
+        ->first();
+
+    if (!$booking) {
+        return response()->json(['message' => 'No confirmed bookings'], 404);
+    }
+
+    return response()->json([
+        'booking_id' => $booking->book_id,
+        'pickup_location' => $booking->p_location,
+        'driver_location' => $booking->driver->driver_location,
+        'driver_id' => $booking->driver->driver_id,
+        'driver_name' => $booking->driver->driver_name,
+    ]);
+}
+
 
 
 }
