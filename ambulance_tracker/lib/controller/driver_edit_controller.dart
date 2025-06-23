@@ -19,7 +19,7 @@ class DriverEditController extends GetxController {
   final sector = RxnString();
   final facilities = <String>[].obs;
   // keep ID so we can send it back
-  int? driverId;
+  late int driverId;
 
   final _srv = DriverProfileService();
 
@@ -58,7 +58,7 @@ class DriverEditController extends GetxController {
     try {
       await _srv.update(
         Driver(
-         
+         id: driverId,
           name: nameCtrl.text.trim(),
           phoneno: phoneCtrl.text.trim(),
           vehicleno: vehNoCtrl.text.trim(),

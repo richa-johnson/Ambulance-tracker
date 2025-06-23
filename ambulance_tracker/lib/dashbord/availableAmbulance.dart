@@ -66,6 +66,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
     final res = await http.get(Uri.parse(getAvailabledriversURL));
     if (res.statusCode == 200) {
       final List list = jsonDecode(res.body);
+        debugPrint(jsonEncode(list));  // or print(data);
       final availableDrivers =
           list.where((e) => e['status'] == 'available').toList();
       final parts = widget.pickupLocation.split(',');
@@ -317,7 +318,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                           final isSelected = tempSector == s;
                           return ChoiceChip(
                             label: Text(
-                              s!,
+                              s,
                               style: TextStyle(
                                 color: isSelected ? Colors.white : Colors.black,
                               ),
@@ -346,7 +347,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                           final isSelected = tempCapacity == c;
                           return ChoiceChip(
                             label: Text(
-                              c!,
+                              c,
                               style: TextStyle(
                                 color: isSelected ? Colors.white : Colors.black,
                               ),
