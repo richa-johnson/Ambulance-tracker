@@ -1,7 +1,4 @@
-//login
 import 'dart:convert';
- // adjust if path differs
-
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/models/api_response.dart';
 import 'package:ambulance_tracker/models/user.dart';
@@ -40,7 +37,6 @@ Future<ApiResponse> login(String email, String password) async {
               ..token = token
               ..role = role;
      
-         // Use 0 if user.id is null
         apiResponse.data = user;
         apiResponse.error = null;
         break;
@@ -62,7 +58,6 @@ Future<ApiResponse> login(String email, String password) async {
   return apiResponse;
 }
 
-//get user details
 Future<ApiResponse> getUserDetail() async {
   ApiResponse apiResponse = ApiResponse();
   try {
@@ -108,8 +103,6 @@ Future<int> getUserId() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
   return pref.getInt('userId') ?? 0;
 }
-
-
 
 Future<bool> logout() async {
   SharedPreferences pref = await SharedPreferences.getInstance();

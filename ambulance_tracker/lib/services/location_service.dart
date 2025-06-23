@@ -17,13 +17,11 @@ class LocationService {
   StreamSubscription<LocationData>? _subscription;
   LocationData? _lastUploaded;
 
-  /* ─────────────── PUBLIC API ─────────────── */
-
   Future<void> startTracking({
     required LocationController controller,
     required BuildContext context,
   }) async {
-    await stopTracking(); // avoid duplicates
+    await stopTracking(); 
     controller.updateIsAccessingLocation(true);
 
     if (!await _ensureServiceEnabled(context)) {
@@ -61,20 +59,15 @@ class LocationService {
     _subscription = null;
   }
 
-  /* ─────────────── PERMISSION + SERVICE ─────────────── */
-
- /* ────────── replace existing _ensureServiceEnabled(BuildContext) ────────── */
 Future<bool> _ensureServiceEnabled(BuildContext ctx) async {
   bool enabled = await _location.serviceEnabled();
-  int cancelCount = 0;                               // track Cancel taps
+  int cancelCount = 0;                               
 
   debugPrint('🛈 GPS enabled = $enabled');
 
   while (!enabled) {
-    enabled = await _location.requestService();      // OS “Turn on GPS” sheet
-    if (enabled) return true;                        // user switched it on 🎉
-
-    // ------- show in‑app “Turn on GPS / Cancel” dialog -------
+    enabled = await _location.requestService();      
+    if (enabled) return true;                      
     final retry = await showDialog<bool>(
       context: ctx,
       barrierDismissible: false,
@@ -99,9 +92,8 @@ Future<bool> _ensureServiceEnabled(BuildContext ctx) async {
 
     if (!retry) {
       cancelCount++;
-      if (cancelCount >= 2) return false;            // stop after 2 Cancels
+      if (cancelCount >= 2) return false;            
     }
-    // loop repeats → OS sheet will show again if retry is true
   }
   return true;
 }
@@ -112,7 +104,7 @@ Future<bool> _ensureServiceEnabled(BuildContext ctx) async {
     int cancelCount = 0;
 
     while (status == PermissionStatus.denied) {
-      status = await _location.requestPermission(); // OS sheet
+      status = await _location.requestPermission();
 
       if (status == PermissionStatus.granted ||
           status == PermissionStatus.grantedLimited)
@@ -121,8 +113,8 @@ Future<bool> _ensureServiceEnabled(BuildContext ctx) async {
       final retry = await _showRetryDialog(ctx);
       if (!retry) {
         cancelCount++;
-        if (cancelCount >= 2) return false; // ← stop after 2 Cancels
-        continue; // ← show dialog again
+        if (cancelCount >= 2) return false; 
+        continue; 
       }
     }
 
@@ -134,8 +126,6 @@ Future<bool> _ensureServiceEnabled(BuildContext ctx) async {
     return status == PermissionStatus.granted ||
         status == PermissionStatus.grantedLimited;
   }
-
-  /* ─────────────── DIALOG HELPERS ─────────────── */
 
   Future<void> _showInfoDialog(
     BuildContext ctx, {
@@ -209,8 +199,6 @@ Future<bool> _ensureServiceEnabled(BuildContext ctx) async {
           ),
     );
   }
-
-  /* ─────────────── LOCATION UPLOAD ─────────────── */
 
   Future<void> _handleNewLocation(
     LocationData data,
