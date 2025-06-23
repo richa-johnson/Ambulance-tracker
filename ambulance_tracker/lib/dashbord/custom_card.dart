@@ -386,14 +386,32 @@ class _CustomCardState extends State<CustomCard> {
     if (res.statusCode == 201) {
       final data = jsonDecode(res.body);
       int bookingId = data['booking_id'];
-
       startBookingTimer(bookingId, widget.driver.id);
-      print("🚑 Booking successful. Timer started.");
       return bookingId;
-    } else {
-      throw Exception('Booking failed: ${res.body}');
+    }else{
+      throw Exception("Booking failed: ${res.body}");
     }
   }
+
+  Future<void> _sendPatients(String token, int bookingId) async {
+    final res = await http.post(
+      Uri.parse('$baseURL/booking/$bookingId/patients'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'patients': widget.patientList}),
+    );
+    if (res.statusCode != 200 &&
+    res.statusCode != 201 &&
+    res.statusCode != 204) {
+  throw Exception('Patient upload failed: ${res.body}');
+}
+
+ }
+
+
+  
 
   Future<void> _bookDriver() async {
     setState(() => isSubmitting = true);
@@ -401,8 +419,14 @@ class _CustomCardState extends State<CustomCard> {
     try {
       final token = await getToken();
       final bookingId = await _createBooking(token);
-      setState(() => isPressed = true);
-      widget.bookingLocked.value = true;
+      await _sendPatients(token, bookingId);
+      if (bookingId != null) {
+        setState(() => isPressed = true);
+        widget.bookingLocked.value = true; // lock every card
+        ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Booking successful!")),
+    );
+      }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -551,6 +575,7 @@ class _CustomCardState extends State<CustomCard> {
     );
   }
 }
+  
 
 class _DriverDetailsSheet extends StatelessWidget {
   final String name;
@@ -650,3 +675,4 @@ class _DriverDetailsSheet extends StatelessWidget {
     );
   }
 }
+  

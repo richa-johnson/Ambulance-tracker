@@ -15,9 +15,6 @@ class BookingController extends Controller
     public function store(Request $r)
     { 
         \Log::info('🏁 before Booking::create');
-    
-
-
         $booking = Booking::create([
             'driver_id' => $r->driver_id,
             'user_id' => auth()->id(),
@@ -30,6 +27,7 @@ class BookingController extends Controller
 
         return response()->json(['booking_id' => $booking->book_id], 201);
     }
+    
 
     public function pending(Request $request)
     {
@@ -45,8 +43,32 @@ class BookingController extends Controller
         \Log::info('pending() rows found: ' . $bookings->count());
         return response()->json($bookings);
     }
+    public function allActivityHistory()
+{
+    \Log::info('🟡 Fetching bookings...');
+    $bookings = Booking::with(['user', 'driver', 'patients'])->get();
+    \Log::info('✅ Bookings fetched: ' . $bookings->count());
 
+    $result = $bookings->map(function ($booking, $index) {
+        \Log::info("🔍 Mapping booking ID: {$booking->book_id}");
 
+        return [
+            'slno' => $index + 1,
+            'uname' => optional($booking->user)->user_name ?? 'N/A',
+            'uphoneno' => optional($booking->user)->user_phone ?? 'N/A',
+            'dname' => optional($booking->driver)->driver_name ?? 'N/A',
+            'dphoneno' => optional($booking->driver)->driver_phone ?? 'N/A',
+            'vehicleno' => optional($booking->driver)->driver_vehno ?? 'N/A',
+            'pcount' => $booking->p_count ?? 0,
+            'location' => $booking->p_location ?? 'N/A',
+            'timestamp' => $booking->created_at ?? now(),
+        ];
+    });
+
+    \Log::info('✅ Mapping completed.');
+
+    return response()->json($result);
+}
 
 
 
@@ -76,7 +98,6 @@ class BookingController extends Controller
         return response()->json(['message' => 'Booking confirmed']);
     }
 
-    // POST /booking/{id}/cancel
     public function cancel($id)
     {
         $driver = ambulanceDriver::find(Auth::id());
@@ -117,7 +138,7 @@ class BookingController extends Controller
 
     return response()->json([
         'message' => 'No expired bookings',
-        'b_status' => 'active', // still pending or already confirmed
+        'b_status' => 'active', 
     ]);
 }
 
@@ -157,6 +178,26 @@ public function getBookingStatus(Request $request, $bookingId)
 
         return response()->json(['message' => 'Ride completed']);
     }
+
+    public function storePatients(Request $request, $id)
+{
+    if (!$request->has('patients') || !is_array($request->patients)) {
+        return response()->json(['message' => 'No patient data sent'], 200);
+    }
+
+    foreach ($request->patients as $patient) {
+        \App\Models\Patient::create([
+            'book_id' => $id,
+            'p_name' => $patient['p_name'] ?? null,
+            'p_blood' => $patient['p_blood'] ?? null,
+            'p_age' => $patient['p_age'] ?? null,
+        ]);
+    }
+
+    return response()->json(['message' => 'Patient data stored'], 204);
+}
+
+
 
     public function driverStatus()
     {

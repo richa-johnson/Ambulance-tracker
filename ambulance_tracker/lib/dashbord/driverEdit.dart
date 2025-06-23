@@ -121,16 +121,7 @@ class driverEditState extends State<driverEdit> {
                 ),
                 CustomTextField(hint: 'PHONE NO'),
                 SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      "EMAIL ID: ",
-                    ),
-                  ),
-                ),
-                CustomTextField(hint: 'EMAIL ID'),
-                SizedBox(height: 10),
+              
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(padding: EdgeInsets.only(left: 40),

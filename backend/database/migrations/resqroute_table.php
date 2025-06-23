@@ -61,7 +61,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id')->nullable(false);
             $table->string('p_location')->nullable(false);
             $table->integer('p_count')->nullable(false);
-             $table->enum('b_status', ['pending', 'confirmed', 'cancelled', 'expired'])->default('pending');
+            $table->enum('b_status', ['pending', 'confirmed', 'cancelled', 'expired'])->default('pending');
 
             $table->timestamp('created_at')->nullable(false);
             $table->timestamp('end_time')->nullable(true);
@@ -76,9 +76,9 @@ return new class extends Migration {
             $table->id('patient_id')->primary()->autoIncrement();
             $table->unsignedBigInteger('book_id')->nullable(false);
 
-            $table->string('p_name')->nullable(false);
-            $table->string('p_blood')->nullable(false);
-            $table->integer('p_age')->nullable(false);
+            $table->string('p_name')->nullable(true);
+            $table->string('p_blood')->nullable(true);
+            $table->integer('p_age')->nullable(true);
 
             $table->timestamps();
 

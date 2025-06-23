@@ -10,5 +10,10 @@ class Patient extends Model
 
     protected $primaryKey='patient_id';
 
-    protected $fillable=['p_name','p_blood','p_age','p_location'];
+    protected $fillable = ['book_id', 'p_name', 'p_blood', 'p_age'];
+    public $timestamps = true;
+     public function booking()
+    {
+        return $this->belongsTo(Booking::class, 'book_id', 'book_id');
+    }
 }

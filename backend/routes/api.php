@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthManager;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ProfileController;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,10 +17,10 @@ Route::post('/auth/adminregister',[AuthManager::class,'adminregister']);
 Route::post('/auth/login', [AuthManager::class, "login"]);
     
 Route::post('/auth/driverregister',[AuthManager::class,'driverregister']);
+Route::get('/booking/activity-history', [BookingController::class, 'allActivityHistory']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
- 
     Route::post('/auth/logout',[AuthManager::class,'logout']);
     Route::get('/auth/user',[AuthManager::class,'user']);
     Route::put('/driver/status',[DriverStatus::class,'updateDriverStatus']);
@@ -43,9 +44,16 @@ Route::middleware('auth:sanctum')
       ->post('/driver/location', [DriverController::class, 'updateLocation']);
 Route::get('/admin/trackAmbulance/driver/{query}',[DriverController::class, 'getDriverLocation']);
 
-
-
+Route::middleware(['auth:sanctum'])->post('/bookings/{booking}/patients', [BookingController::class, 'storePatients']);
 Route::middleware('auth:sanctum')->get('/user/UserDetails', [DriverController::class, 'getSignedInUserDetails']);
 
 Route::middleware('auth:sanctum')->get('/driver/pending-bookings', [BookingController::class, 'pending']);
+
+
+
 Route::middleware('auth:sanctum')->get('/driver/status', [DriverController::class, 'status']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile',  [ProfileController::class, 'show']);   // GET current data
+    Route::put('/profile',  [ProfileController::class, 'update']); // PUT/PATCH update
+});
