@@ -317,7 +317,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                           final isSelected = tempSector == s;
                           return ChoiceChip(
                             label: Text(
-                              s,
+                              s!,
                               style: TextStyle(
                                 color: isSelected ? Colors.white : Colors.black,
                               ),
@@ -346,7 +346,7 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
                           final isSelected = tempCapacity == c;
                           return ChoiceChip(
                             label: Text(
-                              c,
+                              c!,
                               style: TextStyle(
                                 color: isSelected ? Colors.white : Colors.black,
                               ),
