@@ -16,7 +16,7 @@ class _FacilitiesScreenState extends State<FacilitiesScreen> {
     'Oxygen cylinder with mask',
     'Stretcher and wheelchair',
     'Basic monitoring equipment',
-    'Splints,immobilization devices',
+    'Splints & immobilization devices',
     'Suction device',
     'Cardiac Ambulance',
     'advanced Ventilator',

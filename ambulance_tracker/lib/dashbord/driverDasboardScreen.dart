@@ -197,7 +197,7 @@ class _driverDashboardState extends State<driverDashboard> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => driverEdit(),
+                                builder: (context) => DriverEdit(),
                               ),
                             );
                           } else if (value == 'logout') {
