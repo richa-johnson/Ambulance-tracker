@@ -28,13 +28,15 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/booking/store',[BookingController::class,'store']);
     Route::get('/booking/{booking}/response',[BookingController::class,'respond']);
-    Route::post('/bookings/{booking}/patients', [BookingController::class, 'storePatients']);
+    Route::get('/user/confirmed-booking', [BookingController::class, 'getConfirmedBooking']);
+    Route::post('/booking/{bookingId}/patients', [BookingController::class, 'storePatients']);
     Route::get('/booking/check-expiry', [BookingController::class, 'expireIfStillPending']);
     Route::get('/booking/{booking}/status', [BookingController::class, 'getBookingStatus']);
     Route::post('/booking/{id}/confirm', [BookingController::class, 'confirm']);
     Route::post('/booking/{id}/cancel', [BookingController::class, 'cancel']);
     Route::post('/booking/{id}/complete', [BookingController::class, 'complete']);
 });
+
 
 Route::middleware(['auth:sanctum'])->get('/admin/users',[AdminController::class,'getAllUsers']);
 Route::get('/user/availableAmbulances',[DriverController::class,'getAvailabledrivers']);

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:ambulance_tracker/constant.dart';
 import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
+import 'package:ambulance_tracker/location/Trackambulance.dart';
 import 'package:ambulance_tracker/location/location.dart';
 import 'package:ambulance_tracker/models/driver_model.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
@@ -154,7 +155,7 @@ class _CustomCardState extends State<CustomCard> {
                             if (mounted) {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => const RoutingPage(),
+                                  builder: (_) => const Trackambulance(),
                                 ),
                               );
                             }
