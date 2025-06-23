@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:ambulance_tracker/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DriverHistory extends StatefulWidget {
   const DriverHistory({super.key});
@@ -8,7 +12,52 @@ class DriverHistory extends StatefulWidget {
 }
 
 class _DriverHistoryState extends State<DriverHistory> {
-  String uname="ravi",phoneno="7736798040",pcount="7",pname="harsha",age="7",bloodGroup="B+",location="snadkugfheanjzxd",date="77-36-7980",time="77:36:79";
+  List<Map<String, String>> historyList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDriverHistory();
+  }
+
+  Future<void> fetchDriverHistory() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  if (token == null || token.isEmpty) {
+    print("⚠️ Token not found. User may not be logged in.");
+    setState(() => isLoading = false);
+    return;
+  }
+
+  final response = await http.get(
+    Uri.parse('$baseURL/booking/driver-history'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    setState(() {
+      historyList = data.map<Map<String, String>>((item) => {
+            'uname': item['uname'] ?? 'N/A',
+            'phoneno': item['phoneno'] ?? 'N/A',
+            'pcount': item['pcount'].toString(),
+            'location': item['location'] ?? 'N/A',
+            'timestamp': item['timestamp'] ?? 'N/A',
+          }).toList();
+      isLoading = false;
+    });
+  } else {
+    print("❌ Failed to load driver history. Status code: ${response.statusCode}");
+    print("Response body: ${response.body}");
+    setState(() => isLoading = false);
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +77,6 @@ class _DriverHistoryState extends State<DriverHistory> {
       ),
 
       body: Container(
-        
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -48,13 +96,13 @@ class _DriverHistoryState extends State<DriverHistory> {
         child: Container(
           height: double.infinity,
           width: double.infinity,
-          padding: EdgeInsets.only(top: 10,right: 10,left: 10),
+          padding: EdgeInsets.only(top: 10, right: 10, left: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
           child: Container(
-            padding: EdgeInsets.only(top: 30,right: 10,left: 10),
+            padding: EdgeInsets.only(top: 30, right: 10, left: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Color.fromRGBO(156, 150, 150, 1),
@@ -68,49 +116,74 @@ class _DriverHistoryState extends State<DriverHistory> {
                     style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 SizedBox(height: 15),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: List.generate(10, (index)=> Padding(
-                        padding: (EdgeInsets.only(bottom: 10)),
-                          child: SizedBox(
-                            height: 265,
-                            width: 350,
-                            child: Card(
-                              color: Color.fromRGBO(255, 255, 255, 1),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Table(
-                                  columnWidths: {
-                                    0:IntrinsicColumnWidth(),
-                                    1:FixedColumnWidth(10),
-                                    2:FlexColumnWidth()
-                                  },
-                                  children: [
-                                    HistoryTable(label: "Booked by", value: uname).build(),
-                                    HistoryTable(label: "Phone No", value: phoneno).build(),
-                                    HistoryTable(label: "No of Patients    ", value: pcount).build(),
-                                    HistoryTable(label: "Patient Name", value: pname).build(),
-                                    HistoryTable(label: "Age", value: age).build(),
-                                    HistoryTable(label: "Blood Group", value: bloodGroup).build(),
-                                    HistoryTable(label: "Location", value: location).build(),
-                                    HistoryTable(label: "Date", value: date).build(),
-                                    HistoryTable(label: "Time", value: time).build(),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ),
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : Column(
+                          children:
+                              historyList
+                                  .map(
+                                    (entry) => Padding(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: SizedBox(
+                                        height: 200,
+                                        width: 350,
+                                        child: Card(
+                                          color: Color.fromRGBO(
+                                            255,
+                                            255,
+                                            255,
+                                            1,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Table(
+                                              columnWidths: {
+                                                0: IntrinsicColumnWidth(),
+                                                1: FixedColumnWidth(10),
+                                                2: FlexColumnWidth(),
+                                              },
+                                              children: [
+                                                HistoryTable(
+                                                  label: "Booked by",
+                                                  value: entry['uname']!,
+                                                ).build(),
+                                                HistoryTable(
+                                                  label: "Phone No",
+                                                  value: entry['phoneno']!,
+                                                ).build(),
+                                                HistoryTable(
+                                                  label: "No of Patients",
+                                                  value: entry['pcount']!,
+                                                ).build(),
+                                                HistoryTable(
+                                                  label: "Location",
+                                                  value: entry['location']!,
+                                                ).build(),
+                                                HistoryTable(
+                                                  label: "Time Stamp",
+                                                  value: entry['timestamp']!,
+                                                ).build(),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                         ),
-                      ),
-                    ),
                   ),
                 ),
               ],
@@ -121,14 +194,19 @@ class _DriverHistoryState extends State<DriverHistory> {
     );
   }
 }
-class HistoryTable{
+
+class HistoryTable {
   final String label;
   final String seperator;
   final String value;
- 
-  HistoryTable({required this.label,this.seperator=":",required this.value});
 
-  TableRow build(){
+  HistoryTable({
+    required this.label,
+    this.seperator = ":",
+    required this.value,
+  });
+
+  TableRow build() {
     return TableRow(
       children: [
         Text(
@@ -136,7 +214,7 @@ class HistoryTable{
           style: TextStyle(
             color: Color.fromRGBO(0, 0, 0, 1),
             fontWeight: FontWeight.w900,
-            fontSize: 17
+            fontSize: 17,
           ),
         ),
         Text(
@@ -144,15 +222,15 @@ class HistoryTable{
           style: TextStyle(
             color: Color.fromRGBO(0, 0, 0, 1),
             fontWeight: FontWeight.w900,
-            fontSize: 17
+            fontSize: 17,
           ),
         ),
         Text(
-          value, 
+          value,
           style: TextStyle(
             color: Color.fromRGBO(0, 0, 0, 1),
             fontWeight: FontWeight.w900,
-            fontSize: 17
+            fontSize: 17,
           ),
         ),
       ],

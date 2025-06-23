@@ -377,6 +377,7 @@ class _CustomCardState extends State<CustomCard> {
       Uri.parse('$baseURL/booking/store'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
@@ -388,7 +389,7 @@ class _CustomCardState extends State<CustomCard> {
     if (res.statusCode == 201) {
       final data = jsonDecode(res.body);
       int bookingId = data['booking_id'];
-      startBookingTimer(bookingId, widget.driver.id);
+      startBookingTimer(bookingId, widget.driver.id!);
       return bookingId;
     }else{
       throw Exception("Booking failed: ${res.body}");
@@ -411,9 +412,6 @@ class _CustomCardState extends State<CustomCard> {
 }
 
  }
-
-
-  
 
   Future<void> _bookDriver() async {
     setState(() => isSubmitting = true);
