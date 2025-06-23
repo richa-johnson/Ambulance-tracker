@@ -58,7 +58,7 @@ class DriverEditController extends GetxController {
     try {
       await _srv.update(
         Driver(
-          id: driverId,
+         
           name: nameCtrl.text.trim(),
           phoneno: phoneCtrl.text.trim(),
           vehicleno: vehNoCtrl.text.trim(),

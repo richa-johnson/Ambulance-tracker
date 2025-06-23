@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/controller/driver_booking_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
+import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:location/location.dart' as loc;
@@ -29,6 +31,7 @@ class TrackpatientState extends State<Trackpatient> {
   String distanceText = '';
   String durationText = '';
   Timer? _refreshTimer;
+  late int _bookingId;
 
   @override
   void initState() {
@@ -55,7 +58,7 @@ class TrackpatientState extends State<Trackpatient> {
       final data = json.decode(response.body);
       final pickupCoords = data['pickup_location'].split(',');
       final driverCoords = data['driver_location'].split(',');
-
+      final int bookid = data['booking_id'];
       final pickupLatLng = LatLng(
         double.parse(pickupCoords[0]),
         double.parse(pickupCoords[1]),
@@ -66,6 +69,7 @@ class TrackpatientState extends State<Trackpatient> {
       );
 
       setState(() {
+        _bookingId = bookid;
         CurrentLocation = driverLatLng;
         destinationLocation = pickupLatLng;
       });
@@ -169,6 +173,22 @@ class TrackpatientState extends State<Trackpatient> {
       _mapController.move(CurrentLocation!, 15);
     } else {
       showMessage("Current location not available");
+    }
+  }
+
+  Future<void> _handleComplete() async {
+    final ctrl = Get.find<DriverBookingController>();
+    try {
+      // optional: show progress UI
+      await ctrl.completeRide(_bookingId);
+      _refreshTimer?.cancel(); // stop 5-second polling
+      if (mounted) {
+        Get.snackbar('Ride Completed', 'You are now available');
+        // navigate to the driver dashboard (adjust route name)
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Could not complete ride');
     }
   }
 
@@ -340,10 +360,8 @@ class TrackpatientState extends State<Trackpatient> {
                                 SizedBox(height: 10),
                                 ElevatedButton(
                                   onPressed: () {
-                                    // You can navigate or pop here
-                                    Navigator.pop(
-                                      context,
-                                    ); // or Navigator.push to dashboard
+                                    _handleComplete();
+                                    // or Navigator.push to dashboard
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.green,

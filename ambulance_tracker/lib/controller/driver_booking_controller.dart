@@ -7,7 +7,7 @@ import '../models/booking.dart';
 enum DriverStatus { available, unavailable, busy }
 
 class DriverBookingController extends GetxController {
-   final bool _isDriver;
+  final bool _isDriver;
 
   DriverBookingController(this._isDriver);
 
@@ -22,15 +22,16 @@ class DriverBookingController extends GetxController {
   // ──────────────────────────────────
   final isBusy = false.obs;
 
-    final _incoming      = Rxn<Booking>();            // ★ NEW: one-slot “inbox”
-  int?  _lastNotifiedId;   
+  final _incoming = Rxn<Booking>(); // ★ NEW: one-slot “inbox”
+  int? _lastNotifiedId;
 
   @override
-   void onReady() {        // ← runs after the first frame of *any* widget
-    super.onReady(); 
-     if (_isDriver) {
-      _checkAvailabilityFromServer(); 
-      ever(_incoming, _showAlert);   // only drivers will start polling
+  void onReady() {
+    // ← runs after the first frame of *any* widget
+    super.onReady();
+    if (_isDriver) {
+      _checkAvailabilityFromServer();
+      ever(_incoming, _showAlert); // only drivers will start polling
     }
   }
 
@@ -46,7 +47,9 @@ class DriverBookingController extends GetxController {
 
   void startPolling() {
     if (_timer != null) return; // already polling
-     if (!_isDriver) return;
+    if (!_isDriver) return;
+
+    print('🌀 Polling started again');
     _poll(); // immediate fetch
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
   }
@@ -57,24 +60,20 @@ class DriverBookingController extends GetxController {
   }
 
   Future<void> _poll() async {
-     if (!_isDriver) return; 
-    
+    if (!_isDriver) return;
 
     if (status.value != DriverStatus.available) {
-     
       return;
     }
     try {
       final list = await _service.getPendingBookings();
 
-    
       bookings.assignAll(list); // keep existing assignment
 
-       if (list.isNotEmpty && list.first.id != _lastNotifiedId) {
-      _incoming.value = list.first;           // triggers ever() → dialog
-      _lastNotifiedId = list.first.id;        // remember it
-    }
-      
+      if (list.isNotEmpty && list.first.id != _lastNotifiedId) {
+        _incoming.value = list.first; // triggers ever() → dialog
+        _lastNotifiedId = list.first.id; // remember it
+      }
     } catch (e, st) {
       print('❌ _poll error: $e');
       print(st);
@@ -122,9 +121,10 @@ class DriverBookingController extends GetxController {
       Get.snackbar('Error', 'Could not complete ride');
     }
   }
-    void _showAlert(Booking? b) {
+
+  void _showAlert(Booking? b) {
     if (b == null) return;
-    _incoming.value = null;                         // reset immediately
+    _incoming.value = null; // reset immediately
 
     Get.dialog(
       AlertDialog(
@@ -141,14 +141,14 @@ class DriverBookingController extends GetxController {
           TextButton(
             onPressed: () async {
               await cancel(b.id);
-              Get.back();                           // close dialog
+              Get.back(); // close dialog
             },
             child: const Text('Reject'),
           ),
           ElevatedButton(
             onPressed: () async {
               await confirm(b.id);
-              Get.back();                           // close dialog
+              Get.back(); // close dialog
             },
             child: const Text('Confirm'),
           ),
@@ -160,9 +160,9 @@ class DriverBookingController extends GetxController {
 
   @override
   void onClose() {
-     print('🔥 DriverBookingController disposed');
+    print('🔥 DriverBookingController disposed');
     _timer?.cancel();
-     _timer = null;
+    _timer = null;
     super.onClose();
   }
 }
