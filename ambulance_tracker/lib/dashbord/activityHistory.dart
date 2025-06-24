@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart'; // Adjust path if needed
 
@@ -88,6 +89,26 @@ class _ActivityHistoryState extends State<ActivityHistory> {
           ),
           child: Column(
             children: [
+              Container(
+                width: double.infinity,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(227, 185, 197, 1),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(10),
+                    bottom: Radius.circular(0),
+                  ),
+                ),
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 10,
+                      ),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>AdminDashboard())),
+                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                    ),
+              ),
               SizedBox(height: 20),
               Text(
                 "ACTIVITY HISTORY",
