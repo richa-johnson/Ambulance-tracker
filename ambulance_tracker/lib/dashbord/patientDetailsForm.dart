@@ -1,4 +1,5 @@
 import 'package:ambulance_tracker/dashbord/availableAmbulance.dart';
+import 'package:ambulance_tracker/dashbord/userdashbordScreen.dart';
 import 'package:ambulance_tracker/location/userLocation.dart'; // import your map page
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart'; // required for LatLng
@@ -99,7 +100,7 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                               top: Radius.circular(10),
                             ),
                           ),
-                          alignment: Alignment.centerRight,
+                          alignment: Alignment.centerLeft,
                           child: Form(
                             key: _formKey,
                             child: Padding(
@@ -107,8 +108,15 @@ class _patientDetailsFormState extends State<patientDetailsForm> {
                                 horizontal: 10,
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.person, size: 30),
-                                onPressed: () {},
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 10,
+                                ),
+                                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>userdashboard())),
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),

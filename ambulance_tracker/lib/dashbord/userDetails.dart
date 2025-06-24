@@ -1,4 +1,5 @@
 import 'package:ambulance_tracker/constant.dart';
+import 'package:ambulance_tracker/dashbord/admindashboard.dart';
 import 'package:ambulance_tracker/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -112,6 +113,26 @@ class _UserDetailsState extends State<UserDetails> {
           ),
           child: Column(
             children: [
+              Container(
+                width: double.infinity,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(227, 185, 197, 1),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(10),
+                    bottom: Radius.circular(0),
+                  ),
+                ),
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 10,
+                      ),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>AdminDashboard())),
+                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                    ),
+              ),
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),

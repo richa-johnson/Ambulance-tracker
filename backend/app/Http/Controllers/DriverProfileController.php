@@ -10,7 +10,6 @@ class DriverProfileController extends Controller
 {
      public function show(Request $request)
     {
-        // eager-load facilities so Flutter gets the list
         return $request->user()->load('facilities:driver_id,facility');
     }
 

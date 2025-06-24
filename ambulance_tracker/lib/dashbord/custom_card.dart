@@ -452,6 +452,14 @@ class _CustomCardState extends State<CustomCard> {
               d.name,
               style: const TextStyle(fontSize: 24, color: Colors.white),
             ),
+            const SizedBox(height: 4),
+            if (d.distance != null)
+              Text(
+                '${d.distance!.toStringAsFixed(2)} km away',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            const SizedBox(height: 8),
+
             const SizedBox(height: 8),
             Row(
               children: [
@@ -471,6 +479,7 @@ class _CustomCardState extends State<CustomCard> {
                   d.vehicleno,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
+
                 const Spacer(),
                 ValueListenableBuilder<bool>(
                   valueListenable: widget.bookingLocked,

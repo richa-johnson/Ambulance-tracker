@@ -83,15 +83,23 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
         final distB = calculateDistance(pickupLat, pickupLng, bLat, bLng);
         return distA.compareTo(distB);
       });
-      final List<Driver> fetchedDrivers =
-          availableDrivers.map((e) => Driver.fromJson(e)).toList();
-      setState(() {
-        drivers = fetchedDrivers;
-      });
-      return fetchedDrivers;
-    }
-    throw Exception('Failed to load drivers');
+      final List<Driver> fetchedDrivers = availableDrivers.map((e) {
+      final driver = Driver.fromJson(e);
+      final locationParts = (e['location'] ?? '0,0').split(',');
+      final lat = double.tryParse(locationParts[0].trim()) ?? 0.0;
+      final lng = double.tryParse(locationParts[1].trim()) ?? 0.0;
+      driver.distance = calculateDistance(pickupLat, pickupLng, lat, lng);
+      return driver;
+    }).toList();
+
+    setState(() {
+      drivers = fetchedDrivers;
+    });
+
+    return fetchedDrivers;
   }
+  throw Exception('Failed to load drivers');
+}
 
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     const R = 6371;
@@ -234,42 +242,42 @@ class _AvailableAmbulanceState extends State<AvailableAmbulance> {
 
                     return Column(
                       children:
-                          showDrivers
-                              .map(
-                                (d) => CustomCard(
-                                  key: ValueKey(d.id),
-                                  driver: d,
-                                  pickupLocation: widget.pickupLocation,
-                                  patientCount: widget.patientCount,
-                                  patientList: widget.patientList,
-                                  bookingLocked: bookingLocked,
-                                  onBookingResult: (result) {
-                                    if (result != null &&
-                                        result['expired'] == true) {
-                                      setState(() {
-                                        drivers.removeWhere(
-                                          (driver) =>
-                                              driver.id == result['driverId'],
-                                        );
-                                        bookingLocked.value = false;
-                                      });
+                      showDrivers
+                      .map(
+                        (d) => CustomCard(
+                          key: ValueKey(d.id),
+                          driver: d,
+                          pickupLocation: widget.pickupLocation,
+                          patientCount: widget.patientCount,
+                          patientList: widget.patientList,
+                          bookingLocked: bookingLocked,
+                          onBookingResult: (result) {
+                            if (result != null &&
+                                result['expired'] == true) {
+                              setState(() {
+                                drivers.removeWhere(
+                                  (driver) =>
+                                      driver.id == result['driverId'],
+                                );
+                                bookingLocked.value = false;
+                              });
 
-                                      loadDrivers();
+                              loadDrivers();
 
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            '⏱️ Booking expired. Please choose another ambulance.',
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    '⏱️ Booking expired. Please choose another ambulance.',
+                                  ),
                                 ),
-                              )
-                              .toList(),
+                              );
+                            }
+                          },
+                        ),
+                      )
+                      .toList(),
                     );
                   },
                 ),
