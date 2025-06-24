@@ -168,16 +168,21 @@ public function getBookingStatus(Request $request, $bookingId)
 
         // 1) Mark booking done
         $booking->b_status = 'completed';
+        $booking->end_time = now();
         $booking->save();
 
         // 2) Free the driver
-        ambulanceDriver::where('id', auth()->id())
+        ambulanceDriver::where('driver_id', auth()->id())
             ->update(['driver_status' => 'available']);
 
         Log::info('Ride completed', ['id' => $id]);
 
         return response()->json(['message' => 'Ride completed']);
     }
+
+
+
+
 
     public function storePatients(Request $request, $id)
 {

@@ -376,6 +376,7 @@ class _CustomCardState extends State<CustomCard> {
       Uri.parse('$baseURL/booking/store'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
@@ -449,7 +450,7 @@ class _CustomCardState extends State<CustomCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              d.name!,
+              d.name,
               style: const TextStyle(fontSize: 24, color: Colors.white),
             ),
             const SizedBox(height: 8),
@@ -458,7 +459,7 @@ class _CustomCardState extends State<CustomCard> {
                 const Icon(Icons.phone, color: Colors.white, size: 18),
                 const SizedBox(width: 5),
                 Text(
-                  d.phoneno!,
+                  d.phoneno,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
@@ -468,7 +469,7 @@ class _CustomCardState extends State<CustomCard> {
               children: [
                 const SizedBox(width: 25),
                 Text(
-                  d.vehicleno!,
+                  d.vehicleno,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 const Spacer(),
@@ -555,11 +556,11 @@ class _CustomCardState extends State<CustomCard> {
                       ),
                       builder:
                           (_) => _DriverDetailsSheet(
-                            name: d.name!,
-                            sector: d.sector!,
+                            name: d.name,
+                            sector: d.sector,
                             district: d.district ?? '',
-                            capacity: d.capacity!,
-                            facilities: d.facilities!,
+                            capacity: d.capacity,
+                            facilities: d.facilities,
                           ),
                     );
                   },
