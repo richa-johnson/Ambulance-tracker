@@ -46,8 +46,7 @@ class _CustomCardState extends State<CustomCard> {
   bool _hasShownStatusDialog = false;
 
   @override
-  void 
-    pose() {
+  void pose() {
     countdownTimer?.cancel();
     statusCheckTimer?.cancel();
     super.dispose();
@@ -391,7 +390,7 @@ class _CustomCardState extends State<CustomCard> {
       int bookingId = data['booking_id'];
       startBookingTimer(bookingId, widget.driver.id!);
       return bookingId;
-    }else{
+    } else {
       throw Exception("Booking failed: ${res.body}");
     }
   }
@@ -406,12 +405,11 @@ class _CustomCardState extends State<CustomCard> {
       body: jsonEncode({'patients': widget.patientList}),
     );
     if (res.statusCode != 200 &&
-    res.statusCode != 201 &&
-    res.statusCode != 204) {
-  throw Exception('Patient upload failed: ${res.body}');
-}
-
- }
+        res.statusCode != 201 &&
+        res.statusCode != 204) {
+      throw Exception('Patient upload failed: ${res.body}');
+    }
+  }
 
   Future<void> _bookDriver() async {
     setState(() => isSubmitting = true);
@@ -423,9 +421,9 @@ class _CustomCardState extends State<CustomCard> {
       if (bookingId != null) {
         setState(() => isPressed = true);
         widget.bookingLocked.value = true; // lock every card
-        ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Booking successful!")),
-    );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Booking successful!")));
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -575,7 +573,6 @@ class _CustomCardState extends State<CustomCard> {
     );
   }
 }
-  
 
 class _DriverDetailsSheet extends StatelessWidget {
   final String name;
@@ -675,4 +672,3 @@ class _DriverDetailsSheet extends StatelessWidget {
     );
   }
 }
-  

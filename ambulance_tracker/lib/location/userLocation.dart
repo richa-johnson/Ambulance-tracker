@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:http/http.dart' as http;
 
 class SelectLocationPage extends StatefulWidget {
   const SelectLocationPage({super.key});
@@ -13,8 +15,8 @@ class SelectLocationPage extends StatefulWidget {
 class _SelectLocationPageState extends State<SelectLocationPage> {
   LatLng? currentLocation;
   LatLng? pinnedLocation;
-
   final mapController = MapController();
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -41,6 +43,36 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
     setState(() {
       pinnedLocation = latlng;
     });
+  }
+
+  Future<void> _searchLocation(String query) async {
+    final url = Uri.parse(
+      "https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=1",
+    );
+    final response = await http.get(
+      url,
+      headers: {
+        'User-Agent': 'ambulance_tracker_app', // Required by Nominatim API
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        final lat = double.parse(data[0]['lat']);
+        final lon = double.parse(data[0]['lon']);
+        final searchedLocation = LatLng(lat, lon);
+
+        setState(() {
+          pinnedLocation = searchedLocation;
+          mapController.move(searchedLocation, 15.0);
+        });
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Location not found")));
+      }
+    }
   }
 
   @override
@@ -91,6 +123,40 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
                         ],
                       ),
                     ],
+                  ),
+                  // Search Bar
+                  Positioned(
+                    top: 10,
+                    left: 15,
+                    right: 15,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Search location',
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 16,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onSubmitted: _searchLocation,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            _searchLocation(searchController.text);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   if (pinnedLocation != null)
                     Positioned(
