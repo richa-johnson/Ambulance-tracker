@@ -9,6 +9,7 @@ class Driver {
   final String capacity;
   final String district;
   final List<String> facilities;
+  double? distance;
 
   Driver({
     required this.id,
@@ -19,6 +20,7 @@ class Driver {
     required this.capacity,
     required this.district,
     required this.facilities,
+    required this.distance
   });
 
   factory Driver.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class Driver {
       sector: json['sector'],
       capacity: json['capacity']?.toString() ?? '',
       facilities: parsedFacilities,
+      distance: null
     );
   }
 }
