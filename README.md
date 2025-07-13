@@ -1,6 +1,6 @@
-#  ResqRoute – Real-Time Ambulance Tracker
+#  resQroute – Real-Time Ambulance Tracker
 
-**ResqRoute** is a real-time ambulance tracking and booking platform developed during our internship at **DITS, Kannur**. It addresses the emergency service gap by connecting patients to the nearest available ambulances — both government and private — based on real-time location and medical needs.
+**resQroute** is a real-time ambulance tracking and booking platform developed during our internship at **DITS, Kannur**. It addresses the emergency service gap by connecting patients to the nearest available ambulances — both government and private — based on real-time location and medical needs.
 
 ---
 
